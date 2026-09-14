@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+:root {
+  --app-bg: #090a0c;
+  --app-surface-1: #111318;
+  --app-surface-2: #181b22;
+  --app-surface-hover: #222630;
+  --app-border: rgba(255, 255, 255, 0.1);
+  --app-border-strong: rgba(255, 255, 255, 0.22);
+  --app-foreground: #f3f4f6;
+  --app-muted: #9ca3af;
+  --app-faint: rgba(255, 255, 255, 0.05);
+  --app-accent: #f59e0b;
+  --app-accent-hover: #fbbf24;
+  --app-accent-soft: rgba(245, 158, 11, 0.12);
+  --app-green: #34d399;
+  --app-orange: #f97316;
+  --app-red: #ff4500;
+  --app-blue: #fbbf24;
+  --app-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+  --app-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.7);
+  --app-glow: 0 4px 20px rgba(245, 158, 11, 0.12);
+}
+
+@theme inline {
+  --color-background: var(--app-bg);
+  --color-obsidian: var(--app-bg);
+  --color-surface: var(--app-surface-2);
+  --color-surface-1: var(--app-surface-1);
+  --color-surface-2: var(--app-surface-2);
+  --color-surface-hover: var(--app-surface-hover);
+  --color-sidebar: var(--app-surface-1);
+  --color-border: var(--app-border);
+  --color-borderstrong: var(--app-border-strong);
+  --color-foreground: var(--app-foreground);
+  --color-muted: var(--app-muted);
+  --color-faint: var(--app-faint);
+  --color-accent: var(--app-accent);
+  --color-accent-hover: var(--app-accent-hover);
+  --color-accent-soft: var(--app-accent-soft);
+  --color-success: var(--app-green);
+  --color-warning: var(--app-orange);
+  --color-danger: var(--app-red);
+  --color-info: var(--app-blue);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--app-bg);
+  color: var(--app-foreground);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--app-accent-soft);
+  color: var(--app-foreground);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 158, 11, 0.4);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+/* Signature text gradient */
+.text-gold-gradient {
+  background: linear-gradient(
+    90deg,
+    #fde68a 0%,
+    #fbbf24 45%,
+    #f97316 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Signature surface gradient (dark gold) */
+.surface-gold-gradient {
+  background: linear-gradient(to bottom, #1e222b 0%, #12141a 100%);
+}
+
+/* Subtle glow mask for ambient backgrounds */
+.glow-mask {
+  background: radial-gradient(
+    circle at top,
+    rgba(245, 158, 11, 0.15) 0%,
+    transparent 70%
+  );
+}
