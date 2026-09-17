@@ -1,0 +1,96 @@
+import type { Language, Task, TaskPriority, TaskStatus, TimeBlock } from "@/types";
+
+export interface TaskRow {
+  id: string;
+  user_id: string;
+  title: string;
+  notes: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  due_date: string | null;
+  completed_at: string | null;
+  order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BlockRow {
+  id: string;
+  user_id: string;
+  task_id: string | null;
+  title: string;
+  date: string;
+  start: string;
+  end: string;
+  color: TimeBlock["color"];
+  external_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export function taskFromRow(row: TaskRow): Task {
+  return {
+    id: row.id,
+    title: row.title,
+    notes: row.notes ?? "",
+    status: row.status,
+    priority: row.priority,
+    dueDate: row.due_date ?? undefined,
+    completedAt: row.completed_at ?? undefined,
+    order: Number(row.order ?? 0),
+    createdAt: row.created_at ?? new Date().toISOString(),
+  };
+}
+
+export function blockFromRow(row: BlockRow): TimeBlock {
+  return {
+    id: row.id,
+    taskId: row.task_id ?? undefined,
+    title: row.title,
+    date: row.date,
+    start: row.start,
+    end: row.end,
+    color: row.color ?? "default",
+    externalId: row.external_id ?? undefined,
+  };
+}
+
+export function taskToRow(userId: string, task: Task): Omit<TaskRow, "created_at" | "updated_at"> {
+  return {
+    id: task.id,
+    user_id: userId,
+    title: task.title,
+    notes: task.notes ?? "",
+    status: task.status,
+    priority: task.priority ?? "medium",
+    due_date: task.dueDate ?? null,
+    completed_at: task.completedAt ?? null,
+    order: Number(task.order ?? 0),
+  };
+}
+
+export function blockToRow(userId: string, block: TimeBlock): Omit<BlockRow, "created_at" | "updated_at"> {
+  return {
+    id: block.id,
+    user_id: userId,
+    task_id: block.taskId ?? null,
+    title: block.title,
+    date: block.date,
+    start: block.start,
+    end: block.end,
+    color: block.color ?? "default",
+    external_id: block.externalId ?? null,
+  };
+}
+
+export type CloudData = {
+  tasks: Task[];
+  blocks: TimeBlock[];
+  language: Language;
+};
+
+export type LanguageRow = { language: Language };
+
+export function isLanguage(value: unknown): value is Language {
+  return value === "es" || value === "en";
+}

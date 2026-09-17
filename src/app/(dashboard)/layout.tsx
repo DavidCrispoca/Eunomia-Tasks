@@ -9,6 +9,7 @@ import { CommandPalette } from "@/components/command/command-palette";
 import { TaskModal } from "@/components/task-modal";
 import { PomodoroProvider } from "@/providers/pomodoro-provider";
 import { PomodoroChip } from "@/components/pomodoro/pomodoro-chip";
+import { useUi } from "@/providers/ui-provider";
 
 export default function DashboardLayout({
   children,
@@ -46,9 +47,21 @@ export default function DashboardLayout({
         <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
         <TaskModal />
         <PomodoroChip />
+        <UrlHandlers />
       </div>
     </PomodoroProvider>
   );
+}
+
+function UrlHandlers() {
+  const { openCreateTask } = useUi();
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("quickadd")) {
+      openCreateTask();
+    }
+  }, [openCreateTask]);
+  return null;
 }
 
 function PageTransition({ children }: { children: React.ReactNode }) {

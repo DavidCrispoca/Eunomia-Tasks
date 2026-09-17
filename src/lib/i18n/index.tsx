@@ -12,6 +12,7 @@ import en from "@/lib/i18n/dictionaries/en";
 import type { Dictionary } from "@/lib/i18n/dictionaries/es";
 import { LANG_KEY, localStorageStore } from "@/lib/storage/local-storage-store";
 import { useSynced } from "@/lib/storage/synced";
+import { saveUserLanguage } from "@/lib/data/actions";
 
 interface LanguageContextValue {
   lang: Language;
@@ -22,12 +23,23 @@ interface LanguageContextValue {
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
+export function LanguageProvider({
+  syncToCloud = false,
+  children,
+}: {
+  syncToCloud?: boolean;
+  children: ReactNode;
+}) {
   const lang = useSynced<Language>(LANG_KEY, () => "es");
 
   useEffect(() => {
     document.documentElement.lang = lang;
   }, [lang]);
+
+  useEffect(() => {
+    if (!syncToCloud) return;
+    void saveUserLanguage(lang);
+  }, [lang, syncToCloud]);
 
   const setLanguage = (next: Language) => {
     localStorageStore.saveLanguage(next);

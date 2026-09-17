@@ -3,10 +3,13 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
+  useRef,
   type ReactNode,
 } from "react";
 import type { Task, TimeBlock, TaskPriority, TaskStatus } from "@/types";
+import type { CloudData } from "@/lib/data/mappers";
 import {
   BLOCKS_KEY,
   TASKS_KEY,
@@ -15,6 +18,7 @@ import {
   localStorageStore,
 } from "@/lib/storage/local-storage-store";
 import { useSynced } from "@/lib/storage/synced";
+import { persistCloudData, pullCloudData } from "@/lib/data/actions";
 import { uid } from "@/lib/utils";
 
 interface NewTaskInput {
@@ -49,9 +53,98 @@ interface DataContextValue {
 
 const DataContext = createContext<DataContextValue | null>(null);
 
-export function DataProvider({ children }: { children: ReactNode }) {
+function readRaw(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+/** Serialización canónica (orden de claves estable) para comparar datasets. */
+function canonicalJson(value: unknown): string {
+  return JSON.stringify(value, (_, current) =>
+    current !== null &&
+    typeof current === "object" &&
+    !Array.isArray(current)
+      ? Object.fromEntries(
+          Object.entries(current as Record<string, unknown>).sort(
+            ([a], [b]) => (a < b ? -1 : a > b ? 1 : 0),
+          ),
+        )
+      : current,
+  );
+}
+
+function hasRawValue(key: string, value: unknown): boolean {
+  const raw = readRaw(key);
+  return raw !== null && canonicalJson(JSON.parse(raw)) === canonicalJson(value);
+}
+
+export function DataProvider({
+  initialData,
+  children,
+}: {
+  initialData?: CloudData | null;
+  children: ReactNode;
+}) {
   const tasks = useSynced<Task[]>(TASKS_KEY, () => defaultTasks());
   const blocks = useSynced<TimeBlock[]>(BLOCKS_KEY, () => defaultTimeBlocks());
+
+  const cloud = Boolean(initialData);
+  const hydrated = useRef(false);
+
+  // 1. Hidratar el almacén local con los datos del servidor en el primer render.
+  useEffect(() => {
+    if (!initialData || hydrated.current) return;
+    hydrated.current = true;
+    try {
+      if (!hasRawValue(TASKS_KEY, initialData.tasks)) {
+        localStorageStore.saveTasks(initialData.tasks);
+      }
+      if (!hasRawValue(BLOCKS_KEY, initialData.blocks)) {
+        localStorageStore.saveTimeBlocks(initialData.blocks);
+      }
+    } catch {
+      // sin almacenamiento local: seguimos con los datos en memoria
+    }
+  }, [initialData]);
+
+  // 2. Persistir en la nube cada cambio (optimista + debounce).
+  const persistTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!cloud) return;
+    if (persistTimer.current) clearTimeout(persistTimer.current);
+    persistTimer.current = setTimeout(() => {
+      void persistCloudData(tasks, blocks);
+    }, 600);
+    return () => {
+      if (persistTimer.current) clearTimeout(persistTimer.current);
+    };
+  }, [tasks, blocks, cloud]);
+
+  // 3. Sincronizar entre dispositivos: polling + focus por si cambió en la nube.
+  useEffect(() => {
+    if (!cloud) return;
+    const pull = async () => {
+      if (persistTimer.current) return; // no pisar una edición aún no persistida
+      const data = await pullCloudData();
+      if (!data) return;
+      if (!hasRawValue(TASKS_KEY, data.tasks)) {
+        localStorageStore.saveTasks(data.tasks);
+      }
+      if (!hasRawValue(BLOCKS_KEY, data.blocks)) {
+        localStorageStore.saveTimeBlocks(data.blocks);
+      }
+    };
+    const onFocus = () => void pull();
+    window.addEventListener("focus", onFocus);
+    const interval = window.setInterval(() => void pull(), 30_000);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      window.clearInterval(interval);
+    };
+  }, [cloud]);
 
   const value = useMemo<DataContextValue>(
     () => ({

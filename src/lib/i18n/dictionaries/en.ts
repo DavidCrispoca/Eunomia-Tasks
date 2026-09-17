@@ -10,6 +10,24 @@ const en: Dictionary = {
     kanban: "Board",
     calendar: "Calendar",
   },
+  connect: {
+    title: "Connections",
+    whatsapp: "WhatsApp",
+    whatsappDesc: "Daily briefing and chat commands",
+    calendar: "Google Calendar",
+    calendarDesc: "Sync your focus blocks",
+    phoneLabel: "Your WhatsApp number (international format)",
+    phonePlaceholder: "+52 1 55 1234 5678",
+    sendCode: "Send code",
+    sendCodeHint: (code: string) => `Text from your WhatsApp: verify ${code}`,
+    sendCodeTip:
+      "The code lasts 15 minutes. Reply «verificar <codigo>» in the chat with your business number.",
+    connectGoogle: "Connect Google Calendar",
+    syncNow: "Sync now",
+    syncResult: (created: number, updated: number) =>
+      `Blocks created: ${created} · Updated: ${updated}`,
+    errorGeneric: "Could not complete. Please try again.",
+  },
   common: {
     add: "Add",
     cancel: "Cancel",

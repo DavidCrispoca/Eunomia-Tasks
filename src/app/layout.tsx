@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppProviders } from "@/providers/app-providers";
 import { getSessionUser } from "@/lib/auth/cookies";
+import { loadCloudData } from "@/lib/data/actions";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -26,6 +27,7 @@ export const viewport: Viewport = {
 
 export default async function RootLayout(props: LayoutProps<"/">) {
   const user = await getSessionUser();
+  const cloudData = user && !user.demo ? await loadCloudData() : null;
 
   return (
     <html
@@ -33,7 +35,9 @@ export default async function RootLayout(props: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="h-full flex flex-col">
-        <AppProviders initialUser={user}>{props.children}</AppProviders>
+        <AppProviders initialUser={user} initialData={cloudData}>
+          {props.children}
+        </AppProviders>
       </body>
     </html>
   );
