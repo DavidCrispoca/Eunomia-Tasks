@@ -4,7 +4,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 type Variant = "primary" | "subtle" | "ghost" | "danger";
-type Size = "sm" | "md" | "icon";
+type Size = "sm" | "md" | "lg" | "icon";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
@@ -24,6 +24,7 @@ const variants: Record<Variant, string> = {
 const sizes: Record<Size, string> = {
   sm: "h-7 px-2.5 text-[13px] rounded-lg gap-1.5",
   md: "h-8 px-3 text-sm rounded-lg gap-2",
+  lg: "h-9 px-4 text-sm rounded-lg gap-2",
   icon: "h-8 w-8 rounded-lg justify-center",
 };
 
@@ -37,7 +38,7 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex select-none items-center transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/40 disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex select-none items-center transition-all duration-200 ease-out-expo focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/40 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98] active:duration-75",
         variants[variant],
         sizes[size],
         className,

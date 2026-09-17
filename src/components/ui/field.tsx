@@ -9,7 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const baseField =
-  "w-full rounded-lg border border-white/10 bg-surface-2 px-2.5 text-sm text-foreground placeholder:text-muted transition-colors focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-amber-500/25";
+  "w-full rounded-lg border border-white/10 bg-surface-2 px-2.5 text-sm text-foreground placeholder:text-muted transition-[border-color,box-shadow,background-color] duration-200 ease-out-expo focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-amber-500/25";
 
 export const Input = forwardRef<
   HTMLInputElement,

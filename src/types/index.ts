@@ -29,3 +29,10 @@ export type BlockColor = "default" | "green" | "orange" | "red" | "blue";
 export type Language = "es" | "en";
 
 export type View = "kanban" | "calendar";
+
+export interface AppUser {
+  id: string;
+  email: string;
+  name?: string;
+  demo?: boolean;
+}

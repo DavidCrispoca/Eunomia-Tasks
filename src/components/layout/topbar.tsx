@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, FolderKanban, Plus, Search } from "lucide-react";
+import { CalendarDays, FolderKanban, House, Plus, Search } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { useUi } from "@/providers/ui-provider";
 import { cn } from "@/lib/utils";
@@ -15,9 +15,13 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
   const { openCreateTask } = useUi();
 
   const links = [
+    { href: "/", label: t.nav.home, icon: House },
     { href: "/kanban", label: t.nav.kanban, icon: FolderKanban },
     { href: "/calendar", label: t.nav.calendar, icon: CalendarDays },
   ];
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
     <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-white/10 bg-[#090a0c]/70 px-4 backdrop-blur-xl">
@@ -27,13 +31,13 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
 
       <nav className="flex items-center gap-1 lg:hidden">
         {links.map((item) => {
-          const active = pathname.startsWith(item.href);
+          const active = isActive(item.href);
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-1.5 rounded-lg border border-transparent px-2 py-1.5 text-[13px] transition-colors",
+                "flex items-center gap-1.5 rounded-lg border border-transparent px-2 py-1.5 text-[13px] transition-all duration-200 ease-out-expo",
                 active
                   ? "border-amber-500/20 bg-amber-500/10 text-amber-100"
                   : "text-muted hover:bg-white/5 hover:text-foreground",
@@ -49,7 +53,7 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
       <button
         type="button"
         onClick={onOpenPalette}
-        className="ml-auto flex h-8 w-full max-w-[320px] items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 text-[13px] text-muted backdrop-blur transition-all hover:border-amber-500/30 hover:bg-amber-500/5 hover:text-foreground lg:ml-0"
+        className="ml-auto flex h-8 w-full max-w-[320px] items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 text-[13px] text-muted backdrop-blur transition-all duration-200 ease-out-expo hover:border-amber-500/30 hover:bg-amber-500/5 hover:text-foreground active:scale-[0.99] active:duration-75 lg:ml-0"
       >
         <Search size={13} />
         <span className="truncate">{t.common.search}</span>

@@ -28,11 +28,12 @@ export function TaskCard({ task, onOpen, onToggleDone, overlay }: TaskCardProps)
   return (
     <div
       className={cn(
-        "group relative flex cursor-grab flex-col gap-2 rounded-lg border border-white/10 bg-surface-2 p-2.5",
-        "transition-all duration-300 hover:-translate-y-1 hover:border-amber-500/40 hover:shadow-[0_4px_20px_rgba(245,158,11,0.12)]",
+        "group relative flex cursor-grab flex-col gap-2 rounded-lg border border-white/10 bg-surface-2 p-2.5 shadow-[var(--inset-top)]",
+        "transition-all duration-200 ease-out-expo hover:-translate-y-0.5 hover:border-amber-500/40 hover:shadow-[var(--inset-top),0_4px_20px_rgba(245,158,11,0.12)] active:scale-[0.98] active:duration-75",
         overlay &&
           "rotate-1 scale-105 shadow-[0_10px_30px_rgba(245,158,11,0.25)] ring-1 ring-amber-500/30",
-        Done && "border-emerald-400/20 opacity-70 hover:shadow-[0_4px_20px_rgba(52,211,153,0.12)]",
+        Done &&
+          "border-emerald-400/20 opacity-70 hover:shadow-[var(--inset-top),0_4px_20px_rgba(52,211,153,0.12)]",
       )}
       onClick={onOpen}
       role="button"
@@ -47,6 +48,12 @@ export function TaskCard({ task, onOpen, onToggleDone, overlay }: TaskCardProps)
       {Done && (
         <span
           className="pointer-events-none absolute inset-x-0 top-0 h-px rounded-full bg-gradient-to-r from-emerald-400/50 via-amber-400/40 to-transparent"
+          aria-hidden
+        />
+      )}
+      {task.priority === "high" && !Done && (
+        <span
+          className="pointer-events-none absolute inset-y-2 left-0 w-0.5 rounded-full bg-gradient-to-b from-orange-500 to-amber-400 opacity-80"
           aria-hidden
         />
       )}

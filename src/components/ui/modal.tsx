@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ interface ModalProps {
 }
 
 export function Modal({ open, onClose, children, className, labelledBy }: ModalProps) {
+  const reduceMotion = useReducedMotion();
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -38,7 +39,7 @@ export function Modal({ open, onClose, children, className, labelledBy }: ModalP
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
         >
-          <div
+          <motion.div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
             onClick={onClose}
             aria-hidden
@@ -51,10 +52,14 @@ export function Modal({ open, onClose, children, className, labelledBy }: ModalP
               className,
             )}
             aria-labelledby={labelledBy}
-            initial={{ opacity: 0, y: 12, scale: 0.98 }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.98 }}
-            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { duration: 0.18, ease: [0.16, 1, 0.3, 1] }
+            }
           >
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-amber-500/60 via-orange-500/25 to-transparent" />
             {children}

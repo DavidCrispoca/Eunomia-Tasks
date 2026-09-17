@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppProviders } from "@/providers/app-providers";
+import { getSessionUser } from "@/lib/auth/cookies";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,14 +24,16 @@ export const viewport: Viewport = {
   themeColor: [{ media: "(prefers-color-scheme: dark)", color: "#090A0C" }],
 };
 
-export default function RootLayout(props: LayoutProps<"/">) {
+export default async function RootLayout(props: LayoutProps<"/">) {
+  const user = await getSessionUser();
+
   return (
     <html
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="h-full flex flex-col">
-        <AppProviders>{props.children}</AppProviders>
+        <AppProviders initialUser={user}>{props.children}</AppProviders>
       </body>
     </html>
   );

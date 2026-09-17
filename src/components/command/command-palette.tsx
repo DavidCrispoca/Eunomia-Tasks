@@ -3,7 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Command } from "cmdk";
-import { CalendarDays, Check, FolderKanban, Globe, Plus } from "lucide-react";
+import {
+  CalendarDays,
+  Check,
+  FolderKanban,
+  Globe,
+  House,
+  Plus,
+} from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { useData } from "@/providers/data-provider";
 import { useUi } from "@/providers/ui-provider";
@@ -52,7 +59,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-[#090a0c]/85 shadow-[var(--app-shadow-lg)] backdrop-blur-2xl">
+      <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-[#090a0c]/85 shadow-[var(--inset-top),var(--app-shadow-lg)] backdrop-blur-2xl">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-amber-500/60 via-orange-500/25 to-transparent" />
         <Command
           label="Command palette"
@@ -76,6 +83,13 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             <Command.Empty className="px-3 py-8 text-center text-sm text-muted">
               {t.command.noResults}
             </Command.Empty>
+
+            <Command.Group heading={t.nav.home}>
+              <PaletteItem onSelect={run(() => router.push("/"))}>
+                <House size={14} className="text-amber-300/80" />
+                {t.command.goToHome}
+              </PaletteItem>
+            </Command.Group>
 
             <Command.Group heading={t.nav.kanban}>
               <PaletteItem onSelect={run(() => router.push("/kanban"))}>
@@ -171,7 +185,7 @@ function PaletteItem({
     <Command.Item
       value={value}
       onSelect={onSelect}
-      className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[13.5px] text-foreground transition-colors data-[selected=true]:border-amber-500/25 data-[selected=true]:bg-amber-500/10"
+      className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[13.5px] text-foreground transition-all duration-200 ease-out-expo data-[selected=true]:border-amber-500/25 data-[selected=true]:bg-amber-500/10 active:scale-[0.99] active:duration-75"
     >
       {children}
     </Command.Item>

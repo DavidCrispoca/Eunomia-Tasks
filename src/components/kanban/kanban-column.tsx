@@ -50,9 +50,9 @@ export function KanbanColumn({
       <div
         ref={setNodeRef}
         className={cn(
-          "flex-1 min-h-0 overflow-y-auto rounded-2xl border border-white/5 bg-white/[0.02] p-1.5 transition-all duration-150",
+          "flex-1 min-h-0 overflow-y-auto rounded-2xl border border-white/5 bg-white/[0.02] p-1.5 shadow-[var(--inset-top-soft)] transition-[border-color,box-shadow,background-color] duration-200 ease-out-expo",
           isOver &&
-            "border-amber-500/50 bg-amber-500/[0.06] shadow-[inset_0_0_24px_rgba(245,158,11,0.06)]",
+            "border-amber-500/50 bg-amber-500/[0.06] shadow-[var(--inset-top),inset_0_0_28px_rgba(245,158,11,0.06)]",
         )}
       >
         <SortableContext

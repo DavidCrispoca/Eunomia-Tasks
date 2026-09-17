@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarDays, Flag, Tags } from "lucide-react";
+import Link from "next/link";
+import { CalendarDays, Flag, Tags, Timer } from "lucide-react";
 import type { TaskPriority, TaskStatus } from "@/types";
 import { useUi } from "@/providers/ui-provider";
 import { useData } from "@/providers/data-provider";
@@ -152,6 +153,17 @@ export function TaskModal() {
             <option value="done">{t.kanban.columns.done}</option>
           </Select>
         </div>
+
+        {editing && editing.status !== "done" && (
+          <Link
+            href={`/pomodoro/${editing.id}`}
+            onClick={closeTaskDialog}
+            className="mt-1 flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 px-3 text-sm font-semibold text-black shadow-[0_4px_14px_rgba(249,115,22,0.25)] transition-all duration-200 ease-out-expo hover:brightness-110 hover:shadow-[0_0_25px_rgba(249,115,22,0.4)] active:scale-[0.98] active:duration-75"
+          >
+            <Timer size={15} />
+            {t.task.startWork}
+          </Link>
+        )}
 
         <div className="mt-1 flex items-center justify-between border-t border-white/10 pt-3">
           {editing ? (

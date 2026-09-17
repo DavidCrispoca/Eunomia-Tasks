@@ -1,9 +1,18 @@
 "use client";
 
+import { useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Task } from "@/types";
 import { TaskCard } from "@/components/kanban/task-card";
+
+function cleanAttributes<T extends { "aria-describedby"?: string }>(
+  attributes: T,
+): T {
+  const cleaned = { ...attributes };
+  delete cleaned["aria-describedby"];
+  return cleaned;
+}
 
 interface SortableTaskCardProps {
   task: Task;
@@ -33,11 +42,16 @@ export function SortableTaskCard({
     transition,
   };
 
+  const safeAttributes = useMemo(
+    () => cleanAttributes(attributes),
+    [attributes],
+  );
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
+      {...safeAttributes}
       {...listeners}
       className={
         isDragging

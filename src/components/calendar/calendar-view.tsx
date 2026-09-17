@@ -207,7 +207,7 @@ export function CalendarView() {
 
         <div className="flex flex-col gap-6 lg:flex-row">
           <div className="min-w-0 flex-1">
-            <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.02] shadow-[var(--app-shadow)]">
+            <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.02] shadow-[var(--inset-top),var(--app-shadow)]">
               <div className="min-w-[680px]">
                 <div className="flex border-b border-white/10">
                   <div className="w-12 shrink-0" />
@@ -221,7 +221,7 @@ export function CalendarView() {
                       </span>
                       <span
                         className={cn(
-                          "grid h-7 w-7 place-items-center rounded-lg font-mono text-sm font-semibold",
+                          "grid h-7 w-7 place-items-center rounded-full font-mono text-sm font-semibold",
                           isSameDay(date, new Date()) &&
                             "bg-gradient-to-br from-amber-400 to-orange-600 text-black shadow-[0_0_12px_rgba(245,158,11,0.5)]",
                         )}
@@ -279,7 +279,7 @@ export function CalendarView() {
           </div>
 
           <aside className="w-full shrink-0 lg:w-64">
-            <div className="surface-gold-gradient relative overflow-hidden rounded-2xl border border-white/10 p-3 shadow-[var(--app-shadow)]">
+            <div className="surface-gold-gradient relative overflow-hidden rounded-2xl border border-white/10 p-3 shadow-[var(--inset-top),var(--app-shadow)]">
               <div className="glow-mask pointer-events-none absolute inset-0" />
               <div className="mb-2 flex items-center gap-2 px-1">
                 <span className="text-[13px] font-semibold tracking-tight">
@@ -380,7 +380,7 @@ function DayColumn({ date, blocks, onOpenBlock, onCreateBlock }: DayColumnProps)
               key={block.id}
               type="button"
               className={cn(
-                "absolute inset-x-1 relative z-[1] overflow-hidden rounded-lg border px-2 py-1 text-left text-[11px] leading-tight shadow-sm transition-transform hover:scale-[1.02] hover:shadow-[0_4px_16px_rgba(245,158,11,0.15)]",
+                "absolute inset-x-1 relative z-[1] overflow-hidden rounded-lg border px-2 py-1 text-left text-[11px] leading-tight shadow-sm transition-[transform,box-shadow] duration-200 ease-out-expo hover:scale-[1.02] hover:shadow-[0_4px_16px_rgba(245,158,11,0.15)] active:scale-[0.98]",
                 BLOCK_COLORS[block.color ?? "default"],
               )}
               style={{ top: top + 1, height: height - 2 }}
@@ -402,7 +402,7 @@ function DayColumn({ date, blocks, onOpenBlock, onCreateBlock }: DayColumnProps)
       <button
         type="button"
         aria-label={`${date} ＋`}
-        className="absolute bottom-1 right-1 grid h-6 w-6 place-items-center rounded-lg border border-white/10 bg-black/40 text-muted opacity-0 shadow-sm transition-all hover:border-amber-500/40 hover:text-amber-400 group-hover:opacity-100"
+        className="absolute bottom-1 right-1 grid h-6 w-6 place-items-center rounded-lg border border-white/10 bg-black/40 text-muted opacity-0 shadow-sm transition-all duration-200 ease-out-expo hover:border-amber-500/40 hover:text-amber-400 group-hover:opacity-100 active:scale-[0.92] active:duration-75"
         onClick={() => onCreateBlock(date)}
       >
         <CalendarPlus size={13} />
@@ -419,10 +419,16 @@ function UnscheduledTask({ task }: { task: Task }) {
       data: { type: "task", task },
     });
 
+  const safeAttributes = useMemo(() => {
+    const cleaned = { ...attributes } as { "aria-describedby"?: string };
+    delete cleaned["aria-describedby"];
+    return cleaned;
+  }, [attributes]);
+
   return (
     <li
       ref={setNodeRef}
-      {...attributes}
+      {...safeAttributes}
       {...listeners}
       style={{
         transform: transform
@@ -430,7 +436,7 @@ function UnscheduledTask({ task }: { task: Task }) {
           : undefined,
       }}
       className={cn(
-        "flex cursor-grab items-center gap-2 rounded-lg border border-white/10 bg-surface-2 px-2.5 py-2 text-[12.5px] transition-all duration-200 hover:border-amber-500/35 hover:bg-surface-hover hover:shadow-[0_4px_16px_rgba(245,158,11,0.1)]",
+        "flex cursor-grab items-center gap-2 rounded-lg border border-white/10 bg-surface-2 px-2.5 py-2 text-[12.5px] shadow-[var(--inset-top)] transition-all duration-200 ease-out-expo hover:-translate-y-px hover:border-amber-500/35 hover:bg-surface-hover hover:shadow-[var(--inset-top),0_4px_16px_rgba(245,158,11,0.1)]",
         isDragging && "opacity-40 ring-1 ring-amber-500/30",
       )}
     >
