@@ -23,7 +23,6 @@ export interface BlockRow {
   start: string;
   end: string;
   color: TimeBlock["color"];
-  external_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -51,7 +50,6 @@ export function blockFromRow(row: BlockRow): TimeBlock {
     start: row.start,
     end: row.end,
     color: row.color ?? "default",
-    externalId: row.external_id ?? undefined,
   };
 }
 
@@ -79,7 +77,6 @@ export function blockToRow(userId: string, block: TimeBlock): Omit<BlockRow, "cr
     start: block.start,
     end: block.end,
     color: block.color ?? "default",
-    external_id: block.externalId ?? null,
   };
 }
 

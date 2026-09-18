@@ -14,18 +14,12 @@ const en: Dictionary = {
     title: "Connections",
     whatsapp: "WhatsApp",
     whatsappDesc: "Daily briefing and chat commands",
-    calendar: "Google Calendar",
-    calendarDesc: "Sync your focus blocks",
     phoneLabel: "Your WhatsApp number (international format)",
     phonePlaceholder: "+52 1 55 1234 5678",
     sendCode: "Send code",
     sendCodeHint: (code: string) => `Text from your WhatsApp: verify ${code}`,
     sendCodeTip:
       "The code lasts 15 minutes. Reply «verificar <codigo>» in the chat with your business number.",
-    connectGoogle: "Connect Google Calendar",
-    syncNow: "Sync now",
-    syncResult: (created: number, updated: number) =>
-      `Blocks created: ${created} · Updated: ${updated}`,
     errorGeneric: "Could not complete. Please try again.",
   },
   common: {
@@ -164,8 +158,6 @@ const en: Dictionary = {
     passwordPlaceholder: "At least 6 characters",
     submitLogin: "Sign in",
     submitRegister: "Create account",
-    continueWithGoogle: "Continue with Google",
-    orDivider: "or continue with",
     toRegister: "No account?",
     registerWord: "Sign up",
     toLogin: "Already have an account?",
@@ -179,7 +171,6 @@ const en: Dictionary = {
       exists: "An account with that email already exists.",
       generic: "Something went wrong. Please try again.",
       notAllowed: "This email is not authorized. The app is for personal use.",
-      notConfigured: "Google authentication is not configured.",
     },
   },
 };

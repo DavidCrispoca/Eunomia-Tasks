@@ -22,7 +22,6 @@ export interface TimeBlock {
   start: string;
   end: string;
   color?: BlockColor;
-  externalId?: string;
 }
 
 export type BlockColor = "default" | "green" | "orange" | "red" | "blue";

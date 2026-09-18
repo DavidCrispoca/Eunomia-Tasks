@@ -4,15 +4,10 @@ import { redirect } from "next/navigation";
 import type { AppUser } from "@/types";
 import { endSession, startSession } from "@/lib/auth/cookies";
 import { isAllowedEmail, isSupabaseConfigured } from "@/lib/auth/config";
-import {
-  signInWithPassword,
-  signUpUser,
-  googleOAuthUrl,
-} from "@/lib/auth/supabase";
+import { signInWithPassword, signUpUser } from "@/lib/auth/supabase";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD = 6;
-const APP_URL = process.env.APP_URL ?? "http://localhost:3000";
 
 export type AuthState = { messageKey?: string } | undefined;
 
@@ -61,14 +56,6 @@ export async function login(
   }
 
   redirect("/");
-}
-
-export async function googleLogin(): Promise<{ url?: string; messageKey?: string }> {
-  if (!isSupabaseConfigured()) return { messageKey: "notConfigured" };
-  const redirectTo = `${APP_URL}/api/auth/google/callback`;
-  const url = await googleOAuthUrl(redirectTo);
-  if (!url) return { messageKey: "notConfigured" };
-  return { url };
 }
 
 export async function signup(

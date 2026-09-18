@@ -455,86 +455,8 @@ export async function resolveWhatsAppCode(
 }
 
 // ─────────────────────────────────────────────────────────────
-// Google Calendar (tokens y bloques)
+// Utilidades de base de datos
 // ─────────────────────────────────────────────────────────────
-
-export type GoogleTokensRow = {
-  user_id: string;
-  email: string | null;
-  refresh_token: string | null;
-  access_token: string | null;
-  expires_at: string | null;
-};
-
-export async function getGoogleTokens(
-  userId: string,
-): Promise<GoogleTokensRow | null> {
-  const db = supabaseAdmin();
-  if (!db) return null;
-  const res = await db
-    .from("google_tokens")
-    .select("*")
-    .eq("user_id", userId)
-    .maybeSingle();
-  return (res.data as unknown as GoogleTokensRow | null) ?? null;
-}
-
-export async function setGoogleTokens(
-  userId: string,
-  tokens: {
-    email?: string | null;
-    refreshToken: string;
-    accessToken: string;
-    expiresAt: string;
-  },
-): Promise<boolean> {
-  const db = supabaseAdmin();
-  if (!db) return false;
-  const res = await db
-    .from("google_tokens")
-    .upsert(
-      {
-        user_id: userId,
-        email: tokens.email ?? null,
-        refresh_token: tokens.refreshToken,
-        access_token: tokens.accessToken,
-        expires_at: tokens.expiresAt,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id" },
-    );
-  return !res.error;
-}
-
-export async function getBlocksForUser(
-  userId: string,
-): Promise<TimeBlock[]> {
-  const db = supabaseAdmin();
-  if (!db) return [];
-  const res = await db
-    .from("time_blocks")
-    .select("*")
-    .eq("user_id", userId)
-    .order("date", { ascending: true })
-    .order("start", { ascending: true });
-  if (res.error) return [];
-  return (res.data as unknown as BlockRow[]).map(blockFromRow);
-}
-
-export async function setBlockExternalId(
-  userId: string,
-  blockId: string,
-  externalId: string,
-): Promise<boolean> {
-  const db = supabaseAdmin();
-  if (!db) return false;
-  const res = await db
-    .from("time_blocks")
-    .update({ external_id: externalId, updated_at: new Date().toISOString() })
-    .eq("id", blockId)
-    .eq("user_id", userId);
-  return !res.error;
-}
 
 export async function isDatabaseReady(): Promise<boolean> {
   return isSupabaseConfigured() && supabaseAdmin() !== null;

@@ -1,7 +1,5 @@
 import { createClient, type User } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
 import { isSupabaseConfigured, supabaseEnv } from "@/lib/auth/config";
-import { createCookieSupabaseClient } from "@/lib/auth/supabase-ssr";
 
 export interface AuthResult {
   user: User | null;
@@ -40,24 +38,4 @@ export async function signUpUser(params: {
   });
   if (error) return { user: null, error: String(error.code ?? error.message) };
   return { user: data.user };
-}
-
-/**
- * URL de inicio de sesión con Google (flujo PKCE).
- * Se usa el cliente SSR con cookies para que el verifier PKCE persista entre
- * la generación de la URL y el intercambio en el callback.
- */
-export async function googleOAuthUrl(
-  redirectTo: string,
-): Promise<string | null> {
-  if (!isSupabaseConfigured()) return null;
-  const store = await cookies();
-  const client = createCookieSupabaseClient(() => store);
-  if (!client) return null;
-  const { data, error } = await client.auth.signInWithOAuth({
-    provider: "google",
-    options: { redirectTo },
-  });
-  if (error) return null;
-  return data.url ?? null;
 }

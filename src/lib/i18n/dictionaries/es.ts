@@ -12,18 +12,12 @@ const es = {
     title: "Conexiones",
     whatsapp: "WhatsApp",
     whatsappDesc: "Briefing diario y comandos por chat",
-    calendar: "Google Calendar",
-    calendarDesc: "Sincroniza tus bloques de enfoque",
     phoneLabel: "Tu número de WhatsApp (formato internacional)",
     phonePlaceholder: "+52 1 55 1234 5678",
     sendCode: "Enviar código",
     sendCodeHint: (code: string) => `Envía desde tu WhatsApp: verificar ${code}`,
     sendCodeTip:
       "El código dura 15 minutos. Escribe «verificar <código>» en el chat con el número de tu negocio.",
-    connectGoogle: "Conectar Google Calendar",
-    syncNow: "Sincronizar ahora",
-    syncResult: (created: number, updated: number) =>
-      `Bloques creados: ${created} · Actualizados: ${updated}`,
     errorGeneric: "No se pudo completar. Inténtalo de nuevo.",
   },
   common: {
@@ -163,8 +157,6 @@ const es = {
     passwordPlaceholder: "Mínimo 6 caracteres",
     submitLogin: "Iniciar sesión",
     submitRegister: "Crear cuenta",
-    continueWithGoogle: "Continuar con Google",
-    orDivider: "o continúa con",
     toRegister: "¿No tienes cuenta?",
     registerWord: "Regístrate",
     toLogin: "¿Ya tienes cuenta?",
@@ -178,7 +170,6 @@ const es = {
       exists: "Ya existe una cuenta con ese correo.",
       generic: "Ocurrió un error. Inténtalo de nuevo.",
       notAllowed: "Este correo no está autorizado. La app es de uso personal.",
-      notConfigured: "La autenticación con Google no está configurada.",
     },
   },
 };

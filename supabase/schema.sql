@@ -1,7 +1,7 @@
 -- Eunomia Tasks · Esquema de base de datos (Supabase Postgres)
 -- Ejecutar en: Supabase Dashboard → SQL Editor → New query → Run
--- Crea perfiles, tareas, bloques de tiempo, preferencias, notificaciones,
--- tokens de Google Calendar y verificaciones de WhatsApp, con RLS por usuario.
+-- Crea perfiles, tareas, bloques de tiempo, preferencias, notificaciones
+-- y verificaciones de WhatsApp, con RLS por usuario.
 
 -- ─────────────────────────────────────────────────────────────
 -- Extensiones
@@ -73,7 +73,6 @@ create table if not exists public.time_blocks (
   start time not null,
   "end" time not null,
   color text not null default 'default' check (color in ('default', 'green', 'orange', 'red', 'blue')),
-  external_id text, -- id del evento en Google Calendar (sincronización)
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -108,19 +107,6 @@ create table if not exists public.notifications (
 create index if not exists notifications_user_idx on public.notifications (user_id, channel, kind, day);
 
 -- ─────────────────────────────────────────────────────────────
--- Tokens de Google Calendar (OAuth2)
--- ─────────────────────────────────────────────────────────────
-create table if not exists public.google_tokens (
-  user_id uuid primary key references auth.users (id) on delete cascade,
-  email text,
-  refresh_token text,
-  access_token text,
-  expires_at timestamptz,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
--- ─────────────────────────────────────────────────────────────
 -- Verificaciones de WhatsApp (vincular número ↔ cuenta)
 -- ─────────────────────────────────────────────────────────────
 create table if not exists public.whatsapp_verifications (
@@ -143,7 +129,6 @@ alter table public.tasks enable row level security;
 alter table public.time_blocks enable row level security;
 alter table public.user_prefs enable row level security;
 alter table public.notifications enable row level security;
-alter table public.google_tokens enable row level security;
 alter table public.whatsapp_verifications enable row level security;
 
 -- Profiles
@@ -185,14 +170,6 @@ create policy "select own notifications" on public.notifications
   for select using ((select auth.uid()) = user_id);
 create policy "insert own notifications" on public.notifications
   for insert with check ((select auth.uid()) = user_id);
-
--- Google tokens
-create policy "select own google tokens" on public.google_tokens
-  for select using ((select auth.uid()) = user_id);
-create policy "upsert own google tokens" on public.google_tokens
-  for insert with check ((select auth.uid()) = user_id);
-create policy "update own google tokens" on public.google_tokens
-  for update using ((select auth.uid()) = user_id);
 
 -- WhatsApp verifications
 create policy "select own whatsapp verifications" on public.whatsapp_verifications

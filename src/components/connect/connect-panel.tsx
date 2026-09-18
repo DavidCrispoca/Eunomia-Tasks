@@ -1,17 +1,15 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { CalendarDays, Check, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { Modal, ModalHeader } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { useLanguage } from "@/lib/i18n";
 
-type OpenPanel = "whatsapp" | "calendar" | null;
-
 export function ConnectPanel() {
   const { t } = useLanguage();
-  const [panel, setPanel] = useState<OpenPanel>(null);
+  const [open, setOpen] = useState(false);
 
   return (
     <>
@@ -23,22 +21,11 @@ export function ConnectPanel() {
           icon={<MessageCircle size={14} />}
           label={t.connect.whatsapp}
           caption={t.connect.whatsappDesc}
-          onClick={() => setPanel("whatsapp")}
-        />
-        <ConnectButton
-          icon={<CalendarDays size={14} />}
-          label={t.connect.calendar}
-          caption={t.connect.calendarDesc}
-          onClick={() => setPanel("calendar")}
+          onClick={() => setOpen(true)}
         />
       </aside>
 
-      {panel === "whatsapp" && (
-        <WhatsAppModal onClose={() => setPanel(null)} />
-      )}
-      {panel === "calendar" && (
-        <CalendarModal onClose={() => setPanel(null)} />
-      )}
+      {open && <WhatsAppModal onClose={() => setOpen(false)} />}
     </>
   );
 }
@@ -135,55 +122,6 @@ function WhatsAppModal({ onClose }: { onClose: () => void }) {
         {error && (
           <p className="rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-2 text-[12px] text-[#ff6b4a]">
             {t.connect.errorGeneric}
-          </p>
-        )}
-      </div>
-    </Modal>
-  );
-}
-
-function CalendarModal({ onClose }: { onClose: () => void }) {
-  const { t } = useLanguage();
-  const [result, setResult] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  const sync = async () => {
-    setBusy(true);
-    setResult(null);
-    try {
-      const res = await fetch("/api/calendar/sync", { method: "POST" });
-      const data = (await res.json()) as { created?: number; updated?: number; deleted?: number };
-      setResult(
-        res.ok
-          ? t.connect.syncResult(data.created ?? 0, data.updated ?? 0)
-          : t.connect.errorGeneric,
-      );
-    } catch {
-      setResult(t.connect.errorGeneric);
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <Modal open labelledBy="calendar-connect-title" onClose={onClose}>
-      <ModalHeader title={t.connect.calendar} onClose={onClose} />
-      <div className="flex flex-col gap-3 p-5">
-        <p className="text-[12.5px] leading-relaxed text-muted">
-          {t.connect.calendarDesc}
-        </p>
-        <a href="/api/calendar/oauth/start">
-          <Button variant="primary" className="w-full justify-center">
-            {t.connect.connectGoogle}
-          </Button>
-        </a>
-        <Button onClick={sync} disabled={busy} className="justify-center">
-          <Check size={14} />
-          {t.connect.syncNow}
-        </Button>
-        {result && (
-          <p className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-[12px] text-foreground">
-            {result}
           </p>
         )}
       </div>
