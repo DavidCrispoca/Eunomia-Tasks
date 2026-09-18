@@ -51,8 +51,5 @@ id_rsa*
 secrets.*
 credentials.*
 
-# internal docs: plan, design & agent rules (keep only README.md)
-/PLAN.md
-/DESIGN.md
-/AGENTS.md
-/CLAUDE.md
+# no subir documentación Markdown al repo
+*.md
