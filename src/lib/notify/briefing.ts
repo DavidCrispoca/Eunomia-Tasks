@@ -55,7 +55,12 @@ export async function runMorningBriefing(): Promise<{
     const hour = localHour(profile.timezone);
     const day = todayLocal(profile.timezone);
 
-    if (hour !== briefing_time) {
+    // Vercel Hobby: el cron se dispara 1 vez/día a una hora UTC fija, así que
+    // enviamos el briefing a todo usuario cuya hora local sea de mañana
+    // (6:00–11:59) o coincida exactamente con su briefing_time preferido.
+    const isMorning = hour >= 6 && hour <= 11;
+    const matchesPref = hour === briefing_time;
+    if (!isMorning && !matchesPref) {
       skipped += 1;
       continue;
     }

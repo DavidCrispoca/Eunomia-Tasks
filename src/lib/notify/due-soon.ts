@@ -108,7 +108,9 @@ export async function runDueSoonEmails(): Promise<{
   skipped: number;
 }> {
   if (!isEmailConfigured()) return { sent: 0, skipped: 0 };
-  const groups = await getDueSoonGroups(1);
+  // Vercel Hobby permite 1 cron/día: el aviso diario cubre tareas vencidas y
+  // las que vencen hoy o mañana.
+  const groups = await getDueSoonGroups(2);
   let sent = 0;
   let skipped = 0;
   for (const group of groups) {
