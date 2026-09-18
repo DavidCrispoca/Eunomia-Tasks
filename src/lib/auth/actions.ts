@@ -41,16 +41,21 @@ export async function login(
   if (!isAllowedEmail(email)) return { messageKey: "notAllowed" };
 
   if (isSupabaseConfigured()) {
-    const { user } = await signInWithPassword(email, password);
-    if (!user) return { messageKey: "invalid" };
-    await startSession({
-      id: user.id,
-      email: user.email ?? email,
-      name:
-        typeof user.user_metadata?.name === "string"
-          ? user.user_metadata.name
-          : undefined,
-    });
+    try {
+      const { user } = await signInWithPassword(email, password);
+      if (!user) return { messageKey: "invalid" };
+      await startSession({
+        id: user.id,
+        email: user.email ?? email,
+        name:
+          typeof user.user_metadata?.name === "string"
+            ? user.user_metadata.name
+            : undefined,
+      });
+    } catch (error) {
+      console.error("[Eunomia] login error:", error);
+      return { messageKey: "generic" };
+    }
   } else {
     await startSession(demoUser(email));
   }
@@ -79,21 +84,26 @@ export async function signup(
   if (!isAllowedEmail(email)) return { messageKey: "notAllowed" };
 
   if (isSupabaseConfigured()) {
-    const { user, error } = await signUpUser({ name, email, password });
-    if (!user) {
-      const message = (error ?? "").toLowerCase();
-      const exists =
-        message.includes("already") ||
-        message.includes("exists") ||
-        message.includes("taken") ||
-        message.includes("registered");
-      return { messageKey: exists ? "exists" : "generic" };
+    try {
+      const { user, error } = await signUpUser({ name, email, password });
+      if (!user) {
+        const message = (error ?? "").toLowerCase();
+        const exists =
+          message.includes("already") ||
+          message.includes("exists") ||
+          message.includes("taken") ||
+          message.includes("registered");
+        return { messageKey: exists ? "exists" : "generic" };
+      }
+      await startSession({
+        id: user.id,
+        email: user.email ?? email,
+        name,
+      });
+    } catch (error) {
+      console.error("[Eunomia] signup error:", error);
+      return { messageKey: "generic" };
     }
-    await startSession({
-      id: user.id,
-      email: user.email ?? email,
-      name,
-    });
   } else {
     await startSession(demoUser(email, name));
   }

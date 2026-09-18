@@ -7,7 +7,16 @@ export const SESSION_MAX_AGE = 60 * 60 * 24 * 30;
 const FALLBACK_SECRET = "eunomia-draft-session-secret-change-me";
 
 function secretKey(): string {
-  return process.env.SESSION_SECRET ?? FALLBACK_SECRET;
+  const raw = process.env.SESSION_SECRET?.trim();
+  if (!raw) {
+    if (process.env.NODE_ENV === "production") {
+      console.warn(
+        "[Eunomia] SESSION_SECRET vacío o ausente — usando fallback (inseguro). Configura una clave real en las variables de entorno.",
+      );
+    }
+    return FALLBACK_SECRET;
+  }
+  return raw;
 }
 
 export async function createSessionToken(user: AppUser): Promise<string> {
