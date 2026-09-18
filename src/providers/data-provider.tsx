@@ -94,6 +94,16 @@ export function DataProvider({
   const cloud = Boolean(initialData);
   const hydrated = useRef(false);
 
+  useEffect(() => {
+    if (cloud) {
+      console.info("[Eunomia] Sincronización en la nube activada.");
+    } else {
+      console.warn(
+        "[Eunomia] Modo SOLO local: la sincronización en la nube está desactivada. Revisa SUPABASE_SERVICE_ROLE_KEY (y las demás variables) en las variables de entorno de Vercel.",
+      );
+    }
+  }, [cloud]);
+
   // 1. Hidratar el almacén local con los datos del servidor en el primer render.
   useEffect(() => {
     if (!initialData || hydrated.current) return;
