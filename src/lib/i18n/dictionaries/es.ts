@@ -163,6 +163,8 @@ const es = {
     passwordPlaceholder: "Mínimo 6 caracteres",
     submitLogin: "Iniciar sesión",
     submitRegister: "Crear cuenta",
+    continueWithGoogle: "Continuar con Google",
+    orDivider: "o continúa con",
     toRegister: "¿No tienes cuenta?",
     registerWord: "Regístrate",
     toLogin: "¿Ya tienes cuenta?",
@@ -175,6 +177,8 @@ const es = {
       invalid: "Correo o contraseña no válidos.",
       exists: "Ya existe una cuenta con ese correo.",
       generic: "Ocurrió un error. Inténtalo de nuevo.",
+      notAllowed: "Este correo no está autorizado. La app es de uso personal.",
+      notConfigured: "La autenticación con Google no está configurada.",
     },
   },
 };

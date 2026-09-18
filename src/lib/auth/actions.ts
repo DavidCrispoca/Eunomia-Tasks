@@ -3,11 +3,16 @@
 import { redirect } from "next/navigation";
 import type { AppUser } from "@/types";
 import { endSession, startSession } from "@/lib/auth/cookies";
-import { isSupabaseConfigured } from "@/lib/auth/config";
-import { signInWithPassword, signUpUser } from "@/lib/auth/supabase";
+import { isAllowedEmail, isSupabaseConfigured } from "@/lib/auth/config";
+import {
+  signInWithPassword,
+  signUpUser,
+  googleOAuthUrl,
+} from "@/lib/auth/supabase";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD = 6;
+const APP_URL = process.env.APP_URL ?? "http://localhost:3000";
 
 export type AuthState = { messageKey?: string } | undefined;
 
@@ -33,6 +38,7 @@ export async function login(
   if (!EMAIL_RE.test(email) || password.length < MIN_PASSWORD) {
     return { messageKey: "invalid" };
   }
+  if (!isAllowedEmail(email)) return { messageKey: "notAllowed" };
 
   if (isSupabaseConfigured()) {
     const { user } = await signInWithPassword(email, password);
@@ -52,6 +58,14 @@ export async function login(
   redirect("/");
 }
 
+export async function googleLogin(): Promise<{ url?: string; messageKey?: string }> {
+  if (!isSupabaseConfigured()) return { messageKey: "notConfigured" };
+  const redirectTo = `${APP_URL}/api/auth/google/callback`;
+  const url = await googleOAuthUrl(redirectTo);
+  if (!url) return { messageKey: "notConfigured" };
+  return { url };
+}
+
 export async function signup(
   _prev: AuthState,
   formData: FormData,
@@ -62,6 +76,7 @@ export async function signup(
   if (!name || !EMAIL_RE.test(email) || password.length < MIN_PASSWORD) {
     return { messageKey: "invalid" };
   }
+  if (!isAllowedEmail(email)) return { messageKey: "notAllowed" };
 
   if (isSupabaseConfigured()) {
     const { user, error } = await signUpUser({ name, email, password });

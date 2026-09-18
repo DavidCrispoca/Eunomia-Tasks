@@ -164,6 +164,8 @@ const en: Dictionary = {
     passwordPlaceholder: "At least 6 characters",
     submitLogin: "Sign in",
     submitRegister: "Create account",
+    continueWithGoogle: "Continue with Google",
+    orDivider: "or continue with",
     toRegister: "No account?",
     registerWord: "Sign up",
     toLogin: "Already have an account?",
@@ -176,6 +178,8 @@ const en: Dictionary = {
       invalid: "Invalid email or password.",
       exists: "An account with that email already exists.",
       generic: "Something went wrong. Please try again.",
+      notAllowed: "This email is not authorized. The app is for personal use.",
+      notConfigured: "Google authentication is not configured.",
     },
   },
 };
