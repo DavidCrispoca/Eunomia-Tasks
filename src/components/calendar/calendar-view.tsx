@@ -21,6 +21,7 @@ import {
   isSameDay,
   monthFull,
   startOfWeek,
+  weekdayOf,
 } from "@/lib/date";
 import {
   cn,
@@ -217,7 +218,7 @@ export function CalendarView() {
                       className="flex flex-1 flex-col items-center gap-1 border-l border-white/10 py-2.5"
                     >
                       <span className="font-mono text-[10.5px] font-medium uppercase tracking-widest text-muted">
-                        {dayShort(date.getDay(), lang)}
+                        {dayShort(weekdayOf(iso), lang)}
                       </span>
                       <span
                         className={cn(
@@ -402,7 +403,7 @@ function DayColumn({ date, blocks, onOpenBlock, onCreateBlock }: DayColumnProps)
       <button
         type="button"
         aria-label={`${date} ＋`}
-        className="absolute bottom-1 right-1 grid h-6 w-6 place-items-center rounded-lg border border-white/10 bg-black/40 text-muted opacity-0 shadow-sm transition-all duration-200 ease-out-expo hover:border-amber-500/40 hover:text-amber-400 group-hover:opacity-100 active:scale-[0.92] active:duration-75"
+        className="absolute bottom-1.5 right-1.5 grid h-8 w-8 place-items-center rounded-lg border border-white/10 bg-black/40 text-muted opacity-100 shadow-sm transition-all duration-200 ease-out-expo hover:border-amber-500/40 hover:text-amber-400 sm:opacity-0 sm:group-hover:opacity-100 active:scale-[0.92] active:duration-75"
         onClick={() => onCreateBlock(date)}
       >
         <CalendarPlus size={13} />

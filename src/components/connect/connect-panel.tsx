@@ -25,7 +25,7 @@ export function ConnectPanel() {
         />
       </aside>
 
-      {open && <WhatsAppModal onClose={() => setOpen(false)} />}
+      <WhatsAppConnectModal open={open} onClose={() => setOpen(false)} />
     </>
   );
 }
@@ -58,7 +58,13 @@ function ConnectButton({
   );
 }
 
-function WhatsAppModal({ onClose }: { onClose: () => void }) {
+export function WhatsAppConnectModal({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
   const { t } = useLanguage();
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState<string | null>(null);
@@ -90,7 +96,7 @@ function WhatsAppModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Modal open labelledBy="whatsapp-connect-title" onClose={onClose}>
+    <Modal open={open} labelledBy="whatsapp-connect-title" onClose={onClose}>
       <ModalHeader title={t.connect.whatsapp} onClose={onClose} />
       <div className="flex flex-col gap-3 p-5">
         <label className="block">

@@ -2,17 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  CalendarDays,
-  FolderKanban,
-  House,
-  LogOut,
-  Plus,
-  Search,
-} from "lucide-react";
+import { CalendarDays, FolderKanban, House, Plus, Search } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
-import { useAuth } from "@/lib/auth/provider";
-import { logout } from "@/lib/auth/actions";
 import { useUi } from "@/providers/ui-provider";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
@@ -22,11 +13,7 @@ import { ConnectPanel } from "@/components/connect/connect-panel";
 export function Sidebar({ onOpenPalette }: { onOpenPalette: () => void }) {
   const pathname = usePathname();
   const { t, lang, toggleLanguage } = useLanguage();
-  const { user } = useAuth();
   const { openCreateTask } = useUi();
-
-  const displayName = user?.name ?? user?.email ?? "";
-  const initial = (displayName.charAt(0) || "?").toUpperCase();
 
   const items = [
     { href: "/", label: t.nav.home, icon: House },
@@ -76,33 +63,6 @@ export function Sidebar({ onOpenPalette }: { onOpenPalette: () => void }) {
       <ConnectPanel />
 
       <div className="relative mt-auto flex flex-col gap-0.5 border-t border-white/10 px-2.5 py-3">
-        <div className="mb-1 flex items-center gap-2.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-2">
-          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-amber-400 to-orange-600 text-xs font-bold text-black">
-            {initial}
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-[12px] font-medium text-foreground">
-              {displayName}
-            </p>
-            {user?.demo && (
-              <p className="truncate text-[10px] text-amber-200/70">
-                {t.auth.demoBadge}
-              </p>
-            )}
-          </div>
-          {user && (
-            <form action={logout}>
-              <button
-                type="submit"
-                title={t.auth.logout}
-                aria-label={t.auth.logout}
-                className="grid h-7 w-7 shrink-0 place-items-center rounded-md text-muted transition-colors hover:bg-white/5 hover:text-danger"
-              >
-                <LogOut size={13} />
-              </button>
-            </form>
-          )}
-        </div>
         <button
           type="button"
           onClick={onOpenPalette}

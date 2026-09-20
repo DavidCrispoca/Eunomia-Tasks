@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
+import { MobileNav } from "@/components/layout/mobile-nav";
 import { CommandPalette } from "@/components/command/command-palette";
 import { TaskModal } from "@/components/task-modal";
 import { PomodoroProvider } from "@/providers/pomodoro-provider";
@@ -39,10 +40,12 @@ export default function DashboardLayout({
 
         <div className="relative flex min-w-0 flex-1 flex-col">
           <Topbar onOpenPalette={() => setPaletteOpen(true)} />
-          <main className="flex-1 overflow-y-auto px-4 py-6 lg:px-8 lg:py-7">
+          <main className="flex-1 overflow-y-auto px-4 pb-24 pt-6 lg:px-8 lg:pb-7 lg:pt-7">
             <PageTransition>{children}</PageTransition>
           </main>
         </div>
+
+        <MobileNav />
 
         <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
         <TaskModal />

@@ -44,7 +44,7 @@ export function PomodoroChip() {
     <AnimatePresence>
       <motion.div
         key="pomodoro-chip"
-        className="fixed bottom-4 right-4 z-50"
+        className="fixed bottom-20 right-4 z-50 lg:bottom-4"
         initial={{ opacity: 0, y: 16, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 16, scale: 0.96 }}

@@ -33,7 +33,7 @@ export function KanbanColumn({
   const sorted = [...tasks].sort((a, b) => a.order - b.order);
 
   return (
-    <div className="flex min-w-[300px] flex-1 flex-col">
+    <div className="flex min-w-[300px] flex-1 flex-col snap-start">
       <div className="mb-2 flex items-center gap-2 px-1.5">
         <span
           className={cn("h-2 w-2 rounded-full", STATUS_DOT[status])}
@@ -81,7 +81,7 @@ export function KanbanColumn({
             <Button
               variant="ghost"
               size="sm"
-              className="mt-1 justify-start text-muted hover:border-amber-500/25 hover:bg-amber-500/5 hover:text-foreground"
+              className="mt-1 justify-start text-muted hover:border-amber-500/25 hover:bg-amber-500/5 hover:text-foreground max-md:h-10 max-md:border max-md:border-white/10 max-md:bg-white/[0.03]"
               onClick={() => onAddTask(status)}
             >
               <Plus size={14} />
