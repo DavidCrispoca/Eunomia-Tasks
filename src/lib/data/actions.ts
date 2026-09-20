@@ -1,6 +1,6 @@
 "use server";
 
-import type { Language, Task, TimeBlock } from "@/types";
+import type { Language, Task, TaskGroup, TimeBlock } from "@/types";
 import type { CloudData } from "@/lib/data/mappers";
 import { getSessionUser } from "@/lib/auth/cookies";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -27,10 +27,11 @@ export async function loadCloudData(): Promise<CloudData | null> {
 export async function persistCloudData(
   tasks: Task[],
   blocks: TimeBlock[],
+  groups: TaskGroup[],
 ): Promise<boolean> {
   const user = await readyUser();
   if (!user || user.demo) return false;
-  return replaceAllForUser(user.id, tasks, blocks);
+  return replaceAllForUser(user.id, tasks, blocks, groups);
 }
 
 /** Lee el dataset actual del usuario desde la nube (para sincr. entre dispositivos). */

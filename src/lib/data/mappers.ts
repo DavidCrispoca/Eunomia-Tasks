@@ -1,4 +1,4 @@
-import type { Language, Task, TaskPriority, TaskStatus, TimeBlock } from "@/types";
+import type { Language, Task, TaskGroup, TaskPriority, TaskStatus, TimeBlock } from "@/types";
 
 export interface TaskRow {
   id: string;
@@ -10,6 +10,7 @@ export interface TaskRow {
   due_date: string | null;
   completed_at: string | null;
   order: number;
+  group_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -27,6 +28,14 @@ export interface BlockRow {
   updated_at: string;
 }
 
+export interface GroupRow {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export function taskFromRow(row: TaskRow): Task {
   return {
     id: row.id,
@@ -37,6 +46,7 @@ export function taskFromRow(row: TaskRow): Task {
     dueDate: row.due_date ?? undefined,
     completedAt: row.completed_at ?? undefined,
     order: Number(row.order ?? 0),
+    groupId: row.group_id ?? undefined,
     createdAt: row.created_at ?? new Date().toISOString(),
   };
 }
@@ -53,6 +63,13 @@ export function blockFromRow(row: BlockRow): TimeBlock {
   };
 }
 
+export function groupFromRow(row: GroupRow): TaskGroup {
+  return {
+    id: row.id,
+    name: row.name,
+  };
+}
+
 export function taskToRow(userId: string, task: Task): Omit<TaskRow, "created_at" | "updated_at"> {
   return {
     id: task.id,
@@ -64,6 +81,7 @@ export function taskToRow(userId: string, task: Task): Omit<TaskRow, "created_at
     due_date: task.dueDate ?? null,
     completed_at: task.completedAt ?? null,
     order: Number(task.order ?? 0),
+    group_id: task.groupId ?? null,
   };
 }
 
@@ -80,9 +98,18 @@ export function blockToRow(userId: string, block: TimeBlock): Omit<BlockRow, "cr
   };
 }
 
+export function groupToRow(userId: string, group: TaskGroup): Omit<GroupRow, "created_at" | "updated_at"> {
+  return {
+    id: group.id,
+    user_id: userId,
+    name: group.name,
+  };
+}
+
 export type CloudData = {
   tasks: Task[];
   blocks: TimeBlock[];
+  groups: TaskGroup[];
   language: Language;
 };
 

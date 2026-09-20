@@ -1,11 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import { CalendarDays, Check, StickyNote } from "lucide-react";
+import { CalendarDays, Check, FolderOpen, StickyNote } from "lucide-react";
 import type { Task } from "@/types";
 import { PRIORITY_TEXT, STATUS_DOT } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n";
+import { useData } from "@/providers/data-provider";
 import { formatShortDate } from "@/lib/date";
 
 interface TaskCardProps {
@@ -17,6 +18,8 @@ interface TaskCardProps {
 
 export function TaskCard({ task, onOpen, onToggleDone, overlay }: TaskCardProps) {
   const { t, lang } = useLanguage();
+  const { groups } = useData();
+  const group = groups.find((g) => g.id === task.groupId);
 
   const isOverdue = useMemo(() => {
     if (!task.dueDate || task.status === "done") return false;
@@ -92,6 +95,12 @@ export function TaskCard({ task, onOpen, onToggleDone, overlay }: TaskCardProps)
       )}
 
       <div className="flex flex-wrap items-center gap-1.5 pl-6">
+        {group && (
+          <span className="inline-flex items-center gap-1 font-mono text-[11px] text-amber-200/70">
+            <FolderOpen size={11} />
+            {group.name}
+          </span>
+        )}
         {task.dueDate && (
           <span
             className={cn(

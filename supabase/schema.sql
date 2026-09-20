@@ -45,6 +45,7 @@ create trigger on_auth_user_created
 create table if not exists public.tasks (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users (id) on delete cascade,
+  group_id uuid,
   title text not null,
   notes text not null default '',
   status text not null default 'todo' check (status in ('todo', 'doing', 'done')),
@@ -60,6 +61,23 @@ create index if not exists tasks_user_id_idx on public.tasks (user_id);
 create index if not exists tasks_due_date_idx on public.tasks (user_id, due_date)
   where due_date is not null;
 create index if not exists tasks_status_idx on public.tasks (user_id, status);
+
+-- ─────────────────────────────────────────────────────────────
+-- Grupos / clases de tareas
+-- ─────────────────────────────────────────────────────────────
+create table if not exists public.task_groups (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  name text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists task_groups_user_id_idx on public.task_groups (user_id);
+
+alter table public.tasks
+  add constraint tasks_group_id_fk
+  foreign key (group_id) references public.task_groups (id) on delete set null;
 
 -- ─────────────────────────────────────────────────────────────
 -- Time blocks (calendario / time-blocking)
@@ -145,6 +163,17 @@ create policy "insert own tasks" on public.tasks
 create policy "update own tasks" on public.tasks
   for update using ((select auth.uid()) = user_id);
 create policy "delete own tasks" on public.tasks
+  for delete using ((select auth.uid()) = user_id);
+
+-- Task groups
+alter table public.task_groups enable row level security;
+create policy "select own task groups" on public.task_groups
+  for select using ((select auth.uid()) = user_id);
+create policy "insert own task groups" on public.task_groups
+  for insert with check ((select auth.uid()) = user_id);
+create policy "update own task groups" on public.task_groups
+  for update using ((select auth.uid()) = user_id);
+create policy "delete own task groups" on public.task_groups
   for delete using ((select auth.uid()) = user_id);
 
 -- Time blocks

@@ -1,15 +1,22 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
-import type { Language, Task, TaskPriority, TimeBlock } from "@/types";
+import type { Language, Task, TaskGroup, TaskPriority, TimeBlock } from "@/types";
 import { isSupabaseConfigured, supabaseAdmin } from "@/lib/supabase/server";
-import { defaultTasks, defaultTimeBlocks } from "@/lib/storage/local-storage-store";
+import {
+  defaultGroups,
+  defaultTasks,
+  defaultTimeBlocks,
+} from "@/lib/storage/local-storage-store";
 import {
   blockFromRow,
   blockToRow,
+  groupFromRow,
+  groupToRow,
   taskFromRow,
   taskToRow,
   type BlockRow,
   type CloudData,
+  type GroupRow,
   type TaskRow,
 } from "@/lib/data/mappers";
 
@@ -66,7 +73,7 @@ export async function getDatasetForUser(
 ): Promise<CloudData | null> {
   const db = supabaseAdmin();
   if (!db) return null;
-  const [tasksRes, blocksRes, prefsRes] = await Promise.all([
+  const [tasksRes, blocksRes, groupsRes, prefsRes] = await Promise.all([
     db
       .from("tasks")
       .select("*")
@@ -79,18 +86,25 @@ export async function getDatasetForUser(
       .order("date", { ascending: true })
       .order("start", { ascending: true }),
     db
+      .from("task_groups")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: true }),
+    db
       .from("user_prefs")
       .select("language")
       .eq("user_id", userId)
       .maybeSingle(),
   ]);
-  if (tasksRes.error || blocksRes.error) return null;
+  if (tasksRes.error || blocksRes.error || groupsRes.error) return null;
   const tasks = (tasksRes.data ?? []) as unknown as TaskRow[];
   const blocks = (blocksRes.data ?? []) as unknown as BlockRow[];
+  const groups = (groupsRes.data ?? []) as unknown as GroupRow[];
   const language: Language = prefsRes.data?.language === "en" ? "en" : "es";
   return {
     tasks: tasks.map(taskFromRow),
     blocks: blocks.map(blockFromRow),
+    groups: groups.map(groupFromRow),
     language,
   };
 }
@@ -116,6 +130,7 @@ export async function ensureSeedForUser(
     if (b.taskId && !taskId) return [];
     return [{ ...b, id: randomUUID(), taskId, color: b.color ?? "default" }] as TimeBlock[];
   });
+  const groups = defaultGroups().map((g) => ({ ...g, id: randomUUID() }));
 
   const taskRes = await db
     .from("tasks")
@@ -127,16 +142,23 @@ export async function ensureSeedForUser(
       .insert(blocks.map((b) => blockToRow(userId, b)));
     if (blockRes.error) return null;
   }
+  if (groups.length > 0) {
+    const groupRes = await db
+      .from("task_groups")
+      .insert(groups.map((g) => groupToRow(userId, g)));
+    if (groupRes.error) return null;
+  }
   await db
     .from("user_prefs")
     .upsert({ user_id: userId, language: "es" }, { onConflict: "user_id" });
-  return { tasks, blocks, language: "es" };
+  return { tasks, blocks, groups, language: "es" };
 }
 
 export async function replaceAllForUser(
   userId: string,
   tasks: Task[],
   blocks: TimeBlock[],
+  groups: TaskGroup[],
 ): Promise<boolean> {
   const db = supabaseAdmin();
   if (!db) return false;
@@ -144,6 +166,14 @@ export async function replaceAllForUser(
   if (delBlocks.error) return false;
   const delTasks = await db.from("tasks").delete().eq("user_id", userId);
   if (delTasks.error) return false;
+  const delGroups = await db.from("task_groups").delete().eq("user_id", userId);
+  if (delGroups.error) return false;
+  if (groups.length > 0) {
+    const insGroups = await db
+      .from("task_groups")
+      .insert(groups.map((g) => groupToRow(userId, g)));
+    if (insGroups.error) return false;
+  }
   if (tasks.length > 0) {
     const insTasks = await db
       .from("tasks")

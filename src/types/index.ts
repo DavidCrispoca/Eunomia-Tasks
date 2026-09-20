@@ -2,6 +2,11 @@ export type TaskStatus = "todo" | "doing" | "done";
 
 export type TaskPriority = "low" | "medium" | "high";
 
+export interface TaskGroup {
+  id: string;
+  name: string;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -12,6 +17,7 @@ export interface Task {
   completedAt?: string;
   order: number;
   createdAt: string;
+  groupId?: string;
 }
 
 export interface TimeBlock {

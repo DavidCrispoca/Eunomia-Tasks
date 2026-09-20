@@ -1,9 +1,10 @@
-import type { Task, TimeBlock } from "@/types";
+import type { Task, TaskGroup, TimeBlock } from "@/types";
 import { hhmmToMinutes, toISODate } from "@/lib/utils";
 import type { DataStore } from "@/lib/storage/store";
 
 export const TASKS_KEY = "eunomia:tasks";
 export const BLOCKS_KEY = "eunomia:blocks";
+export const GROUPS_KEY = "eunomia:groups";
 export const LANG_KEY = "eunomia:lang";
 
 type Listener = () => void;
@@ -66,6 +67,14 @@ export const localStorageStore: DataStore = {
   saveTimeBlocks(blocks) {
     writeJson(BLOCKS_KEY, blocks);
   },
+  loadGroups() {
+    const groups = readJson<TaskGroup[]>(GROUPS_KEY);
+    if (groups && Array.isArray(groups)) return groups;
+    return defaultGroups();
+  },
+  saveGroups(groups) {
+    writeJson(GROUPS_KEY, groups);
+  },
   saveLanguage(lang) {
     try {
       localStorage.setItem(LANG_KEY, lang);
@@ -82,6 +91,10 @@ export function defaultTasks(): Task[] {
 
 export function defaultTimeBlocks(): TimeBlock[] {
   return seedTimeBlocks();
+}
+
+export function defaultGroups(): TaskGroup[] {
+  return [];
 }
 
 function seedTasks(): Task[] {

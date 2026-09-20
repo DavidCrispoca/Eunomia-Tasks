@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CalendarDays, Flag, Tags, Timer } from "lucide-react";
+import { CalendarDays, Flag, FolderOpen, Tags, Timer } from "lucide-react";
 import type { TaskPriority, TaskStatus } from "@/types";
 import { useUi } from "@/providers/ui-provider";
 import { useData } from "@/providers/data-provider";
@@ -13,7 +13,7 @@ import { Input, Select, Textarea } from "@/components/ui/field";
 
 export function TaskModal() {
   const { taskDialog, closeTaskDialog } = useUi();
-  const { addTask, updateTask, deleteTask } = useData();
+  const { addTask, updateTask, deleteTask, groups } = useData();
   const { t } = useLanguage();
 
   const editing = taskDialog.editing;
@@ -24,6 +24,7 @@ export function TaskModal() {
   const [priority, setPriority] = useState<TaskPriority>("medium");
   const [status, setStatus] = useState<TaskStatus>("todo");
   const [dueDate, setDueDate] = useState("");
+  const [groupId, setGroupId] = useState("");
 
   const dialogKey = editing?.id ?? (open ? "new" : "closed");
   const [lastDialog, setLastDialog] = useState(dialogKey);
@@ -34,6 +35,7 @@ export function TaskModal() {
     setPriority(editing?.priority ?? "medium");
     setStatus(editing?.status ?? taskDialog.status ?? "todo");
     setDueDate(editing?.dueDate ?? "");
+    setGroupId(editing?.groupId ?? "");
   }
 
   const canSave = title.trim().length > 0;
@@ -47,6 +49,7 @@ export function TaskModal() {
         priority,
         status,
         dueDate: dueDate || undefined,
+        groupId: groupId || undefined,
         completedAt:
           status === "done"
             ? editing.completedAt ?? new Date().toISOString()
@@ -59,6 +62,7 @@ export function TaskModal() {
         priority,
         status,
         dueDate: dueDate || undefined,
+        groupId: groupId || undefined,
       });
     }
     closeTaskDialog();
@@ -110,6 +114,23 @@ export function TaskModal() {
             onChange={(e) => setNotes(e.target.value)}
             placeholder={t.task.notesPlaceholder}
           />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="flex items-center gap-1.5 text-xs font-medium text-muted">
+            <FolderOpen size={12} /> {t.task.group}
+          </label>
+          <Select
+            value={groupId}
+            onChange={(e) => setGroupId(e.target.value)}
+          >
+            <option value="">{t.group.personal}</option>
+            {groups.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.name}
+              </option>
+            ))}
+          </Select>
         </div>
 
         <div className="grid grid-cols-2 gap-3">

@@ -8,11 +8,19 @@ import {
   useRef,
   type ReactNode,
 } from "react";
-import type { Task, TimeBlock, TaskPriority, TaskStatus } from "@/types";
+import type {
+  Task,
+  TaskGroup,
+  TimeBlock,
+  TaskPriority,
+  TaskStatus,
+} from "@/types";
 import type { CloudData } from "@/lib/data/mappers";
 import {
   BLOCKS_KEY,
+  GROUPS_KEY,
   TASKS_KEY,
+  defaultGroups,
   defaultTasks,
   defaultTimeBlocks,
   localStorageStore,
@@ -27,6 +35,7 @@ interface NewTaskInput {
   priority?: TaskPriority;
   dueDate?: string;
   status?: TaskStatus;
+  groupId?: string;
 }
 
 interface NewTimeBlockInput {
@@ -41,6 +50,7 @@ interface NewTimeBlockInput {
 interface DataContextValue {
   tasks: Task[];
   blocks: TimeBlock[];
+  groups: TaskGroup[];
   addTask: (input: NewTaskInput) => Task;
   updateTask: (id: string, patch: Partial<Omit<Task, "id" | "createdAt">>) => void;
   deleteTask: (id: string) => void;
@@ -49,6 +59,10 @@ interface DataContextValue {
   updateTimeBlock: (id: string, patch: Partial<Omit<TimeBlock, "id">>) => void;
   deleteTimeBlock: (id: string) => void;
   setTimeBlocks: (blocks: TimeBlock[]) => void;
+  addGroup: (name: string) => TaskGroup;
+  updateGroup: (id: string, patch: Partial<Omit<TaskGroup, "id" | "createdAt">>) => void;
+  deleteGroup: (id: string) => void;
+  setGroups: (groups: TaskGroup[]) => void;
 }
 
 const DataContext = createContext<DataContextValue | null>(null);
@@ -90,6 +104,7 @@ export function DataProvider({
 }) {
   const tasks = useSynced<Task[]>(TASKS_KEY, () => defaultTasks());
   const blocks = useSynced<TimeBlock[]>(BLOCKS_KEY, () => defaultTimeBlocks());
+  const groups = useSynced<TaskGroup[]>(GROUPS_KEY, () => defaultGroups());
 
   const cloud = Boolean(initialData);
   const hydrated = useRef(false);
@@ -115,6 +130,9 @@ export function DataProvider({
       if (!hasRawValue(BLOCKS_KEY, initialData.blocks)) {
         localStorageStore.saveTimeBlocks(initialData.blocks);
       }
+      if (!hasRawValue(GROUPS_KEY, initialData.groups)) {
+        localStorageStore.saveGroups(initialData.groups);
+      }
     } catch {
       // sin almacenamiento local: seguimos con los datos en memoria
     }
@@ -126,12 +144,12 @@ export function DataProvider({
     if (!cloud) return;
     if (persistTimer.current) clearTimeout(persistTimer.current);
     persistTimer.current = setTimeout(() => {
-      void persistCloudData(tasks, blocks);
+      void persistCloudData(tasks, blocks, groups);
     }, 600);
     return () => {
       if (persistTimer.current) clearTimeout(persistTimer.current);
     };
-  }, [tasks, blocks, cloud]);
+  }, [tasks, blocks, groups, cloud]);
 
   // 3. Sincronizar entre dispositivos: polling + focus por si cambió en la nube.
   useEffect(() => {
@@ -145,6 +163,9 @@ export function DataProvider({
       }
       if (!hasRawValue(BLOCKS_KEY, data.blocks)) {
         localStorageStore.saveTimeBlocks(data.blocks);
+      }
+      if (!hasRawValue(GROUPS_KEY, data.groups)) {
+        localStorageStore.saveGroups(data.groups);
       }
     };
     const onFocus = () => void pull();
@@ -160,6 +181,7 @@ export function DataProvider({
     () => ({
       tasks,
       blocks,
+      groups,
       addTask(input) {
         const task: Task = {
           id: uid(),
@@ -168,6 +190,7 @@ export function DataProvider({
           priority: input.priority ?? "medium",
           dueDate: input.dueDate,
           status: input.status ?? "todo",
+          groupId: input.groupId,
           completedAt:
             (input.status ?? "todo") === "done"
               ? new Date().toISOString()
@@ -221,8 +244,32 @@ export function DataProvider({
       setTimeBlocks(next) {
         localStorageStore.saveTimeBlocks(next);
       },
+      addGroup(name) {
+        const group: TaskGroup = {
+          id: uid(),
+          name: name.trim(),
+        };
+        localStorageStore.saveGroups([...groups, group]);
+        return group;
+      },
+      updateGroup(id, patch) {
+        localStorageStore.saveGroups(
+          groups.map((g) => (g.id === id ? { ...g, ...patch } : g)),
+        );
+      },
+      deleteGroup(id) {
+        localStorageStore.saveGroups(groups.filter((g) => g.id !== id));
+        localStorageStore.saveTasks(
+          tasks.map((t) =>
+            t.groupId === id ? { ...t, groupId: undefined } : t,
+          ),
+        );
+      },
+      setGroups(next) {
+        localStorageStore.saveGroups(next);
+      },
     }),
-    [tasks, blocks],
+    [tasks, blocks, groups],
   );
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
