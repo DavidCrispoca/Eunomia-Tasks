@@ -53,3 +53,4 @@ credentials.*
 
 # no subir documentación Markdown al repo
 *.md
+!README.md
