@@ -75,6 +75,11 @@ create table if not exists public.task_groups (
 
 create index if not exists task_groups_user_id_idx on public.task_groups (user_id);
 
+-- En tablas ya existentes, "create table if not exists" no añade columnas:
+alter table public.tasks add column if not exists group_id uuid;
+
+alter table public.tasks
+  drop constraint if exists tasks_group_id_fk;
 alter table public.tasks
   add constraint tasks_group_id_fk
   foreign key (group_id) references public.task_groups (id) on delete set null;
@@ -150,60 +155,82 @@ alter table public.notifications enable row level security;
 alter table public.whatsapp_verifications enable row level security;
 
 -- Profiles
+drop policy if exists "read own profile" on public.profiles;
 create policy "read own profile" on public.profiles
   for select using ((select auth.uid()) = id);
+drop policy if exists "update own profile" on public.profiles;
 create policy "update own profile" on public.profiles
   for update using ((select auth.uid()) = id);
 
 -- Tasks
+drop policy if exists "select own tasks" on public.tasks;
 create policy "select own tasks" on public.tasks
   for select using ((select auth.uid()) = user_id);
+drop policy if exists "insert own tasks" on public.tasks;
 create policy "insert own tasks" on public.tasks
   for insert with check ((select auth.uid()) = user_id);
+drop policy if exists "update own tasks" on public.tasks;
 create policy "update own tasks" on public.tasks
   for update using ((select auth.uid()) = user_id);
+drop policy if exists "delete own tasks" on public.tasks;
 create policy "delete own tasks" on public.tasks
   for delete using ((select auth.uid()) = user_id);
 
 -- Task groups
 alter table public.task_groups enable row level security;
+drop policy if exists "select own task groups" on public.task_groups;
 create policy "select own task groups" on public.task_groups
   for select using ((select auth.uid()) = user_id);
+drop policy if exists "insert own task groups" on public.task_groups;
 create policy "insert own task groups" on public.task_groups
   for insert with check ((select auth.uid()) = user_id);
+drop policy if exists "update own task groups" on public.task_groups;
 create policy "update own task groups" on public.task_groups
   for update using ((select auth.uid()) = user_id);
+drop policy if exists "delete own task groups" on public.task_groups;
 create policy "delete own task groups" on public.task_groups
   for delete using ((select auth.uid()) = user_id);
 
 -- Time blocks
+drop policy if exists "select own blocks" on public.time_blocks;
 create policy "select own blocks" on public.time_blocks
   for select using ((select auth.uid()) = user_id);
+drop policy if exists "insert own blocks" on public.time_blocks;
 create policy "insert own blocks" on public.time_blocks
   for insert with check ((select auth.uid()) = user_id);
+drop policy if exists "update own blocks" on public.time_blocks;
 create policy "update own blocks" on public.time_blocks
   for update using ((select auth.uid()) = user_id);
+drop policy if exists "delete own blocks" on public.time_blocks;
 create policy "delete own blocks" on public.time_blocks
   for delete using ((select auth.uid()) = user_id);
 
 -- User prefs
+drop policy if exists "select own prefs" on public.user_prefs;
 create policy "select own prefs" on public.user_prefs
   for select using ((select auth.uid()) = user_id);
+drop policy if exists "upsert own prefs" on public.user_prefs;
 create policy "upsert own prefs" on public.user_prefs
   for insert with check ((select auth.uid()) = user_id);
+drop policy if exists "update own prefs" on public.user_prefs;
 create policy "update own prefs" on public.user_prefs
   for update using ((select auth.uid()) = user_id);
 
 -- Notifications
+drop policy if exists "select own notifications" on public.notifications;
 create policy "select own notifications" on public.notifications
   for select using ((select auth.uid()) = user_id);
+drop policy if exists "insert own notifications" on public.notifications;
 create policy "insert own notifications" on public.notifications
   for insert with check ((select auth.uid()) = user_id);
 
 -- WhatsApp verifications
+drop policy if exists "select own whatsapp verifications" on public.whatsapp_verifications;
 create policy "select own whatsapp verifications" on public.whatsapp_verifications
   for select using ((select auth.uid()) = user_id);
+drop policy if exists "insert own whatsapp verifications" on public.whatsapp_verifications;
 create policy "insert own whatsapp verifications" on public.whatsapp_verifications
   for insert with check ((select auth.uid()) = user_id);
+drop policy if exists "delete own whatsapp verifications" on public.whatsapp_verifications;
 create policy "delete own whatsapp verifications" on public.whatsapp_verifications
   for delete using ((select auth.uid()) = user_id);
