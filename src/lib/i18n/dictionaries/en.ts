@@ -10,18 +10,6 @@ const en: Dictionary = {
     kanban: "Board",
     calendar: "Calendar",
   },
-  connect: {
-    title: "Connections",
-    whatsapp: "WhatsApp",
-    whatsappDesc: "Daily briefing and chat commands",
-    phoneLabel: "Your WhatsApp number (international format)",
-    phonePlaceholder: "+52 1 55 1234 5678",
-    sendCode: "Send code",
-    sendCodeHint: (code: string) => `Text from your WhatsApp: verify ${code}`,
-    sendCodeTip:
-      "The code lasts 15 minutes. Reply «verificar <codigo>» in the chat with your business number.",
-    errorGeneric: "Could not complete. Please try again.",
-  },
   common: {
     add: "Add",
     cancel: "Cancel",

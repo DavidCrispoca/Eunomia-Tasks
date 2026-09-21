@@ -2,18 +2,16 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ChevronDown, LogOut, MessageCircle } from "lucide-react";
+import { ChevronDown, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth/provider";
 import { useLanguage } from "@/lib/i18n";
 import { logout } from "@/lib/auth/actions";
 import { cn } from "@/lib/utils";
-import { WhatsAppConnectModal } from "@/components/connect/connect-panel";
 
 export function AccountMenu() {
   const { user } = useAuth();
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
-  const [connectOpen, setConnectOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
 
@@ -101,20 +99,7 @@ export function AccountMenu() {
             </div>
 
             <div className="p-1.5">
-              <p className="px-2.5 pb-1 pt-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted">
-                {t.connect.title}
-              </p>
-              <AccountMenuItem
-                icon={<MessageCircle size={14} />}
-                label={t.connect.whatsapp}
-                caption={t.connect.whatsappDesc}
-                onClick={() => {
-                  setOpen(false);
-                  setConnectOpen(true);
-                }}
-              />
-
-              <form action={logout} className="mt-1 border-t border-white/10 pt-1.5">
+              <form action={logout} className="border-t border-white/10 pt-1.5">
                 <AccountMenuItem
                   type="submit"
                   icon={<LogOut size={14} />}
@@ -126,8 +111,6 @@ export function AccountMenu() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      <WhatsAppConnectModal open={connectOpen} onClose={() => setConnectOpen(false)} />
     </div>
   );
 }

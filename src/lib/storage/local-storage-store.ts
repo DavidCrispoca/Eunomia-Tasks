@@ -103,7 +103,7 @@ function seedTasks(): Task[] {
   return [
     {
       id: "seed-review-briefing",
-      title: "Revisar el briefing del día",
+      title: "Revisar las prioridades del día",
       notes: "Leer las prioridades y preparar el plan matutino.",
       status: "todo",
       priority: "high",

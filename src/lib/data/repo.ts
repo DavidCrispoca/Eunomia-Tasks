@@ -25,7 +25,6 @@ export type Profile = {
   email: string;
   name: string | null;
   timezone: string;
-  whatsapp_phone: string | null;
 };
 
 function pad(n: number) {
@@ -214,42 +213,9 @@ export async function saveLanguage(
   return !res.error;
 }
 
-export async function getPrefs(
-  userId: string,
-): Promise<{ language: Language; briefing_time: number }> {
-  const db = supabaseAdmin();
-  if (!db) return { language: "es", briefing_time: 9 };
-  const res = await db
-    .from("user_prefs")
-    .select("language,briefing_time")
-    .eq("user_id", userId)
-    .maybeSingle();
-  return {
-    language: res.data?.language === "en" ? "en" : "es",
-    briefing_time: Number(res.data?.briefing_time ?? 9),
-  };
-}
-
 // ─────────────────────────────────────────────────────────────
-// Tareas (acciones usadas por webhook/cron/correo)
+// Tareas (acciones usadas por correo)
 // ─────────────────────────────────────────────────────────────
-
-export async function listPendingTasks(
-  userId: string,
-): Promise<{ id: string; title: string; priority: TaskPriority; due_date: string | null }[]> {
-  const db = supabaseAdmin();
-  if (!db) return [];
-  const res = await db
-    .from("tasks")
-    .select("id,title,priority,due_date")
-    .eq("user_id", userId)
-    .neq("status", "done")
-    .order("due_date", { ascending: true, nullsFirst: false })
-    .order("created_at", { ascending: true })
-    .limit(100);
-  if (res.error) return [];
-  return (res.data ?? []) as typeof res.data;
-}
 
 export async function completeTaskById(userId: string, taskId: string): Promise<boolean> {
   const db = supabaseAdmin();
@@ -367,8 +333,8 @@ export async function getDueGroups(
 
 export async function hasNotification(
   userId: string,
-  channel: "email" | "whatsapp",
-  kind: "due_soon" | "due_week" | "briefing",
+  channel: "email",
+  kind: "due_soon" | "due_week",
   day: string,
 ): Promise<boolean> {
   const db = supabaseAdmin();
@@ -386,8 +352,8 @@ export async function hasNotification(
 
 export async function markNotification(
   userId: string,
-  channel: "email" | "whatsapp",
-  kind: "due_soon" | "due_week" | "briefing",
+  channel: "email",
+  kind: "due_soon" | "due_week",
   day: string,
 ): Promise<void> {
   const db = supabaseAdmin();
@@ -404,93 +370,6 @@ export async function markNotification(
       },
       { onConflict: "user_id,channel,kind,day" },
     );
-}
-
-// ─────────────────────────────────────────────────────────────
-// Profil & WhatsApp
-// ─────────────────────────────────────────────────────────────
-
-export async function getProfile(userId: string): Promise<Profile | null> {
-  const db = supabaseAdmin();
-  if (!db) return null;
-  const res = await db.from("profiles").select("*").eq("id", userId).maybeSingle();
-  return (res.data as unknown as Profile | null) ?? null;
-}
-
-export async function getUserByPhone(phone: string): Promise<Profile | null> {
-  const db = supabaseAdmin();
-  if (!db) return null;
-  const res = await db
-    .from("profiles")
-    .select("*")
-    .eq("whatsapp_phone", phone)
-    .maybeSingle();
-  return (res.data as unknown as Profile | null) ?? null;
-}
-
-export async function listBriefingTargets(): Promise<Profile[]> {
-  const db = supabaseAdmin();
-  if (!db) return [];
-  const res = await db
-    .from("profiles")
-    .select("*")
-    .not("whatsapp_phone", "is", null)
-    .neq("whatsapp_phone", "");
-  if (res.error) return [];
-  return (res.data as unknown as Profile[]) ?? [];
-}
-
-export async function setWhatsAppPhone(
-  userId: string,
-  phone: string | null,
-): Promise<boolean> {
-  const db = supabaseAdmin();
-  if (!db) return false;
-  const res = await db
-    .from("profiles")
-    .update({ whatsapp_phone: phone })
-    .eq("id", userId);
-  return !res.error;
-}
-
-export async function createWhatsAppVerification(
-  userId: string,
-  phone: string,
-): Promise<string | null> {
-  const db = supabaseAdmin();
-  if (!db) return null;
-  const code = String(Math.floor(100000 + Math.random() * 900000));
-  const res = await db.from("whatsapp_verifications").insert({
-    user_id: userId,
-    phone,
-    code,
-    expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-  });
-  if (res.error) return null;
-  return code;
-}
-
-export async function resolveWhatsAppCode(
-  phone: string,
-  code: string,
-): Promise<string | null> {
-  const db = supabaseAdmin();
-  if (!db) return null;
-  const res = await db
-    .from("whatsapp_verifications")
-    .select("user_id,expires_at")
-    .eq("phone", phone)
-    .eq("code", code.trim())
-    .maybeSingle();
-  if (!res.data) return null;
-  if (new Date(res.data.expires_at).getTime() < Date.now()) return null;
-  const userId = res.data.user_id as string;
-  await db
-    .from("whatsapp_verifications")
-    .delete()
-    .eq("user_id", userId);
-  await setWhatsAppPhone(userId, phone);
-  return userId;
 }
 
 // ─────────────────────────────────────────────────────────────

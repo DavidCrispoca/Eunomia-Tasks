@@ -1,6 +1,7 @@
 import "server-only";
 import { Resend } from "resend";
 import nodemailer from "nodemailer";
+import type { Transporter } from "nodemailer";
 
 export function appUrl(): string {
   return process.env.APP_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
@@ -23,9 +24,9 @@ export function isEmailConfigured(): boolean {
   return hasSmtp() || hasResend();
 }
 
-let smtp: nodemailer.Transporter | null = null;
+let smtp: Transporter | null = null;
 
-function smtpTransport(): nodemailer.Transporter | null {
+function smtpTransport(): Transporter | null {
   if (smtp) return smtp;
   if (!hasSmtp()) return null;
   smtp = nodemailer.createTransport({

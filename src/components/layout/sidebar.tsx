@@ -8,7 +8,6 @@ import { useUi } from "@/providers/ui-provider";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
-import { ConnectPanel } from "@/components/connect/connect-panel";
 
 export function Sidebar({ onOpenPalette }: { onOpenPalette: () => void }) {
   const pathname = usePathname();
@@ -59,8 +58,6 @@ export function Sidebar({ onOpenPalette }: { onOpenPalette: () => void }) {
           );
         })}
       </nav>
-
-      <ConnectPanel />
 
       <div className="relative mt-auto flex flex-col gap-0.5 border-t border-white/10 px-2.5 py-3">
         <button

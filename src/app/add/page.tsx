@@ -15,7 +15,7 @@ export default async function AddTaskPage(props: {
 }) {
   const { s } = await props.searchParams;
   const payload = await verifyAction(s);
-  const token = payload && payload.action === "add" ? s : null;
+  const token = payload && payload.action === "add" ? (s ?? null) : null;
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden bg-background">

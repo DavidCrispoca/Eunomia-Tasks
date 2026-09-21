@@ -1,7 +1,7 @@
 -- Eunomia Tasks · Esquema de base de datos (Supabase Postgres)
 -- Ejecutar en: Supabase Dashboard → SQL Editor → New query → Run
--- Crea perfiles, tareas, bloques de tiempo, preferencias, notificaciones
--- y verificaciones de WhatsApp, con RLS por usuario.
+-- Crea perfiles, tareas, bloques de tiempo, preferencias y notificaciones,
+-- con RLS por usuario.
 
 -- ─────────────────────────────────────────────────────────────
 -- Extensiones
@@ -15,7 +15,6 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   email text not null default '',
   name text,
-  whatsapp_phone text,
   timezone text not null default 'America/Bogota',
   created_at timestamptz not null default now()
 );
@@ -109,47 +108,44 @@ create index if not exists time_blocks_date_idx on public.time_blocks (user_id, 
 create table if not exists public.user_prefs (
   user_id uuid primary key references auth.users (id) on delete cascade,
   language text not null default 'es' check (language in ('es', 'en')),
-  briefing_time integer not null default 9, -- hora local del "Morning Briefing" (0-23)
   updated_at timestamptz not null default now()
 );
 
+-- En bases ya existentes, retira la columna del briefing de WhatsApp
+-- (ya no se usa; la app solo envía correos):
+alter table public.user_prefs drop column if exists briefing_time;
+
 -- ─────────────────────────────────────────────────────────────
--- Notificaciones (deduplicación correo / whatsapp)
+-- Notificaciones (deduplicación correo)
 -- ─────────────────────────────────────────────────────────────
 create table if not exists public.notifications (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users (id) on delete cascade,
   task_id uuid,
-  channel text not null check (channel in ('email', 'whatsapp')),
-  kind text not null check (kind in ('due_soon', 'briefing')),
+  channel text not null check (channel in ('email')),
+  kind text not null check (kind in ('due_soon', 'due_week')),
   day date not null,
   sent_at timestamptz not null default now(),
   unique nulls not distinct (user_id, channel, kind, day)
 );
 
--- Re-ejecutable en bases ya creadas: añade el kind 'due_week' al check.
+-- Re-ejecutable en bases ya creadas: estrecha los checks a los valores del correo.
 alter table public.notifications
   drop constraint if exists notifications_kind_check;
 alter table public.notifications
   add constraint notifications_kind_check
-  check (kind in ('due_soon', 'briefing', 'due_week'));
+  check (kind in ('due_soon', 'due_week'));
+alter table public.notifications
+  drop constraint if exists notifications_channel_check;
+alter table public.notifications
+  add constraint notifications_channel_check
+  check (channel in ('email'));
 
 create index if not exists notifications_user_idx on public.notifications (user_id, channel, kind, day);
 
--- ─────────────────────────────────────────────────────────────
--- Verificaciones de WhatsApp (vincular número ↔ cuenta)
--- ─────────────────────────────────────────────────────────────
-create table if not exists public.whatsapp_verifications (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users (id) on delete cascade,
-  phone text not null,
-  code text not null,
-  created_at timestamptz not null default now(),
-  expires_at timestamptz not null default (now() + interval '15 minutes')
-);
-
-create index if not exists whatsapp_verifications_phone_idx
-  on public.whatsapp_verifications (phone, code);
+-- En bases ya existentes, elimina la tabla de verificaciones de WhatsApp
+-- (integración eliminada en 2026-09-20):
+drop table if exists public.whatsapp_verifications;
 
 -- ─────────────────────────────────────────────────────────────
 -- Row Level Security: cada usuario solo ve/escribe sus filas
@@ -159,7 +155,6 @@ alter table public.tasks enable row level security;
 alter table public.time_blocks enable row level security;
 alter table public.user_prefs enable row level security;
 alter table public.notifications enable row level security;
-alter table public.whatsapp_verifications enable row level security;
 
 -- Profiles
 drop policy if exists "read own profile" on public.profiles;
@@ -231,13 +226,6 @@ drop policy if exists "insert own notifications" on public.notifications;
 create policy "insert own notifications" on public.notifications
   for insert with check ((select auth.uid()) = user_id);
 
--- WhatsApp verifications
-drop policy if exists "select own whatsapp verifications" on public.whatsapp_verifications;
-create policy "select own whatsapp verifications" on public.whatsapp_verifications
-  for select using ((select auth.uid()) = user_id);
-drop policy if exists "insert own whatsapp verifications" on public.whatsapp_verifications;
-create policy "insert own whatsapp verifications" on public.whatsapp_verifications
-  for insert with check ((select auth.uid()) = user_id);
-drop policy if exists "delete own whatsapp verifications" on public.whatsapp_verifications;
-create policy "delete own whatsapp verifications" on public.whatsapp_verifications
-  for delete using ((select auth.uid()) = user_id);
+-- En bases ya existentes, retira la columna del perfil vinculada a WhatsApp
+-- (la tabla whatsapp_verifications ya se eliminó arriba):
+alter table public.profiles drop column if exists whatsapp_phone;

@@ -5,9 +5,8 @@ tiempo. Inspirada en *Eunomia*, la diosa griega del orden y la disciplina.
 
 **Fase actual:** **Desplegada en producción** (`https://eunomia-tasks.vercel.app`).
 MVP con backend real: autenticación Supabase (email/password con correos
-autorizados), datos multidispositivo en Postgres (RLS por usuario), alertas por
-correo (Resend) de tareas por vencer y asistente de WhatsApp Business (briefing
-diario + comandos). Ver `SETUP.md` (incluye una sección de **diagnóstico en
+autorizados), datos multidispositivo en Postgres (RLS por usuario) y alertas por
+correo de tareas por vencer. Ver `SETUP.md` (incluye una sección de **diagnóstico en
 producción** con el endpoint `/api/health`).
 
 ## Ejecutar en local
@@ -35,7 +34,7 @@ datos se guardan en `localStorage`.
 - **Diseño totalmente responsive móvil**: en pantallas pequeñas la navegación pasa a
   una **barra inferior fija** (Inicio / Tablero / Calendario + botón central "Nueva
   tarea" con `safe-area-inset-bottom`); el **menú de cuenta** se muestra en la esquina
-  superior derecha (avatar, nombre, email, badge demo, acceso a WhatsApp y logout) y
+  superior derecha (avatar, nombre, email, badge demo y logout) y
   todos los controles táctiles miden ≥ 44px.
 - **Autenticación**: login/registro con **email/password** (solo correos de
   `ALLOWED_EMAILS`), sesión firmada en cookie HttpOnly (`jose`) que valida contra
@@ -43,10 +42,9 @@ datos se guardan en `localStorage`.
 - **Datos multidispositivo**: al configurar Supabase, los datos viven en
   Postgres con RLS por usuario y se sincronizan entre dispositivos (al cargar,
   al ganar el foco y cada 30 s; escrituras optimistas).
-- **Correo (Resend)**: máximo 1 correo/día con las tareas pendientes por vencer
-  y enlaces firmados para **completar / posponer 24 h / añadir** sin login.
-- **WhatsApp Business**: *Morning Briefing* diario a la hora local y comandos
-  por chat (`añadir`, `completar <n>`, `listar`, `verificar <código>`).
+- **Correo (Gmail SMTP o Resend)**: máximo 1 correo/día con las tareas pendientes
+  por vencer, resumen semanal los lunes, y enlaces firmados para **completar /
+  posponer 24 h / añadir** sin login.
 - **i18n Español/Inglés** y sistema visual nocturno obsidiana & oro ámbar
   (ver `DESIGN.md`).
 
@@ -64,22 +62,21 @@ Copia `.env.example` a `.env.local`. Sin variables → modo demo local.
 
 > En Vercel, las variables `NEXT_PUBLIC_*` se inyectan **al compilar**: si las
 > añades/cambias debes hacer **redeploy**. Verifica el estado con
-> `GET /api/health` (ver `SETUP.md` → 6.1).
+> `GET /api/health` (ver `SETUP.md` → 5.1).
 
-| Variable                        | Uso                                                        |
-| ------------------------------- | ---------------------------------------------------------- |
-| `SESSION_SECRET`                | Firma de la cookie de sesión (`openssl rand -base64 32`)   |
-| `NEXT_PUBLIC_SUPABASE_URL`      | URL del proyecto Supabase (backend de datos)               |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon key pública                                           |
-| `SUPABASE_SERVICE_ROLE_KEY`     | Service role (solo servidor; nunca enviar al cliente)      |
-| `RESEND_API_KEY`                | Envío de correos de tareas por vencer                      |
-| `EMAIL_FROM`                    | Remitente verificado (`Eunomia Tasks <no-reply@dominio>`)  |
-| `APP_URL`                       | URL pública para los enlaces firmados del correo           |
-| `WHATSAPP_TOKEN`                | Token de sistema (Meta Cloud API)                          |
-| `WHATSAPP_PHONE_ID`             | Phone Number ID del número de negocio                      |
-| `WHATSAPP_VERIFY_TOKEN`         | Verify token del webhook                                   |
-| `WHATSAPP_APP_SECRET`           | App Secret de Meta (firma de webhooks)                     |
-| `CRON_SECRET`                   | Protege los crons (la inyecta Vercel)                      |
+| Variable                               | Uso                                                                       |
+| -------------------------------------- | ------------------------------------------------------------------------- |
+| `SESSION_SECRET`                       | Firma de la cookie de sesión (`openssl rand -base64 32`)                  |
+| `NEXT_PUBLIC_SUPABASE_URL`             | URL del proyecto Supabase (backend de datos)                              |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`        | Anon key pública                                                          |
+| `SUPABASE_SERVICE_ROLE_KEY`            | Service role (solo servidor; nunca enviar al cliente)                     |
+| `RESEND_API_KEY`                       | Envío por Resend (usado solo si no hay SMTP)                              |
+| `EMAIL_FROM`                           | Remitente (`Eunomia Tasks <no-reply@dominio>`; con Gmail = `SMTP_USER`)   |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` | Envío por SMTP si está configurado (p. ej. `smtp.gmail.com` / `465` / `true`); gana sobre Resend |
+| `SMTP_USER` / `SMTP_PASS`              | Gmail con 2FA + «Contraseña de aplicaciones»                              |
+| `MAIL_HOUR`                            | Hora local (0–23) del envío diario (default 8; los lunes, resumen semanal)|
+| `APP_URL`                              | URL pública para los enlaces firmados del correo                          |
+| `CRON_SECRET`                          | Protege el cron (debe tener valor no vacío)                               |
 
 ## Estructura
 
@@ -90,19 +87,17 @@ src/
 │   ├── (dashboard)/            # Inicio, kanban, calendar, pomodoro
 │   └── api/                    # Route Handlers
 │       ├── health/             # GET /api/health: diagnóstico de variables (sin secretos)
-│       ├── cron/               # due-soon (correo) y morning-briefing (WhatsApp)
-│       ├── email/actions/      # Enlaces firmados (completar/posponer/añadir)
-│       ├── whatsapp/           # webhook + vinculación
+│       ├── cron/               # due-soon (correo)
+│       ├── email/add/          # Añadir tarea por enlace firmado
+│       └── email/actions/      # Enlaces firmados (completar/posponer/añadir)
 ├── components/
-│   ├── connect/                # Panel de conexiones (WhatsApp)
 │   ├── layout/                 # topbar, sidebar, account-menu, mobile-nav
 │   └── auth/, dashboard/, kanban/, calendar/, pomodoro/,
 │       command/, ui/
 ├── lib/
 │   ├── supabase/               # config + cliente admin (server-only)
 │   ├── data/                   # mappers, repo y server actions
-│   ├── notify/                 # email (Resend), whatsapp, briefing, signed
-│   ├── whatsapp/               # parser de comandos
+│   ├── notify/                 # email (SMTP/Resend), due-soon, signed
 │   ├── cron/                   # guard de invocaciones de cron
 │   ├── auth/, i18n/, storage/, date.ts, constants.ts, utils.ts
 ├── providers/                  # Idioma, sesión, datos, UI
