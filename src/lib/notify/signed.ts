@@ -7,7 +7,7 @@ const secretKey = () =>
 
 export type EmailActionPayload = {
   v: number;
-  action: "complete" | "snooze" | "quickadd";
+  action: "complete" | "snooze" | "quickadd" | "add";
   userId: string;
   taskId?: string;
 };
@@ -33,7 +33,12 @@ export async function verifyAction(
     });
     const action = payload.action;
     const userId = typeof payload.userId === "string" ? payload.userId : "";
-    if (action !== "complete" && action !== "snooze" && action !== "quickadd") {
+    if (
+      action !== "complete" &&
+      action !== "snooze" &&
+      action !== "quickadd" &&
+      action !== "add"
+    ) {
       return null;
     }
     if (!userId) return null;

@@ -181,6 +181,24 @@ const en: Dictionary = {
       notAllowed: "This email is not authorized. The app is for personal use.",
     },
   },
+  emailAdd: {
+    title: "Add task by email",
+    subtitle:
+      "This link is temporary and only lets you add a task to your board, without signing in.",
+    badge: "Signed link",
+    successTitle: "Task added!",
+    successBody:
+      "The task is now on your Eunomia Tasks board. Close this page or sign in to view and organize it.",
+    addAnother: "Add another task",
+    loginNow: "Sign in",
+    invalidTitle: "Invalid link",
+    invalidBody:
+      "This link is invalid, expired or already used. Request a new one from the email you received from Eunomia Tasks.",
+    backToApp: "Back to home",
+    noteRequired: "Write a title for the task.",
+    noteSaved: "It will be saved to «To do» on your board.",
+    submitError: "Could not create the task. Check the fields and try again.",
+  },
 };
 
 export default en;

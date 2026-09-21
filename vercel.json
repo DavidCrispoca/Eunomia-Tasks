@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/due-soon",
-      "schedule": "30 11 * * *"
+      "schedule": "15 * * * *"
     },
     {
       "path": "/api/cron/morning-briefing",

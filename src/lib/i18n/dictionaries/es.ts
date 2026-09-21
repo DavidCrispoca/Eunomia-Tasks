@@ -180,6 +180,23 @@ const es = {
       notAllowed: "Este correo no está autorizado. La app es de uso personal.",
     },
   },
+  emailAdd: {
+    title: "Añadir tarea por correo",
+    subtitle: "Este enlace es temporal y solo sirve para añadir una tarea a tu tablero, sin iniciar sesión.",
+    badge: "Enlace firmado",
+    successTitle: "¡Tarea añadida!",
+    successBody:
+      "La tarea ya está en tu tablero de Eunomia Tasks. Cierra esta página o inicia sesión para verla y organizarla.",
+    addAnother: "Añadir otra tarea",
+    loginNow: "Iniciar sesión",
+    invalidTitle: "Enlace no válido",
+    invalidBody:
+      "Este enlace es inválido, caducó o ya se usó. Pídelo de nuevo desde el correo que recibiste de Eunomia Tasks.",
+    backToApp: "Volver al inicio",
+    noteRequired: "Escribe un título para la tarea.",
+    noteSaved: "Se guardará en «Por hacer» de tu tablero.",
+    submitError: "No se pudo crear la tarea. Revisa los datos e inténtalo de nuevo.",
+  },
 };
 
 export default es;

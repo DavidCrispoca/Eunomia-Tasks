@@ -38,6 +38,12 @@ export function utcISO(offsetDays = 0): string {
   return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
 }
 
+export function addDaysToISO(iso: string, days: number): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  const next = new Date(Date.UTC(y, m - 1, d + days));
+  return `${next.getUTCFullYear()}-${pad(next.getUTCMonth() + 1)}-${pad(next.getUTCDate())}`;
+}
+
 function timeZoneNow(timezone: string): { date: string; hour: number } {
   const fmt = new Intl.DateTimeFormat("en-CA", {
     timeZone: timezone,
@@ -291,7 +297,7 @@ export async function snoozeTaskById(
 export async function addTaskForUser(
   userId: string,
   title: string,
-  opts: { priority?: TaskPriority; dueDate?: string } = {},
+  opts: { priority?: TaskPriority; dueDate?: string; notes?: string } = {},
 ): Promise<void> {
   const db = supabaseAdmin();
   if (!db) return;
@@ -299,7 +305,7 @@ export async function addTaskForUser(
     id: randomUUID(),
     user_id: userId,
     title,
-    notes: "",
+    notes: opts.notes ?? "",
     status: "todo",
     priority: opts.priority ?? "medium",
     due_date: opts.dueDate ?? null,
@@ -317,19 +323,22 @@ export type DueSoonGroup = {
   tasks: { id: string; title: string; priority: TaskPriority; due_date: string | null }[];
 };
 
-export async function getDueSoonGroups(
-  limitDays = 1,
+export async function getDueGroups(
+  fromDays: number,
+  toDays: number,
 ): Promise<DueSoonGroup[]> {
   const db = supabaseAdmin();
   if (!db) return [];
-  const limit = utcISO(limitDays);
+  const from = utcISO(fromDays);
+  const to = utcISO(toDays);
 
   const { data, error } = await db
     .from("tasks")
     .select("id,user_id,title,priority,due_date")
     .neq("status", "done")
     .not("due_date", "is", null)
-    .lte("due_date", limit)
+    .gte("due_date", from)
+    .lte("due_date", to)
     .limit(5000);
 
   if (error || !data) return [];
@@ -359,7 +368,7 @@ export async function getDueSoonGroups(
 export async function hasNotification(
   userId: string,
   channel: "email" | "whatsapp",
-  kind: "due_soon" | "briefing",
+  kind: "due_soon" | "due_week" | "briefing",
   day: string,
 ): Promise<boolean> {
   const db = supabaseAdmin();
@@ -378,7 +387,7 @@ export async function hasNotification(
 export async function markNotification(
   userId: string,
   channel: "email" | "whatsapp",
-  kind: "due_soon" | "briefing",
+  kind: "due_soon" | "due_week" | "briefing",
   day: string,
 ): Promise<void> {
   const db = supabaseAdmin();
