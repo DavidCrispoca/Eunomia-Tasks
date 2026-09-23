@@ -12,8 +12,8 @@ import {
 } from "@dnd-kit/core";
 import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
 import { Settings2 } from "lucide-react";
-import type { Task, TaskStatus } from "@/types";
-import { STATUS_ORDER, cn } from "@/lib/utils";
+import type { Task, TaskStatus, TodoSort } from "@/types";
+import { STATUS_ORDER, cn, parseISODate } from "@/lib/utils";
 import { useData } from "@/providers/data-provider";
 import { useUi } from "@/providers/ui-provider";
 import { useLanguage } from "@/lib/i18n";
@@ -24,6 +24,32 @@ import { Button } from "@/components/ui/button";
 
 const PERSONAL = "__personal";
 
+function dueTime(task: Task): number | null {
+  return task.dueDate ? parseISODate(task.dueDate).getTime() : null;
+}
+
+function compareDueAsc(a: Task, b: Task): number {
+  const ta = dueTime(a);
+  const tb = dueTime(b);
+  if (ta === null && tb === null) return a.order - b.order;
+  if (ta === null) return 1;
+  if (tb === null) return -1;
+  return ta - tb;
+}
+
+function compareDueDesc(a: Task, b: Task): number {
+  const ta = dueTime(a);
+  const tb = dueTime(b);
+  if (ta === null && tb === null) return a.order - b.order;
+  if (ta === null) return 1;
+  if (tb === null) return -1;
+  return tb - ta;
+}
+
+function compareCreated(a: Task, b: Task): number {
+  return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+}
+
 export function KanbanBoard() {
   const { tasks, groups, updateTask, setTasks } = useData();
   const { openEditTask, openCreateTask } = useUi();
@@ -31,6 +57,7 @@ export function KanbanBoard() {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [filter, setFilter] = useState<string | null>(null);
   const [managerOpen, setManagerOpen] = useState(false);
+  const [todoSort, setTodoSort] = useState<TodoSort>("manual");
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
@@ -54,16 +81,27 @@ export function KanbanBoard() {
     return tasks.filter((task) => task.groupId === effectiveFilter);
   }, [tasks, effectiveFilter]);
 
-  const columns = useMemo(
-    () =>
-      STATUS_ORDER.map((status) => ({
-        status,
-        tasks: visibleTasks
-          .filter((task) => task.status === status)
-          .sort((a, b) => a.order - b.order),
-      })),
-    [visibleTasks],
-  );
+  const columns = useMemo(() => {
+    const sortTodo = (list: Task[]) => {
+      const copy = [...list];
+      if (todoSort === "dueAsc") copy.sort(compareDueAsc);
+      else if (todoSort === "dueDesc") copy.sort(compareDueDesc);
+      else if (todoSort === "createdAsc") copy.sort(compareCreated);
+      else copy.sort((a, b) => compareCreated(b, a));
+      return copy;
+    };
+
+    return STATUS_ORDER.map((status) => {
+      const columnTasks = visibleTasks.filter(
+        (task) => task.status === status,
+      );
+      const tasks =
+        status === "todo" && todoSort !== "manual"
+          ? sortTodo(columnTasks)
+          : [...columnTasks].sort((a, b) => a.order - b.order);
+      return { status, tasks };
+    });
+  }, [visibleTasks, todoSort]);
 
   function handleDragStart(event: DragStartEvent) {
     const task = tasks.find((t) => t.id === event.active.id);
@@ -88,6 +126,18 @@ export function KanbanBoard() {
       const overTask = tasks.find((t) => t.id === over.id);
       if (!overTask) return;
       targetStatus = overTask.status;
+    }
+
+    const sortActive = todoSort !== "manual" && targetStatus === "todo";
+    if (sortActive) {
+      if (dragged.status !== "todo") {
+        setTasks(
+          tasks.map((task) =>
+            task.id === dragged.id ? { ...task, status: "todo" } : task,
+          ),
+        );
+      }
+      return;
     }
 
     const sameColumnNoIndex = targetStatus === dragged.status && overIsColumn;
@@ -179,6 +229,8 @@ export function KanbanBoard() {
               key={column.status}
               status={column.status}
               tasks={column.tasks}
+              sortMode={todoSort}
+              onSortModeChange={setTodoSort}
               onOpenTask={openEditTask}
               onToggleDone={handleToggleDone}
               onAddTask={openCreateTask}

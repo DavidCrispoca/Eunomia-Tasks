@@ -6,16 +6,19 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Plus } from "lucide-react";
-import type { Task, TaskStatus } from "@/types";
+import type { Task, TaskStatus, TodoSort } from "@/types";
 import { STATUS_DOT } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n";
 import { SortableTaskCard } from "@/components/kanban/sortable-task-card";
+import { TodoSortSelect } from "@/components/kanban/todo-sort-select";
 import { Button } from "@/components/ui/button";
 
 interface KanbanColumnProps {
   status: TaskStatus;
   tasks: Task[];
+  sortMode: TodoSort;
+  onSortModeChange: (sort: TodoSort) => void;
   onOpenTask: (task: Task) => void;
   onToggleDone: (task: Task) => void;
   onAddTask: (status: TaskStatus) => void;
@@ -24,13 +27,18 @@ interface KanbanColumnProps {
 export function KanbanColumn({
   status,
   tasks,
+  sortMode,
+  onSortModeChange,
   onOpenTask,
   onToggleDone,
   onAddTask,
 }: KanbanColumnProps) {
   const { t } = useLanguage();
   const { setNodeRef, isOver } = useDroppable({ id: `column:${status}` });
-  const sorted = [...tasks].sort((a, b) => a.order - b.order);
+  const sorted =
+    sortMode === "manual"
+      ? [...tasks].sort((a, b) => a.order - b.order)
+      : tasks;
 
   return (
     <div className="flex min-w-[300px] flex-1 flex-col snap-start">
@@ -45,6 +53,9 @@ export function KanbanColumn({
         <span className="rounded-md border border-white/10 bg-white/[0.04] px-1.5 font-mono text-[11px] text-amber-200/80">
           {sorted.length}
         </span>
+        {status === "todo" && (
+          <TodoSortSelect value={sortMode} onChange={onSortModeChange} />
+        )}
       </div>
 
       <div

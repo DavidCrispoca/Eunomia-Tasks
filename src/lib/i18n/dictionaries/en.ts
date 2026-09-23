@@ -35,6 +35,12 @@ const en: Dictionary = {
       doing: "In progress",
       done: "Done",
     },
+    sortHint: "Sort by date",
+    sortManual: "Manual",
+    sortDueAsc: "By due date: soonest first",
+    sortDueDesc: "By due date: latest first",
+    sortCreatedDesc: "By added: newest first",
+    sortCreatedAsc: "By added: oldest first",
   },
   task: {
     title: "Title",

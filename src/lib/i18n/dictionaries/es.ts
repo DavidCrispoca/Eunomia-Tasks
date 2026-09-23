@@ -33,6 +33,12 @@ const es = {
       doing: "En curso",
       done: "Terminado",
     },
+    sortHint: "Ordenar por fecha",
+    sortManual: "Manual",
+    sortDueAsc: "Por vencimiento: próximas primero",
+    sortDueDesc: "Por vencimiento: lejanas primero",
+    sortCreatedDesc: "Por añadida: recientes primero",
+    sortCreatedAsc: "Por añadida: antiguas primero",
   },
   task: {
     title: "Título",
