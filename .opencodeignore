@@ -1,0 +1,9 @@
+node_modules/
+.next/
+.git/
+dist/
+build/
+*.log
+package-lock.json
+pnpm-lock.yaml
+supabase/.branches/

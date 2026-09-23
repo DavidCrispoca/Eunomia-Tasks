@@ -290,10 +290,41 @@ export type DueSoonGroup = {
 };
 
 export async function getDueGroups(
-  fromDays: number,
-  toDays: number,
+	fromDays: number,
+	toDays: number,
 ): Promise<DueSoonGroup[]> {
-  const db = supabaseAdmin();
+	if (!isSupabaseConfigured()) {
+		const from = utcISO(fromDays);
+		const to = utcISO(toDays);
+		const tasks = defaultTasks()
+			.filter(
+				(t) =>
+					t.status !== "done" &&
+					t.dueDate &&
+					t.dueDate >= from &&
+					t.dueDate <= to,
+			)
+			.map((t) => ({
+				id: t.id,
+				title: t.title,
+				priority: t.priority,
+				due_date: t.dueDate,
+			}));
+		if (tasks.length === 0) return [];
+		return [
+			{
+				profile: {
+					id: "demo-david",
+					email: "demo-david.crispoca@gmail.com",
+					name: "David Crispoca",
+					timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+				},
+				tasks,
+			},
+		];
+	}
+
+	const db = supabaseAdmin();
   if (!db) return [];
   const from = utcISO(fromDays);
   const to = utcISO(toDays);

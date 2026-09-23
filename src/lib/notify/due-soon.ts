@@ -193,7 +193,12 @@ export async function runDueSoonEmails(): Promise<{
   sent: number;
   skipped: number;
 }> {
-  if (!isEmailConfigured()) return { sent: 0, skipped: 0 };
+  if (!isEmailConfigured()) {
+    console.error(
+      "[Eunomia] runDueSoonEmails: correo no configurado. Falta SMTP_HOST/SMTP_USER/SMTP_PASS/EMAIL_FROM (o RESEND_API_KEY) en Vercel.",
+    );
+    return { sent: 0, skipped: 0 };
+  }
 
   // Ventanas en días UTC: diario cubre vencidas(-7 días) y hasta hoy/tarde,
   // semanal cubre hasta +7 para el envío de los lunes.

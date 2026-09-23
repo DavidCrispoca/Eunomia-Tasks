@@ -20,5 +20,18 @@ export async function GET() {
         present(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) &&
         present(process.env.SUPABASE_SERVICE_ROLE_KEY),
     },
+    email: {
+      smtpConfigured:
+        present(process.env.SMTP_HOST) &&
+        present(process.env.SMTP_USER) &&
+        present(process.env.SMTP_PASS) &&
+        present(process.env.EMAIL_FROM),
+      smtpHost: present(process.env.SMTP_HOST),
+      smtpUser: present(process.env.SMTP_USER),
+      smtpPass: present(process.env.SMTP_PASS),
+      sender: present(process.env.EMAIL_FROM),
+      resend: present(process.env.RESEND_API_KEY),
+      mailHour: process.env.MAIL_HOUR?.trim() ? process.env.MAIL_HOUR : "8 (default)",
+    },
   });
 }

@@ -24,6 +24,13 @@
 .DS_Store
 *.pem
 
+# opencode personal config (MCP servers, agentes locales)
+opencode.json
+.opencode/
+
+# perfiles de navegador de Playwright (sesiones locales)
+.playwright-profiles/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

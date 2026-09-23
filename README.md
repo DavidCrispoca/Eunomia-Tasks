@@ -7,7 +7,13 @@ tiempo. Inspirada en *Eunomia*, la diosa griega del orden y la disciplina.
 MVP con backend real: autenticación Supabase (email/password con correos
 autorizados), datos multidispositivo en Postgres (RLS por usuario) y alertas por
 correo de tareas por vencer. Ver `SETUP.md` (incluye una sección de **diagnóstico en
-producción** con el endpoint `/api/health`).
+producción** con el endpoint `/api/health`, que también expone el estado del correo:
+bloque `email` con `smtpConfigured`/`smtpHost`/`smtpUser`/`smtpPass`/`sender`/`resend`/`mailHour`).
+
+> ℹ️ **Estado del correo (22/09/2026):** el código de envío está listo, pero aún no
+> llegan correos hasta que se rellenen las credenciales SMTP (`SMTP_USER`/`SMTP_PASS`/
+> `EMAIL_FROM`) en Vercel — lo confirma `smtpConfigured:false` en `/api/health`.
+> Pasos exactos en `PROCESO.md` (22-09) y `SETUP.md` (§4.1 y §8).
 
 ## Ejecutar en local
 
@@ -44,7 +50,10 @@ datos se guardan en `localStorage`.
   al ganar el foco y cada 30 s; escrituras optimistas).
 - **Correo (Gmail SMTP o Resend)**: máximo 1 correo/día con las tareas pendientes
   por vencer, resumen semanal los lunes, y enlaces firmados para **completar /
-  posponer 24 h / añadir** sin login.
+  posponer 24 h / añadir** sin login. *Requiere las variables SMTP en Vercel para
+  enrutar (ver `SETUP.md` §4.1).*
+- **Playwright E2E**: `scripts/e2e.mjs` automatiza pruebas con Chrome del sistema
+  u OperaGX (health / login / enlace firmado `/add` / Gmail).
 - **i18n Español/Inglés** y sistema visual nocturno obsidiana & oro ámbar
   (ver `DESIGN.md`).
 
@@ -86,7 +95,7 @@ src/
 │   ├── (auth)/                 # Login y registro
 │   ├── (dashboard)/            # Inicio, kanban, calendar, pomodoro
 │   └── api/                    # Route Handlers
-│       ├── health/             # GET /api/health: diagnóstico de variables (sin secretos)
+│       ├── health/             # GET /api/health: diagnóstico de variables + estado del correo (sin secretos)
 │       ├── cron/               # due-soon (correo)
 │       ├── email/add/          # Añadir tarea por enlace firmado
 │       └── email/actions/      # Enlaces firmados (completar/posponer/añadir)
@@ -103,8 +112,9 @@ src/
 ├── providers/                  # Idioma, sesión, datos, UI
 └── types/                      # Task, TimeBlock, AppUser, Language
 src/proxy.ts                    # Middleware (Next 16)
+scripts/e2e.mjs                 # Playwright E2E (health/login/add/gmail; Chrome/OperaGX)
 supabase/schema.sql             # Esquema + RLS
-vercel.json                     # Crons
+vercel.json                     # Cron due-soon
 ```
 
 ## Comandos útiles
@@ -115,3 +125,39 @@ npm run build    # build de producción
 npm run start    # servir el build
 npm run lint     # ESLint (Next.js)
 ```
+
+## Desarrollo con Opencode
+
+Opencode es el asistente de IA usado para desarrollar este proyecto. Sus
+capacidades se configuran en `opencode.json` (MCPs) y en `.opencode/skills/` y
+`.agents/skills/` (skills). Ver también `AGENTS.md`, que incluye el mapa
+completo y se carga en cada sesión.
+
+### MCP servers
+
+| Server       | Tipo   | Para qué sirve                                        | Setup |
+| ------------ | ------ | ----------------------------------------------------- | ----- |
+| `playwright` | local  | Navegador automatizado: E2E, debugging visual, verificar la UI | Ya configurado y conectado |
+| `supabase`   | remote | Gestión del proyecto Supabase (tablas, SQL, Edge Functions, tipos TS, advisories de seguridad) | Autenticar una vez: `opencode mcp auth supabase` |
+
+Para autenticar el MCP de Supabase: `opencode mcp auth supabase` (abre el
+navegador con tu cuenta de Supabase). Verifica con
+`opencode mcp auth list` y `opencode mcp list`.
+
+### Skills
+
+| Skill                     | Origen                  | Qué activa                                                                 |
+| ------------------------- | ----------------------- | -------------------------------------------------------------------------- |
+| `web-clean-architecture`  | `.opencode/skills/`     | Arquitectura limpia web/Next.js: separar UI/lógica/datos, TS estricto sin `any`, Zod, encapsular Supabase en services/actions. |
+| `clawscan`                | `.opencode/skills/`     | Auditoría de seguridad (skills, plugins, MCP, `.env`) con `npx @openclaw/clawscan`. |
+| `design-taste-frontend`   | `.agents/skills/`       | Frontend anti-slop (landing, portfolios, rediseños).                     |
+| `high-end-visual-design`  | `.agents/skills/`       | Diseño visual premium (tipografía, sombras, animaciones).                |
+| `minimalist-ui`           | `.agents/skills/`       | Interfaces editoriales minimalistas (monocromo cálido).                  |
+| `image-to-code`           | `.agents/skills/`       | De imagen de diseño a código para tareas visuales.                       |
+| `stitch-design-taste`     | `.agents/skills/`       | Generar `DESIGN.md` con estándares de UI (Google Stitch).                |
+| `full-output-enforcement` | `.agents/skills/`       | Generación de código completa, sin truncar.                              |
+| `find-skills`             | global                  | Descubrir e instalar skills adicionales.                                 |
+
+> Notas: los cambios en `opencode.json` y en skills/MCPs se cargan al **reiniciar
+> opencode** (la config no se relee en caliente). Las skills se activan con el
+> tool `skill` del asistente.

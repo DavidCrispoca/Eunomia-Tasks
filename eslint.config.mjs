@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Playwright: perfiles de navegador y utilidades de E2E
+    ".playwright-profiles/**",
+    "scripts/**",
   ]),
 ]);
 
