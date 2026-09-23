@@ -308,7 +308,7 @@ export async function getDueGroups(
 				id: t.id,
 				title: t.title,
 				priority: t.priority,
-				due_date: t.dueDate,
+				due_date: t.dueDate ?? null,
 			}));
 		if (tasks.length === 0) return [];
 		return [
