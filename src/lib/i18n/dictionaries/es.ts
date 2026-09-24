@@ -118,13 +118,23 @@ const es = {
   dashboard: {
     title: "Resumen",
     subtitle: "Tus métricas y próximas fechas de un vistazo.",
+    focus: "Enfoque del día",
+    todayProgress: (done: number, total: number) =>
+      `${done} de ${total} completadas hoy`,
+    nothingToday: "Nada agendado para hoy",
     pending: "Pendientes",
+    overdueLabel: "Vencidas",
+    overdueAlert: (n: number) =>
+      `${n} tareas fuera de plazo por atender`,
     thisWeek: "Esta semana",
     completed: "Completadas",
     completedToday: "completadas hoy",
     dueSoon: "Por vencer",
     dueSoonHint: "en los próximos 7 días",
     overdueHint: "tareas fuera de plazo",
+    weekLoad: "Carga de la semana",
+    todayBlocks: "Bloques de hoy",
+    noBlocksToday: "Sin bloques programados hoy",
     deadlines: "Próximas tareas a vencer",
     deadlinesEmpty: "Sin fechas límite próximas. ¡Buen trabajo!",
     deadlineMore: (count: number) => `+${count} más`,

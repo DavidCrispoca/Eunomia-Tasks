@@ -48,15 +48,15 @@ import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/field";
 import { Modal, ModalHeader } from "@/components/ui/modal";
 
-const DAY_START_MIN = 7 * 60;
-const DAY_END_MIN = 21 * 60;
+const DAY_START_MIN = 4 * 60;
+const DAY_END_MIN = 24 * 60;
 const ROW_MIN = 30;
 const ROW_HEIGHT = 20;
 const TOTAL_ROWS = (DAY_END_MIN - DAY_START_MIN) / ROW_MIN;
 
 const TIME_OPTIONS = Array.from(
-  { length: 48 },
-  (_, i) => minutesToHHMM(i * 30),
+  { length: TOTAL_ROWS },
+  (_, i) => minutesToHHMM(DAY_START_MIN + i * ROW_MIN),
 );
 
 export function CalendarView() {
@@ -156,7 +156,7 @@ export function CalendarView() {
   }
 
   function createBlockFromTask(task: Task, date: string, startMin: number) {
-    const endMin = Math.min(startMin + 60, DAY_END_MIN - 0);
+    const endMin = Math.min(startMin + 60, DAY_END_MIN - 1);
     const color: BlockColor =
       task.priority === "high"
         ? "red"

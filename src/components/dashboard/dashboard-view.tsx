@@ -2,12 +2,28 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { AlarmClock, ArrowRight, CheckCheck, ListTodo, Sparkles, Timer } from "lucide-react";
-import type { Task } from "@/types";
+import {
+  AlertTriangle,
+  ArrowRight,
+  CalendarClock,
+  CheckCheck,
+  Clock,
+  ListTodo,
+  Sparkles,
+  Timer,
+} from "lucide-react";
+import type { Task, TimeBlock } from "@/types";
 import { cn } from "@/lib/utils";
 import { useData } from "@/providers/data-provider";
 import { useLanguage } from "@/lib/i18n";
-import { addDays, dayShort, formatShortDate, startOfWeek } from "@/lib/date";
+import {
+  addDays,
+  dayFull,
+  dayShort,
+  formatShortDate,
+  startOfWeek,
+  weekdayOf,
+} from "@/lib/date";
 import { toISODate, todayISO } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -17,6 +33,14 @@ const PRIORITY_DOT: Record<Task["priority"], string> = {
   high: "bg-orange-500",
 };
 
+const BLOCK_DOT: Record<NonNullable<TimeBlock["color"]>, string> = {
+  default: "text-amber-200",
+  green: "text-emerald-300",
+  orange: "text-orange-300",
+  red: "text-[#ff8a4d]",
+  blue: "text-amber-100",
+};
+
 interface DeadlineRow {
   id: string;
   title: string;
@@ -24,10 +48,11 @@ interface DeadlineRow {
   priority: Task["priority"];
   kind: "overdue" | "today" | "tomorrow" | "upcoming";
   badge: string;
+  time?: string;
 }
 
 export function DashboardView() {
-  const { tasks } = useData();
+  const { tasks, blocks } = useData();
   const { t, lang } = useLanguage();
 
   const data = useMemo(() => {
@@ -35,13 +60,15 @@ export function DashboardView() {
     const weekStart = startOfWeek(today);
     const weekStartISO = toISODate(weekStart);
     const weekEndISO = toISODate(addDays(weekStart, 6));
-    const in7Days = toISODate(addDays(new Date(), 7));
 
     const pending = tasks.filter((task) => task.status !== "done");
     const completed = tasks.filter((task) => task.status === "done");
     const completedToday = completed.filter(
       (task) => task.completedAt?.slice(0, 10) === today,
     ).length;
+
+    const dueToday = tasks.filter((task) => task.dueDate === today);
+    const dueTodayDone = dueToday.filter((task) => task.status === "done").length;
 
     const pendingThisWeek = pending.filter(
       (task) => task.dueDate && task.dueDate >= weekStartISO && task.dueDate <= weekEndISO,
@@ -56,12 +83,7 @@ export function DashboardView() {
     });
     const maxDay = Math.max(1, ...perDay.map((d) => d.count));
 
-    const overdue = pending.filter(
-      (task) => task.dueDate && task.dueDate < today,
-    );
-    const dueSoon = pending.filter(
-      (task) => task.dueDate && task.dueDate <= in7Days,
-    );
+    const overdue = pending.filter((task) => task.dueDate && task.dueDate < today);
 
     const tomorrow = toISODate(addDays(new Date(), 1));
     const deadlines: DeadlineRow[] = pending
@@ -83,6 +105,7 @@ export function DashboardView() {
           dueDate: due,
           priority: task.priority,
           kind,
+          time: blocks.find((b) => b.taskId === task.id)?.start,
           badge:
             kind === "overdue"
               ? t.dashboard.overdueBadge
@@ -94,19 +117,24 @@ export function DashboardView() {
         };
       });
 
+    const todayBlocks = blocks
+      .filter((b) => b.date === today)
+      .sort((a, b) => (a.start < b.start ? -1 : 1));
+
     return {
       pendingCount: pending.length,
-      pendingThisWeek: pendingThisWeek.length,
-      completedCount: completed.length,
-      completedToday,
       overdueCount: overdue.length,
-      dueSoon: dueSoon.length,
+      pendingThisWeek: pendingThisWeek.length,
+      completedToday,
+      dueToday: dueToday.length,
+      dueTodayDone,
+      todayBlocks,
       perDay,
       maxDay,
       deadlines,
       hasTasks: tasks.length > 0,
     };
-  }, [tasks, t]);
+  }, [tasks, blocks, t]);
 
   if (!data.hasTasks) {
     return (
@@ -127,6 +155,58 @@ export function DashboardView() {
 
   return (
     <div className="flex flex-col gap-4">
+      <GlassCard>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+              {t.common.today}
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-lg font-semibold tracking-tight text-amber-100/95">
+                {dayFull(weekdayOf(todayISO()), lang)},{" "}
+                {formatShortDate(todayISO(), lang)}
+              </h2>
+              {data.completedToday > 0 && (
+                <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 font-mono text-[10.5px] font-semibold text-emerald-300">
+                  {data.completedToday} {t.dashboard.completedToday}
+                </span>
+              )}
+            </div>
+            <p className="mt-1 text-[12.5px] text-muted">
+              {data.dueToday === 0
+                ? t.dashboard.nothingToday
+                : `${data.dueTodayDone} ${t.dashboard.completedToday}`}
+            </p>
+          </div>
+
+          <div className="w-full sm:w-72">
+            <div className="mb-1.5 flex items-center justify-between gap-2 text-[11px]">
+              <span className="text-muted">{t.dashboard.focus}</span>
+              <span className="shrink-0 font-mono text-amber-200">
+                {data.dueToday === 0
+                  ? t.dashboard.nothingToday
+                  : t.dashboard.todayProgress(data.dueTodayDone, data.dueToday)}
+              </span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-white/[0.06] shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-600 transition-all duration-500 ease-out-expo"
+                style={{
+                  width: data.dueToday > 0 ? `${(data.dueTodayDone / data.dueToday) * 100}%` : "0%",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {data.overdueCount > 0 && (
+          <div className="mt-4 flex items-center gap-2 rounded-lg border border-[#ff4500]/25 bg-[#ff4500]/[0.06] px-3 py-2 text-[12.5px] text-[#ff8a4d]">
+            <AlertTriangle size={14} className="shrink-0" />
+            <span className="min-w-0 flex-1">{t.dashboard.overdueAlert(data.overdueCount)}</span>
+          </div>
+        )}
+      </GlassCard>
+
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KpiCard
           label={t.dashboard.pending}
@@ -136,91 +216,132 @@ export function DashboardView() {
           valueClass="text-amber-200"
         />
         <KpiCard
+          label={t.dashboard.overdueLabel}
+          icon={<AlertTriangle size={18} />}
+          iconClass="bg-gradient-to-br from-[#ff4500] to-orange-600 text-white shadow-[0_0_14px_rgba(255,69,0,0.45)]"
+          value={String(data.overdueCount)}
+          valueClass={data.overdueCount > 0 ? "text-[#ff8a4d]" : "text-foreground"}
+          subtext={t.dashboard.overdueHint}
+        />
+        <KpiCard
           label={t.dashboard.thisWeek}
           icon={<Timer size={18} />}
           iconClass="bg-gradient-to-br from-amber-400 to-orange-600 text-black shadow-[0_0_14px_rgba(245,158,11,0.4)]"
           value={String(data.pendingThisWeek)}
           valueClass="text-amber-200"
-          footer={<WeekBars perDay={data.perDay} maxDay={data.maxDay} lang={lang} />}
         />
         <KpiCard
-          label={t.dashboard.completed}
-          icon={<CheckCheck size={18} />}
-          iconClass="bg-gradient-to-br from-emerald-400 to-emerald-600 text-black shadow-[0_0_14px_rgba(52,211,153,0.4)]"
-          value={String(data.completedCount)}
-          valueClass="text-emerald-300"
-          subtext={
-            data.completedToday > 0
-              ? `${data.completedToday} ${t.dashboard.completedToday}`
-              : undefined
-          }
-        />
-        <KpiCard
-          label={t.dashboard.dueSoon}
-          icon={<AlarmClock size={18} />}
-          iconClass="bg-gradient-to-br from-[#ff4500] to-orange-600 text-white shadow-[0_0_14px_rgba(255,69,0,0.45)]"
-          value={String(data.dueSoon)}
-          valueClass={
-            data.overdueCount > 0 ? "text-[#ff8a4d]" : "text-amber-200"
-          }
-          subtext={
-            data.overdueCount > 0
-              ? `${data.overdueCount} ${t.dashboard.overdueHint}`
-              : t.dashboard.dueSoonHint
-          }
+          label={t.dashboard.todayBlocks}
+          icon={<CalendarClock size={18} />}
+          iconClass="bg-gradient-to-br from-amber-400 to-orange-600 text-black shadow-[0_0_14px_rgba(245,158,11,0.4)]"
+          value={String(data.todayBlocks.length)}
+          valueClass="text-amber-200"
+          subtext={data.todayBlocks.length === 0 ? t.dashboard.noBlocksToday : undefined}
         />
       </div>
 
-      <GlassCard className="h-full">
-        <CardHeader title={t.dashboard.deadlines} />
-        {data.deadlines.length === 0 ? (
-          <p className="py-6 text-center text-sm text-muted">
-            {t.dashboard.deadlinesEmpty}
-          </p>
-        ) : (
-          <ul className="flex flex-col gap-1">
-            {data.deadlines.slice(0, 8).map((row) => (
-              <li
-                key={row.id}
-                className={cn(
-                  "flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-[13.5px] transition-colors hover:border-white/10 hover:bg-white/[0.03]",
-                  row.kind === "overdue" &&
-                    "border-[#ff4500]/20 bg-[#ff4500]/[0.05] hover:border-[#ff4500]/30",
-                  row.kind === "today" &&
-                    "border-amber-500/20 bg-amber-500/[0.06] hover:border-amber-500/35",
-                )}
-              >
-                <span
+      <div className="grid gap-4 lg:grid-cols-3">
+        <GlassCard className="lg:col-span-2">
+          <CardHeader icon={<CheckCheck size={13} />} iconClass="text-emerald-300" title={t.dashboard.deadlines} />
+          {data.deadlines.length === 0 ? (
+            <p className="py-6 text-center text-sm text-muted">
+              {t.dashboard.deadlinesEmpty}
+            </p>
+          ) : (
+            <ul className="flex flex-col gap-1">
+              {data.deadlines.slice(0, 8).map((row) => (
+                <li
+                  key={row.id}
                   className={cn(
-                    "h-1.5 w-1.5 shrink-0 rounded-full",
-                    PRIORITY_DOT[row.priority],
-                  )}
-                  aria-hidden
-                />
-                <span className="min-w-0 flex-1 truncate">{row.title}</span>
-                <span
-                  className={cn(
-                    "shrink-0 font-mono text-[11px]",
-                    row.kind === "overdue"
-                      ? "text-[#ff8a4d]"
-                      : row.kind === "upcoming"
-                        ? "text-muted"
-                        : "text-amber-200",
+                    "flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-[13.5px] transition-colors hover:border-white/10 hover:bg-white/[0.03]",
+                    row.kind === "overdue" &&
+                      "border-[#ff4500]/20 bg-[#ff4500]/[0.05] hover:border-[#ff4500]/30",
+                    row.kind === "today" &&
+                      "border-amber-500/20 bg-amber-500/[0.06] hover:border-amber-500/35",
                   )}
                 >
-                  {row.badge && <>{row.badge}&nbsp;</>}
-                  {formatShortDate(row.dueDate, lang)}
-                </span>
-              </li>
-            ))}
-            {data.deadlines.length > 8 && (
-              <li className="px-3 pt-0.5 text-right font-mono text-[11px] text-muted">
-                {t.dashboard.deadlineMore(data.deadlines.length - 8)}
-              </li>
+                  <span
+                    className={cn(
+                      "h-1.5 w-1.5 shrink-0 rounded-full",
+                      PRIORITY_DOT[row.priority],
+                    )}
+                    aria-hidden
+                  />
+                  <span className="min-w-0 flex-1 truncate">{row.title}</span>
+                  {row.time && (
+                    <span className="hidden shrink-0 items-center gap-1 font-mono text-[11px] text-muted/80 sm:flex">
+                      <Clock size={10} />
+                      {row.time}
+                    </span>
+                  )}
+                  <span
+                    className={cn(
+                      "shrink-0 font-mono text-[11px]",
+                      row.kind === "overdue"
+                        ? "text-[#ff8a4d]"
+                        : row.kind === "upcoming"
+                          ? "text-muted"
+                          : "text-amber-200",
+                    )}
+                  >
+                    {row.badge && <>{row.badge}&nbsp;</>}
+                    {formatShortDate(row.dueDate, lang)}
+                  </span>
+                </li>
+              ))}
+              {data.deadlines.length > 8 && (
+                <li className="px-3 pt-0.5 text-right font-mono text-[11px] text-muted">
+                  {t.dashboard.deadlineMore(data.deadlines.length - 8)}
+                </li>
+              )}
+            </ul>
+          )}
+        </GlassCard>
+
+        <div className="flex flex-col gap-4">
+          <GlassCard>
+            <CardHeader icon={<Timer size={13} />} iconClass="text-amber-300" title={t.dashboard.weekLoad} />
+            <WeekBars perDay={data.perDay} maxDay={data.maxDay} lang={lang} />
+            <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-2.5 text-[11px] text-muted">
+              <span>
+                {data.pendingThisWeek} {t.dashboard.thisWeek.toLowerCase()}
+              </span>
+            </div>
+          </GlassCard>
+
+          <GlassCard className="h-full">
+            <CardHeader icon={<CalendarClock size={13} />} iconClass="text-amber-300" title={t.dashboard.todayBlocks} />
+            {data.todayBlocks.length === 0 ? (
+              <p className="py-6 text-center text-xs text-muted">
+                {t.dashboard.noBlocksToday}
+              </p>
+            ) : (
+              <ul className="flex flex-col gap-1">
+                {data.todayBlocks.slice(0, 6).map((block) => (
+                  <li
+                    key={block.id}
+                    className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-[12.5px] transition-colors hover:bg-white/[0.03]"
+                  >
+                    <span
+                      className={cn(
+                        "h-1.5 w-1.5 shrink-0 rounded-full bg-current opacity-80",
+                        BLOCK_DOT[block.color ?? "default"],
+                      )}
+                      aria-hidden
+                    />
+                    <span className="shrink-0 font-mono text-[10.5px] text-muted">
+                      {block.start}–{block.end}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-foreground/90">
+                      {block.title}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             )}
-          </ul>
-        )}
-      </GlassCard>
+          </GlassCard>
+        </div>
+      </div>
 
       <div className="flex gap-2">
         <Link href="/kanban" className="flex-1">
@@ -250,26 +371,39 @@ function WeekBars({
 }) {
   const today = todayISO();
   return (
-    <div className="mt-2.5 flex items-end gap-1" aria-hidden>
+    <div className="flex h-16 items-end gap-1.5 pt-1" aria-hidden>
       {perDay.map((day) => {
-        const height = day.count > 0 ? Math.max(4, (day.count / maxDay) * 100) : 2;
+        const barHeight =
+          day.count > 0 ? Math.max(6, (day.count / maxDay) * 30) : 3;
+        const isToday = day.iso === today;
         return (
-          <div key={day.iso} className="flex flex-1 flex-col items-center gap-1">
+          <div
+            key={day.iso}
+            className="flex h-full flex-1 flex-col items-center justify-end gap-1"
+          >
+            <span
+              className={cn(
+                "font-mono text-[8px] leading-none",
+                isToday ? "text-amber-300" : "text-muted/70",
+              )}
+            >
+              {day.count > 0 ? day.count : ""}
+            </span>
             <span
               className={cn(
                 "w-full rounded-t-sm",
-                day.iso === today
+                isToday
                   ? "bg-gradient-to-t from-amber-500 to-orange-400 shadow-[0_0_8px_rgba(245,158,11,0.4)]"
                   : day.count > 0
                     ? "bg-amber-500/40"
                     : "bg-white/[0.06]",
               )}
-              style={{ height: `${height}%` }}
+              style={{ height: `${barHeight}px` }}
             />
             <span
               className={cn(
-                "font-mono text-[8px] uppercase",
-                day.iso === today ? "text-amber-300" : "text-muted/70",
+                "font-mono text-[8px] uppercase leading-none",
+                isToday ? "text-amber-300" : "text-muted/70",
               )}
             >
               {dayShort(perDay.indexOf(day), lang).slice(0, 2)}
@@ -288,7 +422,6 @@ function KpiCard({
   value,
   valueClass,
   subtext,
-  footer,
 }: {
   label: string;
   icon?: React.ReactNode;
@@ -296,7 +429,6 @@ function KpiCard({
   value: string;
   valueClass?: string;
   subtext?: string;
-  footer?: React.ReactNode;
 }) {
   return (
     <div className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] p-4 shadow-[var(--inset-top)] transition-all duration-200 ease-out-expo hover:-translate-y-0.5 hover:border-amber-500/30 hover:shadow-[var(--inset-top),0_4px_20px_rgba(245,158,11,0.12)]">
@@ -327,7 +459,6 @@ function KpiCard({
       {subtext && (
         <p className="mt-2.5 text-[11px] leading-snug text-muted">{subtext}</p>
       )}
-      {footer}
     </div>
   );
 }
@@ -351,10 +482,25 @@ function GlassCard({
   );
 }
 
-function CardHeader({ title }: { title: string }) {
+function CardHeader({
+  title,
+  icon,
+  iconClass,
+}: {
+  title: string;
+  icon?: React.ReactNode;
+  iconClass?: string;
+}) {
   return (
     <h3 className="mb-3 flex items-center gap-2 text-[13px] font-semibold tracking-tight">
-      <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-b from-amber-400 to-orange-600" />
+      <span
+        className={cn(
+          "grid h-5 w-5 place-items-center rounded-md border border-white/10 bg-white/[0.04]",
+          iconClass,
+        )}
+      >
+        {icon}
+      </span>
       {title}
     </h3>
   );
