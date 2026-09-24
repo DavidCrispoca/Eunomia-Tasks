@@ -27,13 +27,14 @@ import {
 } from "@/lib/storage/local-storage-store";
 import { useSynced } from "@/lib/storage/synced";
 import { persistCloudData, pullCloudData } from "@/lib/data/actions";
-import { uid } from "@/lib/utils";
+import { addMinutesToHHMM, uid } from "@/lib/utils";
 
 interface NewTaskInput {
   title: string;
   notes?: string;
   priority?: TaskPriority;
   dueDate?: string;
+  dueTime?: string;
   status?: TaskStatus;
   groupId?: string;
 }
@@ -47,12 +48,49 @@ interface NewTimeBlockInput {
   color?: TimeBlock["color"];
 }
 
+type TaskPatch = Partial<Omit<Task, "id" | "createdAt">> & {
+  dueTime?: string;
+};
+
+function blockColorForTask(priority: TaskPriority): TimeBlock["color"] {
+  if (priority === "high") return "red";
+  if (priority === "low") return "green";
+  return "orange";
+}
+
+function reconcileTaskBlock(
+  blocks: TimeBlock[],
+  task: Task,
+  dueTime: string | undefined,
+): TimeBlock[] {
+  const block = blocks.find((b) => b.taskId === task.id);
+  if (task.dueDate && dueTime) {
+    const slot = {
+      title: task.title,
+      date: task.dueDate,
+      start: dueTime,
+      end: addMinutesToHHMM(dueTime, 60),
+      color: blockColorForTask(task.priority),
+    };
+    if (block) {
+      return blocks.map((b) =>
+        b.id === block.id ? { ...b, ...slot } : b,
+      );
+    }
+    return [...blocks, { id: uid(), taskId: task.id, ...slot }];
+  }
+  if (block) {
+    return blocks.filter((b) => b.id !== block.id);
+  }
+  return blocks;
+}
+
 interface DataContextValue {
   tasks: Task[];
   blocks: TimeBlock[];
   groups: TaskGroup[];
   addTask: (input: NewTaskInput) => Task;
-  updateTask: (id: string, patch: Partial<Omit<Task, "id" | "createdAt">>) => void;
+  updateTask: (id: string, patch: TaskPatch) => void;
   deleteTask: (id: string) => void;
   setTasks: (tasks: Task[]) => void;
   addTimeBlock: (input: NewTimeBlockInput) => TimeBlock;
@@ -198,18 +236,33 @@ export function DataProvider({
           order: 0,
           createdAt: new Date().toISOString(),
         };
-        localStorageStore.saveTasks([
+        const nextTasks = [
           ...tasks.map((t) =>
             t.status === task.status ? { ...t, order: t.order + 1 } : t,
           ),
           task,
-        ]);
+        ];
+        localStorageStore.saveTasks(nextTasks);
+        if (input.dueTime) {
+          const nextBlocks = reconcileTaskBlock(blocks, task, input.dueTime);
+          if (nextBlocks !== blocks) localStorageStore.saveTimeBlocks(nextBlocks);
+        }
         return task;
       },
       updateTask(id, patch) {
-        localStorageStore.saveTasks(
-          tasks.map((t) => (t.id === id ? { ...t, ...patch } : t)),
+        const { dueTime, ...rest } = patch;
+        const current = tasks.find((t) => t.id === id);
+        if (!current) return;
+        const nextTasks = tasks.map((t) =>
+          t.id === id ? { ...t, ...rest } : t,
         );
+        localStorageStore.saveTasks(nextTasks);
+        const datesChanged = "dueDate" in patch || "dueTime" in patch;
+        if (!datesChanged) return;
+
+        const next = { ...current, ...rest };
+        const nextBlocks = reconcileTaskBlock(blocks, next, dueTime);
+        if (nextBlocks !== blocks) localStorageStore.saveTimeBlocks(nextBlocks);
       },
       deleteTask(id) {
         localStorageStore.saveTasks(tasks.filter((t) => t.id !== id));

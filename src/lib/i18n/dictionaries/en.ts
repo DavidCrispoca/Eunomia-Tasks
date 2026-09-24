@@ -49,6 +49,7 @@ const en: Dictionary = {
     notesPlaceholder: "Add more context…",
     priority: "Priority",
     dueDate: "Due date",
+    dueTime: "Due time",
     status: "Status",
     group: "Class",
     createTask: "Create task",

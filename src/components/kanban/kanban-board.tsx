@@ -57,7 +57,7 @@ export function KanbanBoard() {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [filter, setFilter] = useState<string | null>(null);
   const [managerOpen, setManagerOpen] = useState(false);
-  const [todoSort, setTodoSort] = useState<TodoSort>("manual");
+  const [todoSort, setTodoSort] = useState<TodoSort>("dueAsc");
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
@@ -96,7 +96,7 @@ export function KanbanBoard() {
         (task) => task.status === status,
       );
       const tasks =
-        status === "todo" && todoSort !== "manual"
+        status !== "done" && todoSort !== "manual"
           ? sortTodo(columnTasks)
           : [...columnTasks].sort((a, b) => a.order - b.order);
       return { status, tasks };
@@ -128,7 +128,7 @@ export function KanbanBoard() {
       targetStatus = overTask.status;
     }
 
-    const sortActive = todoSort !== "manual" && targetStatus === "todo";
+    const sortActive = todoSort !== "manual" && targetStatus !== "done";
     if (sortActive) {
       if (dragged.status !== "todo") {
         setTasks(

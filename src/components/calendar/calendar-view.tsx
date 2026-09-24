@@ -114,14 +114,17 @@ export function CalendarView() {
         : task.priority === "low"
           ? "green"
           : "orange";
-    addTimeBlock({
+    const payload = {
       taskId: task.id,
       title: task.title,
       date,
       start: minutesToHHMM(startMin),
       end: minutesToHHMM(endMin),
       color,
-    });
+    };
+    const existing = blocks.find((b) => b.taskId === task.id);
+    if (existing) updateTimeBlock(existing.id, payload);
+    else addTimeBlock(payload);
   }
 
   function handleDragStart(event: DragStartEvent) {
@@ -161,6 +164,13 @@ export function CalendarView() {
   function handleBlockSave(patch: Partial<Omit<TimeBlock, "id">>) {
     if (!blockDraft) return;
     if (blockDraft.id.startsWith("new:")) {
+      if (patch.taskId) {
+        const existing = blocks.find((b) => b.taskId === patch.taskId);
+        if (existing) {
+          updateTimeBlock(existing.id, patch);
+          return;
+        }
+      }
       addTimeBlock({
         ...patch,
         title: patch.title ?? t.calendar.block,

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CalendarDays, Flag, FolderOpen, Tags, Timer } from "lucide-react";
+import { CalendarDays, Clock, Flag, FolderOpen, Tags, Timer } from "lucide-react";
 import type { TaskPriority, TaskStatus } from "@/types";
 import { useUi } from "@/providers/ui-provider";
 import { useData } from "@/providers/data-provider";
@@ -13,7 +13,7 @@ import { Input, Select, Textarea } from "@/components/ui/field";
 
 export function TaskModal() {
   const { taskDialog, closeTaskDialog } = useUi();
-  const { addTask, updateTask, deleteTask, groups } = useData();
+  const { addTask, updateTask, deleteTask, blocks, groups } = useData();
   const { t } = useLanguage();
 
   const editing = taskDialog.editing;
@@ -24,6 +24,7 @@ export function TaskModal() {
   const [priority, setPriority] = useState<TaskPriority>("medium");
   const [status, setStatus] = useState<TaskStatus>("todo");
   const [dueDate, setDueDate] = useState("");
+  const [dueTime, setDueTime] = useState("");
   const [groupId, setGroupId] = useState("");
 
   const dialogKey = editing?.id ?? (open ? "new" : "closed");
@@ -35,6 +36,9 @@ export function TaskModal() {
     setPriority(editing?.priority ?? "medium");
     setStatus(editing?.status ?? taskDialog.status ?? "todo");
     setDueDate(editing?.dueDate ?? "");
+    setDueTime(
+      editing ? (blocks.find((b) => b.taskId === editing.id)?.start ?? "") : "",
+    );
     setGroupId(editing?.groupId ?? "");
   }
 
@@ -49,6 +53,7 @@ export function TaskModal() {
         priority,
         status,
         dueDate: dueDate || undefined,
+        dueTime: dueTime || undefined,
         groupId: groupId || undefined,
         completedAt:
           status === "done"
@@ -62,6 +67,7 @@ export function TaskModal() {
         priority,
         status,
         dueDate: dueDate || undefined,
+        dueTime: dueTime || undefined,
         groupId: groupId || undefined,
       });
     }
@@ -136,6 +142,32 @@ export function TaskModal() {
         <div className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1.5">
             <label className="flex items-center gap-1.5 text-xs font-medium text-muted">
+              <CalendarDays size={12} /> {t.task.dueDate}
+            </label>
+            <Input
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="[color-scheme:dark]"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="flex items-center gap-1.5 text-xs font-medium text-muted">
+              <Clock size={12} /> {t.task.dueTime}
+            </label>
+            <Input
+              type="time"
+              value={dueTime}
+              onChange={(e) => setDueTime(e.target.value)}
+              className="[color-scheme:dark]"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-1.5">
+            <label className="flex items-center gap-1.5 text-xs font-medium text-muted">
               <Flag size={12} /> {t.task.priority}
             </label>
             <Select
@@ -150,29 +182,17 @@ export function TaskModal() {
 
           <div className="flex flex-col gap-1.5">
             <label className="flex items-center gap-1.5 text-xs font-medium text-muted">
-              <CalendarDays size={12} /> {t.task.dueDate}
+              <Tags size={12} /> {t.task.status}
             </label>
-            <Input
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              className="[color-scheme:dark]"
-            />
+            <Select
+              value={status}
+              onChange={(e) => setStatus(e.target.value as TaskStatus)}
+            >
+              <option value="todo">{t.kanban.columns.todo}</option>
+              <option value="doing">{t.kanban.columns.doing}</option>
+              <option value="done">{t.kanban.columns.done}</option>
+            </Select>
           </div>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label className="flex items-center gap-1.5 text-xs font-medium text-muted">
-            <Tags size={12} /> {t.task.status}
-          </label>
-          <Select
-            value={status}
-            onChange={(e) => setStatus(e.target.value as TaskStatus)}
-          >
-            <option value="todo">{t.kanban.columns.todo}</option>
-            <option value="doing">{t.kanban.columns.doing}</option>
-            <option value="done">{t.kanban.columns.done}</option>
-          </Select>
         </div>
 
         {editing && editing.status !== "done" && (

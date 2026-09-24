@@ -14,6 +14,7 @@ export function AddTaskForm({ token }: { token: string | null }) {
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("medium");
   const [dueDate, setDueDate] = useState("");
+  const [dueTime, setDueTime] = useState("");
   const [notes, setNotes] = useState("");
 
   if (!token) {
@@ -60,6 +61,7 @@ export function AddTaskForm({ token }: { token: string | null }) {
                 setTitle("");
                 setNotes("");
                 setDueDate("");
+                setDueTime("");
                 setStatus("form");
               }}
             >
@@ -90,6 +92,7 @@ export function AddTaskForm({ token }: { token: string | null }) {
           title,
           priority,
           dueDate: dueDate || undefined,
+          dueTime: dueTime || undefined,
           notes,
         }),
       });
@@ -148,6 +151,17 @@ export function AddTaskForm({ token }: { token: string | null }) {
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
+            />
+          </label>
+
+          <label className="block">
+            <span className="mb-1 block text-[12px] font-medium text-muted">
+              {t.task.dueTime}
+            </span>
+            <Input
+              type="time"
+              value={dueTime}
+              onChange={(e) => setDueTime(e.target.value)}
             />
           </label>
 

@@ -44,6 +44,14 @@ export function hhmmToMinutes(value: string) {
   return h * 60 + m;
 }
 
+export function addMinutesToHHMM(
+  start: string,
+  minutes: number,
+  maxMinutes = 24 * 60,
+) {
+  return minutesToHHMM(Math.min(hhmmToMinutes(start) + minutes, maxMinutes));
+}
+
 export const STATUS_ORDER: TaskStatus[] = ["todo", "doing", "done"];
 
 export const PRIORITY_ORDER: TaskPriority[] = ["low", "medium", "high"];

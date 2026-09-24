@@ -47,6 +47,7 @@ const es = {
     notesPlaceholder: "Añade más contexto…",
     priority: "Prioridad",
     dueDate: "Fecha límite",
+    dueTime: "Hora límite",
     status: "Estado",
     group: "Clase",
     createTask: "Crear tarea",

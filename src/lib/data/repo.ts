@@ -2,6 +2,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import type { Language, Task, TaskGroup, TaskPriority, TimeBlock } from "@/types";
 import { isSupabaseConfigured, supabaseAdmin } from "@/lib/supabase/server";
+import { addMinutesToHHMM } from "@/lib/utils";
 import {
   defaultGroups,
   defaultTasks,
@@ -263,12 +264,18 @@ export async function snoozeTaskById(
 export async function addTaskForUser(
   userId: string,
   title: string,
-  opts: { priority?: TaskPriority; dueDate?: string; notes?: string } = {},
+  opts: {
+    priority?: TaskPriority;
+    dueDate?: string;
+    dueTime?: string;
+    notes?: string;
+  } = {},
 ): Promise<void> {
   const db = supabaseAdmin();
   if (!db) return;
+  const id = randomUUID();
   await db.from("tasks").insert({
-    id: randomUUID(),
+    id,
     user_id: userId,
     title,
     notes: opts.notes ?? "",
@@ -278,6 +285,24 @@ export async function addTaskForUser(
     order: 0,
     created_at: new Date().toISOString(),
   });
+  if (opts.dueDate && opts.dueTime) {
+    await db.from("time_blocks").insert({
+      id: randomUUID(),
+      user_id: userId,
+      task_id: id,
+      title,
+      date: opts.dueDate,
+      start: opts.dueTime,
+      end: addMinutesToHHMM(opts.dueTime, 60),
+      color:
+        opts.priority === "high"
+          ? "red"
+          : opts.priority === "low"
+            ? "green"
+            : "orange",
+      created_at: new Date().toISOString(),
+    });
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
