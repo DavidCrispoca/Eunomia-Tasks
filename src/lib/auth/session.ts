@@ -6,7 +6,8 @@ export const SESSION_MAX_AGE = 60 * 60 * 24 * 30;
 
 const FALLBACK_SECRET = "eunomia-draft-session-secret-change-me";
 
-function secretKey(): string {
+/** Secreto compartido de sesión (SESSION_SECRET, con fallback local). */
+export function sessionSecret(): string {
   const raw = process.env.SESSION_SECRET?.trim();
   if (!raw) {
     if (process.env.NODE_ENV === "production") {
@@ -17,6 +18,10 @@ function secretKey(): string {
     return FALLBACK_SECRET;
   }
   return raw;
+}
+
+function secretKey(): string {
+  return sessionSecret();
 }
 
 export async function createSessionToken(user: AppUser): Promise<string> {

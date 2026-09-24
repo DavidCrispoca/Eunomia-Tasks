@@ -78,6 +78,33 @@ const en: Dictionary = {
     editBlock: "Edit block",
     deleteBlock: "Delete block",
     minutes: "min",
+    google: {
+      connect: "Connect Google Calendar",
+      connectHint:
+        "Publish your blocks to your primary Google calendar and see Google events here.",
+      connected: "Google Calendar connected",
+      paused: "Sync paused",
+      syncedAt: (time: string) => `Synced ${time}`,
+      neverSynced: "Not synced yet",
+      syncNow: "Retry",
+      syncing: "Syncing…",
+      pause: "Pause",
+      resume: "Resume",
+      disconnect: "Disconnect",
+      disconnectConfirm:
+        "Disconnect Google Calendar? Events already created in Google won't be deleted.",
+      disconnectDone: "Google Calendar disconnected",
+      syncError: "Could not sync with Google",
+      syncPartial: (count: number) => `Synced with ${count} error(s)`,
+      badge: "Google",
+      openInGoogle: "Open in Google Calendar",
+      timeAgo: {
+        now: "just now",
+        minutesAgo: (n: number) => `${n} min ago`,
+        hoursAgo: (n: number) => `${n} h ago`,
+        daysAgo: (n: number) => `${n} d ago`,
+      },
+    },
   },
   command: {
     placeholder: "Type a command or search…",

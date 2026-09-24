@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -28,6 +28,8 @@ import {
   cn,
   hhmmToMinutes,
   minutesToHHMM,
+  parseISODate,
+  toHoursMinutes,
   toISODate,
   todayISO,
   uid,
@@ -35,6 +37,13 @@ import {
 import { BLOCK_COLORS, PRIORITY_TEXT } from "@/lib/constants";
 import { useData } from "@/providers/data-provider";
 import { useLanguage } from "@/lib/i18n";
+import { useAuth } from "@/lib/auth/provider";
+import { GoogleSyncPanel } from "@/components/calendar/google-sync-panel";
+import {
+  loadGoogleConnectionState,
+  type GoogleConnectionState,
+} from "@/lib/google/actions";
+import { loadGoogleEvents, type GoogleEventPreview } from "@/lib/google/read";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/field";
 import { Modal, ModalHeader } from "@/components/ui/modal";
@@ -54,10 +63,17 @@ export function CalendarView() {
   const { blocks, tasks, addTimeBlock, updateTimeBlock, deleteTimeBlock } =
     useData();
   const { t, lang } = useLanguage();
+  const { user } = useAuth();
   const [weekOffset, setWeekOffset] = useState(0);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [blockDraft, setBlockDraft] = useState<TimeBlock | null>(null);
   const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
+  const [googleState, setGoogleState] = useState<GoogleConnectionState | null>(
+    null,
+  );
+  const [googleEvents, setGoogleEvents] = useState<GoogleEventPreview[]>([]);
+
+  const isDemo = Boolean(user?.demo);
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 4 } }),
@@ -100,6 +116,39 @@ export function CalendarView() {
     const end = formatShortDate(toISODate(addDays(weekStart, 6)), lang);
     return `${start} – ${end} · ${weekStart.getFullYear()}`;
   }, [weekStart, lang]);
+
+  const weekStartISO = toISODate(weekStart);
+  const weekEndISO = toISODate(addDays(weekStart, 6));
+
+  // Estado de la conexión con Google Calendar (oculto en modo demo).
+  useEffect(() => {
+    if (isDemo) return;
+    let cancelled = false;
+    void loadGoogleConnectionState().then((state) => {
+      if (!cancelled) setGoogleState(state);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isDemo]);
+
+  // Overlay de Google: refresca al montar, al cambiar de semana y al
+  // cambiar los bloques (debounce ~1 s para no martillear la API).
+  useEffect(() => {
+    if (!googleState?.connected) return;
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      void loadGoogleEvents(weekStartISO, weekEndISO).then((events) => {
+        if (!cancelled) setGoogleEvents(events ?? []);
+      });
+    }, 1000);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [googleState, weekStartISO, weekEndISO, blocks]);
+
+  const visibleGoogleEvents = googleState?.connected ? googleEvents : [];
 
   function openBlockModal(block: TimeBlock) {
     setBlockDraft(block);
@@ -220,6 +269,10 @@ export function CalendarView() {
           </span>
         </div>
 
+        {!isDemo && (
+          <GoogleSyncPanel state={googleState} onStateChange={setGoogleState} />
+        )}
+
         <div className="flex flex-col gap-6 lg:flex-row">
           <div className="min-w-0 flex-1">
             <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.02] shadow-[var(--inset-top),var(--app-shadow)]">
@@ -275,6 +328,7 @@ export function CalendarView() {
                       key={iso}
                       date={iso}
                       blocks={blocks.filter((b) => b.date === iso)}
+                      googleEvents={visibleGoogleEvents}
                       onOpenBlock={openBlockModal}
                       onCreateBlock={() => {
                         openBlockModal({
@@ -347,11 +401,50 @@ export function CalendarView() {
 interface DayColumnProps {
   date: string;
   blocks: TimeBlock[];
+  googleEvents: GoogleEventPreview[];
   onOpenBlock: (block: TimeBlock) => void;
   onCreateBlock: (date: string) => void;
 }
 
-function DayColumn({ date, blocks, onOpenBlock, onCreateBlock }: DayColumnProps) {
+/** Recorte del evento de Google a la rejilla del día (por si cruza días). */
+interface GoogleSpan {
+  top: number;
+  height: number;
+  event: GoogleEventPreview;
+}
+
+function googleEventSpans(
+  events: GoogleEventPreview[],
+  iso: string,
+): GoogleSpan[] {
+  const dayStart = parseISODate(iso).getTime();
+  const dayEnd = addDays(parseISODate(iso), 1).getTime();
+  const gridHeight = TOTAL_ROWS * ROW_HEIGHT;
+  return events
+    .map<GoogleSpan | null>((event) => {
+      const from = Math.max(new Date(event.start).getTime(), dayStart);
+      const to = Math.min(new Date(event.end).getTime(), dayEnd);
+      if (to <= from) return null;
+      const startMinutes = (from - dayStart) / 60_000;
+      const endMinutes = (to - dayStart) / 60_000;
+      const top = ((startMinutes - DAY_START_MIN) / ROW_MIN) * ROW_HEIGHT;
+      const bottom = ((endMinutes - DAY_START_MIN) / ROW_MIN) * ROW_HEIGHT;
+      const clampedTop = Math.max(0, Math.min(top, gridHeight - 6));
+      const clampedBottom = Math.max(0, Math.min(bottom, gridHeight));
+      if (clampedBottom - clampedTop <= 2) return null;
+      return { top: clampedTop, height: clampedBottom - clampedTop, event };
+    })
+    .filter((span): span is GoogleSpan => span !== null);
+}
+
+function DayColumn({
+  date,
+  blocks,
+  googleEvents,
+  onOpenBlock,
+  onCreateBlock,
+}: DayColumnProps) {
+  const { t } = useLanguage();
   const { setNodeRef, isOver } = useDroppable({ id: `day:${date}` });
   const isToday = date === todayISO();
 
@@ -379,6 +472,49 @@ function DayColumn({ date, blocks, onOpenBlock, onCreateBlock }: DayColumnProps)
             )}
             style={{ top }}
           />
+        );
+      })}
+
+      {googleEventSpans(googleEvents, date).map(({ top, height, event }) => {
+        const content = (
+          <>
+            <span className="line-clamp-2 font-medium">
+              {event.summary || t.calendar.google.badge}
+            </span>
+            <span className="flex items-center gap-1 font-mono text-[10px] text-white/50">
+              <span className="rounded border border-white/20 px-1 font-sans text-[8.5px] font-semibold uppercase tracking-wider text-white/70">
+                {t.calendar.google.badge}
+              </span>
+              <Clock size={9} />
+              {toHoursMinutes(new Date(event.start))}–
+              {toHoursMinutes(new Date(event.end))}
+            </span>
+          </>
+        );
+        const className =
+          "absolute inset-x-1 z-0 overflow-hidden rounded-lg border border-dashed border-white/25 bg-white/[0.04] px-2 py-1 text-left text-[11px] leading-tight text-white/75 transition-colors duration-200 hover:border-white/40 hover:bg-white/[0.07]";
+        const style = { top: top + 1, height: Math.max(height - 2, 12) };
+        return event.htmlLink ? (
+          <a
+            key={event.eventId}
+            href={event.htmlLink}
+            target="_blank"
+            rel="noreferrer"
+            className={className}
+            style={style}
+            aria-label={t.calendar.google.openInGoogle}
+          >
+            {content}
+          </a>
+        ) : (
+          <div
+            key={event.eventId}
+            className={className}
+            style={style}
+            aria-label={event.summary || t.calendar.google.badge}
+          >
+            {content}
+          </div>
         );
       })}
 

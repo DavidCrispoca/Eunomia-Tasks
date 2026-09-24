@@ -76,6 +76,33 @@ const es = {
     editBlock: "Editar bloque",
     deleteBlock: "Eliminar bloque",
     minutes: "min",
+    google: {
+      connect: "Conectar Google Calendar",
+      connectHint:
+        "Publica tus bloques en tu calendario principal de Google y mira aquí los eventos de Google.",
+      connected: "Google Calendar conectado",
+      paused: "Sincronización en pausa",
+      syncedAt: (time: string) => `Sincronizado ${time}`,
+      neverSynced: "Aún sin sincronizar",
+      syncNow: "Reintentar",
+      syncing: "Sincronizando…",
+      pause: "Pausar",
+      resume: "Reanudar",
+      disconnect: "Desconectar",
+      disconnectConfirm:
+        "¿Desconectar Google Calendar? Los eventos ya creados en Google no se borrarán.",
+      disconnectDone: "Google Calendar desconectado",
+      syncError: "No se pudo sincronizar con Google",
+      syncPartial: (count: number) => `Sincronizado con ${count} error(es)`,
+      badge: "Google",
+      openInGoogle: "Abrir en Google Calendar",
+      timeAgo: {
+        now: "justo ahora",
+        minutesAgo: (n: number) => `hace ${n} min`,
+        hoursAgo: (n: number) => `hace ${n} h`,
+        daysAgo: (n: number) => `hace ${n} d`,
+      },
+    },
   },
   command: {
     placeholder: "Escribe un comando o busca…",
