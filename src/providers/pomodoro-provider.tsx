@@ -11,10 +11,18 @@ import {
   type ReactNode,
 } from "react";
 import { useLanguage } from "@/lib/i18n";
+import { useData } from "@/providers/data-provider";
+import {
+  playBackgroundAudio,
+  stopBackgroundAudio,
+  updateAudioVolume,
+} from "@/lib/flight/audio";
+import type { AmbienceType } from "@/lib/flight/types";
 
 const STORAGE_KEY = "eunomia:pomodoro";
 
 export type PomodoroStatus = "running" | "paused" | "finished";
+export type PomodoroMode = "simple" | "flight";
 
 export interface StoredPomodoro {
   taskId: string;
@@ -23,6 +31,11 @@ export interface StoredPomodoro {
   endAt: number | null;
   remainingMs: number;
   status: PomodoroStatus;
+  startedAt: number;
+  mode?: PomodoroMode;
+  routeLabel?: string;
+  ambience?: AmbienceType;
+  volume?: number;
 }
 
 interface ItemTask {
@@ -30,14 +43,23 @@ interface ItemTask {
   title: string;
 }
 
+export interface StartOptions {
+  mode?: PomodoroMode;
+  routeLabel?: string;
+  ambience?: AmbienceType;
+  volume?: number;
+}
+
 interface PomodoroContextValue {
   session: StoredPomodoro | null;
   remainingMs: number;
   elapsedPct: number;
-  start: (task: ItemTask, durationMin: number) => void;
+  start: (task: ItemTask, durationMin: number, options?: StartOptions) => void;
   pause: () => void;
   resume: () => void;
   dismiss: () => void;
+  changeAmbience: (type: AmbienceType) => void;
+  changeVolume: (volume: number) => void;
 }
 
 const PomodoroContext = createContext<PomodoroContextValue | null>(null);
@@ -66,7 +88,13 @@ function loadSession(): StoredPomodoro | null {
         };
       }
     }
-    return parsed;
+    return {
+      ...parsed,
+      startedAt:
+        typeof parsed.startedAt === "number"
+          ? parsed.startedAt
+          : Date.now(),
+    };
   } catch {
     return null;
   }
@@ -117,19 +145,77 @@ function playChime() {
   }
 }
 
+/** Minutos efectivos de una sesión aún sin terminar. */
+function elapsedMinutesOf(session: StoredPomodoro): number {
+  if (session.status === "finished") return session.durationMin;
+  if (session.status === "running") {
+    const elapsed = ((session.endAt ?? Date.now()) - session.startedAt) / 60000;
+    return Math.max(0, Math.min(session.durationMin, elapsed));
+  }
+  return Math.max(0, session.durationMin - session.remainingMs / 60000);
+}
+
 export function PomodoroProvider({ children }: { children: ReactNode }) {
   const { t } = useLanguage();
+  const { tasks, updateTask } = useData();
   const [session, setSession] = useState<StoredPomodoro | null>(() =>
     loadSession(),
   );
   const sessionRef = useRef(session);
   const [now, setNow] = useState(() => Date.now());
 
+  const tasksRef = useRef(tasks);
+  const updateTaskRef = useRef(updateTask);
+  useEffect(() => {
+    tasksRef.current = tasks;
+    updateTaskRef.current = updateTask;
+  }, [tasks, updateTask]);
+
+  // Evita registrar dos veces la misma sesión (clave: tarea + instante de inicio).
+  const loggedSessionsRef = useRef<Set<string>>(new Set());
+
   useEffect(() => {
     sessionRef.current = session;
   }, [session]);
 
   const running = session?.status === "running";
+
+  const volumeRef = useRef(session?.volume ?? 0.5);
+  useEffect(() => {
+    volumeRef.current = session?.volume ?? 0.5;
+  }, [session?.volume]);
+
+  // Sonido ambiente: arranca al correr, se detiene al pausar/terminar.
+  const ambienceKey = `${session?.status ?? "idle"}:${session?.ambience ?? "none"}`;
+  useEffect(() => {
+    if (session?.status === "running" && session.ambience && session.ambience !== "none") {
+      playBackgroundAudio(session.ambience, volumeRef.current);
+    } else {
+      stopBackgroundAudio();
+    }
+  }, [ambienceKey, session?.status, session?.ambience]);
+
+  const sessionVolume = session?.volume;
+
+  useEffect(() => {
+    updateAudioVolume(sessionVolume ?? 0.5);
+  }, [sessionVolume]);
+
+  useEffect(() => () => stopBackgroundAudio(), []);
+
+  const logFocus = useCallback(
+    (current: StoredPomodoro) => {
+      const key = `${current.taskId}:${current.startedAt}`;
+      if (loggedSessionsRef.current.has(key)) return;
+      const minutes = Math.round(elapsedMinutesOf(current));
+      if (minutes <= 0) return;
+      loggedSessionsRef.current.add(key);
+      const task = tasksRef.current.find((item) => item.id === current.taskId);
+      const updated = (task?.focusMinutes ?? 0) + minutes;
+      updateTaskRef.current(current.taskId, { focusMinutes: updated });
+    },
+    [],
+  );
 
   const notifyFinished = useCallback(
     (finished: StoredPomodoro) => {
@@ -164,35 +250,44 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
         setSession(finished);
         setNow(nowMs);
         playChime();
+        logFocus(finished);
         notifyFinished(finished);
       } else {
         setNow(nowMs);
       }
     }, 500);
     return () => window.clearInterval(id);
-  }, [running, notifyFinished]);
+  }, [running, notifyFinished, logFocus]);
 
-  const start = useCallback((task: ItemTask, durationMin: number) => {
-    const created: StoredPomodoro = {
-      taskId: task.id,
-      title: task.title,
-      durationMin,
-      endAt: Date.now() + durationMin * 60 * 1000,
-      remainingMs: durationMin * 60 * 1000,
-      status: "running",
-    };
-    sessionRef.current = created;
-    saveSession(created);
-    setSession(created);
-    setNow(Date.now());
-    if (
-      typeof window !== "undefined" &&
-      "Notification" in window &&
-      Notification.permission === "default"
-    ) {
-      void Notification.requestPermission().catch(() => undefined);
-    }
-  }, []);
+  const start = useCallback(
+    (task: ItemTask, durationMin: number, options?: StartOptions) => {
+      const created: StoredPomodoro = {
+        taskId: task.id,
+        title: task.title,
+        durationMin,
+        endAt: Date.now() + durationMin * 60 * 1000,
+        remainingMs: durationMin * 60 * 1000,
+        status: "running",
+        startedAt: Date.now(),
+        mode: options?.mode,
+        routeLabel: options?.routeLabel,
+        ambience: options?.ambience,
+        volume: options?.volume ?? 0.5,
+      };
+      sessionRef.current = created;
+      saveSession(created);
+      setSession(created);
+      setNow(Date.now());
+      if (
+        typeof window !== "undefined" &&
+        "Notification" in window &&
+        Notification.permission === "default"
+      ) {
+        void Notification.requestPermission().catch(() => undefined);
+      }
+    },
+    [],
+  );
 
   const pause = useCallback(() => {
     const current = sessionRef.current;
@@ -223,9 +318,32 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const dismiss = useCallback(() => {
+    const current = sessionRef.current;
+    if (current && current.status !== "finished") {
+      logFocus(current);
+    }
     sessionRef.current = null;
     saveSession(null);
     setSession(null);
+    stopBackgroundAudio();
+  }, [logFocus]);
+
+  const changeAmbience = useCallback((ambience: AmbienceType) => {
+    const current = sessionRef.current;
+    if (!current || current.status === "finished") return;
+    const next = { ...current, ambience };
+    sessionRef.current = next;
+    saveSession(next);
+    setSession(next);
+  }, []);
+
+  const changeVolume = useCallback((volume: number) => {
+    const current = sessionRef.current;
+    if (!current || current.status === "finished") return;
+    const next = { ...current, volume };
+    sessionRef.current = next;
+    saveSession(next);
+    setSession(next);
   }, []);
 
   const remainingMs = useMemo(() => {
@@ -252,8 +370,20 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
       pause,
       resume,
       dismiss,
+      changeAmbience,
+      changeVolume,
     }),
-    [session, remainingMs, elapsedPct, start, pause, resume, dismiss],
+    [
+      session,
+      remainingMs,
+      elapsedPct,
+      start,
+      pause,
+      resume,
+      dismiss,
+      changeAmbience,
+      changeVolume,
+    ],
   );
 
   return (

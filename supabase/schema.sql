@@ -52,6 +52,7 @@ create table if not exists public.tasks (
   due_date date,
   completed_at timestamptz,
   "order" integer not null default 0,
+  focus_minutes integer not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -76,6 +77,8 @@ create index if not exists task_groups_user_id_idx on public.task_groups (user_i
 
 -- En tablas ya existentes, "create table if not exists" no añade columnas:
 alter table public.tasks add column if not exists group_id uuid;
+-- En bases ya existentes, "create table if not exists" no añade columnas:
+alter table public.tasks add column if not exists focus_minutes integer not null default 0;
 
 alter table public.tasks
   drop constraint if exists tasks_group_id_fk;

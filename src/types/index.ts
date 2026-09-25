@@ -25,6 +25,7 @@ export interface Task {
   order: number;
   createdAt: string;
   groupId?: string;
+  focusMinutes?: number;
 }
 
 export interface TimeBlock {

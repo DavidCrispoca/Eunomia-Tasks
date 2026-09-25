@@ -2,7 +2,13 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { ArrowUpRight, CheckCircle2, Circle, X } from "lucide-react";
+import {
+  ArrowUpRight,
+  CheckCircle2,
+  Circle,
+  Plane,
+  X,
+} from "lucide-react";
 import { usePomodoro } from "@/providers/pomodoro-provider";
 import { useData } from "@/providers/data-provider";
 import { useLanguage } from "@/lib/i18n";
@@ -89,6 +95,12 @@ export function PomodoroChip() {
               <span className="max-w-40 truncate font-medium">
                 {active.title}
               </span>
+              {active.mode === "flight" && active.routeLabel && (
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/25 bg-amber-500/10 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-amber-200">
+                  <Plane size={9} />
+                  {active.routeLabel}
+                </span>
+              )}
               {isActive ? (
                 <span className="ml-1 font-mono text-sm tabular-nums text-amber-200">
                   {time}

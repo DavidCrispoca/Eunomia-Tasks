@@ -11,6 +11,7 @@ export interface TaskRow {
   completed_at: string | null;
   order: number;
   group_id: string | null;
+  focus_minutes: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -47,6 +48,7 @@ export function taskFromRow(row: TaskRow): Task {
     completedAt: row.completed_at ?? undefined,
     order: Number(row.order ?? 0),
     groupId: row.group_id ?? undefined,
+    focusMinutes: row.focus_minutes ? Number(row.focus_minutes) : undefined,
     createdAt: row.created_at ?? new Date().toISOString(),
   };
 }
@@ -82,6 +84,7 @@ export function taskToRow(userId: string, task: Task): Omit<TaskRow, "created_at
     completed_at: task.completedAt ?? null,
     order: Number(task.order ?? 0),
     group_id: task.groupId ?? null,
+    focus_minutes: task.focusMinutes ?? 0,
   };
 }
 

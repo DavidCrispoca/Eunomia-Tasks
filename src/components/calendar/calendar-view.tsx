@@ -48,7 +48,7 @@ import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/field";
 import { Modal, ModalHeader } from "@/components/ui/modal";
 
-const DAY_START_MIN = 4 * 60;
+const DAY_START_MIN = 0;
 const DAY_END_MIN = 24 * 60;
 const ROW_MIN = 30;
 const ROW_HEIGHT = 20;

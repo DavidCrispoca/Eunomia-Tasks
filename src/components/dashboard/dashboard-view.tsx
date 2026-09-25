@@ -8,6 +8,7 @@ import {
   CalendarClock,
   CheckCheck,
   Clock,
+  Flame,
   ListTodo,
   Sparkles,
   Timer,
@@ -52,7 +53,7 @@ interface DeadlineRow {
 }
 
 export function DashboardView() {
-  const { tasks, blocks } = useData();
+  const { tasks, blocks, groups } = useData();
   const { t, lang } = useLanguage();
 
   const data = useMemo(() => {
@@ -121,6 +122,31 @@ export function DashboardView() {
       .filter((b) => b.date === today)
       .sort((a, b) => (a.start < b.start ? -1 : 1));
 
+    const classFocus = [
+      ...groups
+        .map((group) => ({
+          id: group.id,
+          name: group.name,
+          minutes: tasks.reduce(
+            (sum, task) =>
+              task.groupId === group.id
+                ? sum + (task.focusMinutes ?? 0)
+                : sum,
+            0,
+          ),
+        }))
+        .filter((c) => c.minutes > 0),
+      {
+        id: "__personal",
+        name: t.group.personal,
+        minutes: tasks
+          .filter((task) => !task.groupId)
+          .reduce((sum, task) => sum + (task.focusMinutes ?? 0), 0),
+      },
+    ]
+      .filter((c) => c.minutes > 0)
+      .sort((a, b) => b.minutes - a.minutes);
+
     return {
       pendingCount: pending.length,
       overdueCount: overdue.length,
@@ -133,8 +159,9 @@ export function DashboardView() {
       maxDay,
       deadlines,
       hasTasks: tasks.length > 0,
+      classFocus,
     };
-  }, [tasks, blocks, t]);
+  }, [tasks, blocks, t, groups]);
 
   if (!data.hasTasks) {
     return (
@@ -307,6 +334,62 @@ export function DashboardView() {
                 {data.pendingThisWeek} {t.dashboard.thisWeek.toLowerCase()}
               </span>
             </div>
+          </GlassCard>
+
+          <GlassCard>
+            <CardHeader
+              icon={<Clock size={13} />}
+              iconClass="text-amber-300"
+              title={t.dashboard.focusByClass}
+            />
+            <p className="mb-3 mt-[-6px] text-[11px] leading-snug text-muted/80">
+              {t.dashboard.focusByClassHint}
+            </p>
+            {data.classFocus.length === 0 ? (
+              <p className="py-5 text-center text-xs text-muted">
+                {t.dashboard.focusEmpty}
+              </p>
+            ) : (
+              <ul className="flex flex-col gap-2.5">
+                {data.classFocus.slice(0, 4).map((entry, index) => {
+                  const max = data.classFocus[0].minutes;
+                  const isTop = index === 0;
+                  return (
+                    <li key={entry.id} className="flex flex-col gap-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span
+                          className={cn(
+                            "inline-flex min-w-0 items-center gap-1 truncate text-[12.5px]",
+                            isTop ? "font-semibold text-amber-200" : "text-muted",
+                          )}
+                        >
+                          {isTop && (
+                            <Flame size={11} className="shrink-0 text-orange-400" aria-hidden />
+                          )}
+                          <span className="truncate">{entry.name}</span>
+                        </span>
+                        <span className="shrink-0 font-mono text-[11px] text-amber-100/90">
+                          {entry.minutes} {t.calendar.minutes}
+                        </span>
+                      </div>
+                      <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06] shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]">
+                        <div
+                          className={cn(
+                            "h-full rounded-full transition-all duration-500 ease-out-expo",
+                            isTop
+                              ? "bg-gradient-to-r from-amber-400 to-orange-500"
+                              : "bg-amber-500/40",
+                          )}
+                          style={{
+                            width: `${Math.max(4, (entry.minutes / max) * 100)}%`,
+                          }}
+                        />
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </GlassCard>
 
           <GlassCard className="h-full">

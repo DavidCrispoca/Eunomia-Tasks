@@ -34,8 +34,14 @@ datos se guardan en `localStorage`.
 - **Tablero Kanban**: tres columnas con arrastrar y soltar (`@dnd-kit`),
   reordenación, creación/edición, prioridades, notas y fechas límite.
 - **Calendario semanal / Time-blocking**: bloqueos arrastrando tareas desde el
-  panel "Sin programar" a la parrilla (7:00–21:00).
-- **Pomodoro**: sesiones de enfoque ajustables (10–60 min) por tarea.
+  panel "Sin programar" a la parrilla (00:00–24:00).
+- **Pomodoro**: sesiones de enfoque ajustables por tarea con dos modos:
+  **Simple** (presets 10–60 min) y **Vuelo** (duración de vuelos reales entre
+  32 aeropuertos, por minutos con rutas recomendadas o eligiendo origen/destino)
+  e **sonido ambiente** regulable (motor / lluvia / ruido blanco, volumen).
+- **Enfoque medido por Clase**: cada sesión registra los minutos enfocados en la
+  tarea; las tarjetas muestran su acumulado y tanto el tablero como el resumen
+  calculan el **total y el ranking por clase** (🔥 en la clase más enfocada).
 - **Paleta de comandos `Ctrl/Cmd + K`**.
 - **Diseño totalmente responsive móvil**: en pantallas pequeñas la navegación pasa a
   una **barra inferior fija** (Inicio / Tablero / Calendario + botón central "Nueva
@@ -47,7 +53,11 @@ datos se guardan en `localStorage`.
   **Supabase Auth**; modo demo si no hay credenciales.
 - **Datos multidispositivo**: al configurar Supabase, los datos viven en
   Postgres con RLS por usuario y se sincronizan entre dispositivos (al cargar,
-  al ganar el foco y cada 30 s; escrituras optimistas).
+  al ganar el foco y cada 30 s; escrituras optimistas). La nube solo se
+  **persiste tras mutaciones reales** y tiene candados anti-pérdida: una cuenta
+  vacía o con solo tareas de semilla **nunca pisa** los datos locales reales, y
+  `replaceAllForUser` aborta un reemplazo que intente sobrescribir datos reales
+  con la semilla de arranque.
 - **Correo (Gmail SMTP o Resend)**: máximo 1 correo/día con las tareas pendientes
   por vencer, resumen semanal los lunes, y enlaces firmados para **completar /
   posponer 24 h / añadir** sin login. *Requiere las variables SMTP en Vercel para
@@ -106,6 +116,7 @@ src/
 ├── lib/
 │   ├── supabase/               # config + cliente admin (server-only)
 │   ├── data/                   # mappers, repo y server actions
+│   ├── flight/                 # Motor de vuelo del Pomodoro: flight.ts, airports.json, audio.ts
 │   ├── notify/                 # email (SMTP/Resend), due-soon, signed
 │   ├── cron/                   # guard de invocaciones de cron
 │   ├── auth/, i18n/, storage/, date.ts, constants.ts, utils.ts

@@ -8,6 +8,7 @@ import {
   ArrowRight,
   Check,
   Pause,
+  Plane,
   Play,
   RotateCcw,
 } from "lucide-react";
@@ -16,8 +17,11 @@ import { cn } from "@/lib/utils";
 import { PRIORITY_TEXT, STATUS_DOT } from "@/lib/constants";
 import { useData } from "@/providers/data-provider";
 import { useLanguage } from "@/lib/i18n";
-import { usePomodoro } from "@/providers/pomodoro-provider";
+import { usePomodoro, type PomodoroMode } from "@/providers/pomodoro-provider";
+import type { AmbienceType } from "@/lib/flight/types";
 import { Button } from "@/components/ui/button";
+import { AudioControls } from "@/components/pomodoro/audio-controls";
+import { FlightControls } from "@/components/pomodoro/flight-controls";
 
 const PRESETS = [10, 15, 25, 30, 45, 60] as const;
 const DEFAULT_MINUTES = 25;
@@ -28,17 +32,41 @@ export function PomodoroSession({ task }: { task: Task }) {
   const { t } = useLanguage();
   const { updateTask } = useData();
   const router = useRouter();
-  const { session, remainingMs, elapsedPct, start, pause, resume, dismiss } =
-    usePomodoro();
+  const {
+    session,
+    remainingMs,
+    elapsedPct,
+    start,
+    pause,
+    resume,
+    dismiss,
+    changeAmbience,
+    changeVolume,
+  } = usePomodoro();
 
   const [localMinutes, setLocalMinutes] = useState<number>(DEFAULT_MINUTES);
+  const [mode, setMode] = useState<PomodoroMode>("simple");
+  const [localAmbience, setLocalAmbience] = useState<AmbienceType>("none");
+  const [localVolume, setLocalVolume] = useState(0.5);
+  const [flightDuration, setFlightDuration] = useState<number | null>(null);
 
   const active = session && session.taskId === task.id ? session : null;
   const isRunning = active?.status === "running";
   const finished = active?.status === "finished";
 
-  const duration = active ? active.durationMin : localMinutes;
-  const totalSeconds = duration * 60;
+  const modeInUse = active ? (active.mode ?? "simple") : mode;
+  const ambience = active ? (active.ambience ?? "none") : localAmbience;
+  const volume = active ? (active.volume ?? 0.5) : localVolume;
+
+  const duration = active
+    ? active.durationMin
+    : mode === "flight"
+      ? (flightDuration ?? null)
+      : localMinutes;
+
+  const flightIdle = mode === "flight" && !active && duration === null;
+
+  const totalSeconds = duration ? duration * 60 : 0;
   const remainingSeconds = active
     ? Math.max(0, Math.ceil(remainingMs / 1000))
     : totalSeconds;
@@ -46,7 +74,10 @@ export function PomodoroSession({ task }: { task: Task }) {
 
   const mm = Math.floor(remainingSeconds / 60);
   const ss = remainingSeconds % 60;
-  const time = `${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`;
+  const time =
+    totalSeconds > 0
+      ? `${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`
+      : "--:--";
 
   useEffect(() => {
     const previous = document.title;
@@ -61,15 +92,32 @@ export function PomodoroSession({ task }: { task: Task }) {
   function pick(minutes: number) {
     if (isRunning) return;
     if (active) {
-      start({ id: task.id, title: task.title }, minutes);
+      begin(minutes, "simple");
       return;
     }
     setLocalMinutes(minutes);
   }
 
+  function begin(
+    minutes: number,
+    usedMode: PomodoroMode,
+    route?: string,
+  ) {
+    start(
+      { id: task.id, title: task.title },
+      minutes,
+      { mode: usedMode, routeLabel: route, ambience, volume },
+    );
+  }
+
   function toggle() {
     if (!active || finished) {
-      start({ id: task.id, title: task.title }, duration);
+      const usedMode = active?.mode ?? modeInUse;
+      begin(
+        active?.durationMin ?? duration ?? DEFAULT_MINUTES,
+        usedMode,
+        active?.routeLabel,
+      );
       return;
     }
     if (isRunning) {
@@ -83,6 +131,11 @@ export function PomodoroSession({ task }: { task: Task }) {
     dismiss();
   }
 
+  function onFlightStart(minutes: number, route: string) {
+    setFlightDuration(minutes);
+    begin(minutes, "flight", route);
+  }
+
   function choose(status: TaskStatus) {
     updateTask(task.id, {
       status,
@@ -91,6 +144,24 @@ export function PomodoroSession({ task }: { task: Task }) {
     dismiss();
     router.push("/kanban");
   }
+
+  function onAmbienceChange(type: AmbienceType) {
+    if (active && !finished) changeAmbience(type);
+    else setLocalAmbience(type);
+  }
+
+  function onVolumeChange(value: number) {
+    if (active && !finished) changeVolume(value);
+    else setLocalVolume(value);
+  }
+
+  const modeButton = (value: PomodoroMode) =>
+    cn(
+      "flex-1 rounded-full px-3 py-1.5 text-[12px] font-medium transition-all duration-200 ease-out-expo",
+      modeInUse === value
+        ? "bg-amber-500/15 text-amber-200"
+        : "text-muted hover:text-foreground",
+    );
 
   return (
     <section className="flex flex-col gap-5">
@@ -124,6 +195,12 @@ export function PomodoroSession({ task }: { task: Task }) {
             <span className="min-w-0 flex-1 truncate text-[13.5px] font-medium">
               {task.title}
             </span>
+            {modeInUse === "flight" && active?.routeLabel && (
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/25 bg-amber-500/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-amber-200">
+                <Plane size={10} />
+                {active.routeLabel}
+              </span>
+            )}
             <span
               className={cn(
                 "shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-semibold",
@@ -149,7 +226,7 @@ export function PomodoroSession({ task }: { task: Task }) {
                 cy="100"
                 r={RING_RADIUS}
                 fill="none"
-                stroke="url(#pomodoro-ring)"
+                stroke={modeInUse === "flight" ? "url(#pomodoro-flight-ring)" : "url(#pomodoro-ring)"}
                 strokeWidth="6"
                 strokeLinecap="round"
                 strokeDasharray={RING_CIRCUMFERENCE}
@@ -160,6 +237,10 @@ export function PomodoroSession({ task }: { task: Task }) {
                 <linearGradient id="pomodoro-ring" x1="0" y1="0" x2="1" y2="1">
                   <stop offset="0%" stopColor="#fbbf24" />
                   <stop offset="100%" stopColor="#f97316" />
+                </linearGradient>
+                <linearGradient id="pomodoro-flight-ring" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#38bdf8" />
+                  <stop offset="100%" stopColor="#818cf8" />
                 </linearGradient>
               </defs>
             </svg>
@@ -182,32 +263,70 @@ export function PomodoroSession({ task }: { task: Task }) {
                   finished ? "text-amber-300" : "text-muted",
                 )}
               >
-                {finished ? t.pomodoro.timeUp : t.pomodoro.focus}
+                {finished
+                  ? t.pomodoro.timeUp
+                  : modeInUse === "flight"
+                    ? t.pomodoro.flight.toUpperCase()
+                    : t.pomodoro.focus}
               </span>
             </div>
           </div>
 
-          <div className="mt-6">
-            <p className="mb-2.5 text-center text-[11px] font-medium uppercase tracking-widest text-muted">
-              {t.pomodoro.duration}
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-1.5">
-              {PRESETS.map((minutes) => (
-                <button
-                  key={minutes}
-                  type="button"
-                  disabled={isRunning}
-                  onClick={() => pick(minutes)}
-                  className={cn(
-                    "h-8 min-w-9 rounded-lg px-2 font-mono text-[12.5px] font-semibold transition-all duration-200 ease-out-expo active:scale-[0.97] active:duration-75 disabled:cursor-not-allowed disabled:opacity-40",
-                    duration === minutes
-                      ? "border border-amber-500/40 bg-amber-500/10 text-amber-300 shadow-[0_0_14px_rgba(245,158,11,0.15)]"
-                      : "border border-white/10 bg-surface-2 text-muted hover:border-amber-500/25 hover:text-foreground",
-                  )}
-                >
-                  {minutes}
-                </button>
-              ))}
+          <div className="mt-5 flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] p-1">
+            {(["simple", "flight"] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                disabled={Boolean(active)}
+                onClick={() => setMode(value)}
+                className={cn(modeButton(value), active && "cursor-not-allowed")}
+              >
+                {value === "simple" ? t.pomodoro.simple : t.pomodoro.flight}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-5">
+            {modeInUse === "flight" ? (
+              <FlightControls
+                disabled={Boolean(active)}
+                onStart={onFlightStart}
+              />
+            ) : (
+              <>
+                <p className="mb-2.5 text-center text-[11px] font-medium uppercase tracking-widest text-muted">
+                  {t.pomodoro.duration}
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-1.5">
+                  {PRESETS.map((minutes) => (
+                    <button
+                      key={minutes}
+                      type="button"
+                      disabled={isRunning}
+                      onClick={() => pick(minutes)}
+                      className={cn(
+                        "h-8 min-w-9 rounded-lg px-2 font-mono text-[12.5px] font-semibold transition-all duration-200 ease-out-expo active:scale-[0.97] active:duration-75 disabled:cursor-not-allowed disabled:opacity-40",
+                        duration === minutes
+                          ? "border border-amber-500/40 bg-amber-500/10 text-amber-300 shadow-[0_0_14px_rgba(245,158,11,0.15)]"
+                          : "border border-white/10 bg-surface-2 text-muted hover:border-amber-500/25 hover:text-foreground",
+                      )}
+                    >
+                      {minutes}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="mt-5">
+            <div className="rounded-xl border border-white/10 bg-white/[0.02] px-3.5 py-3">
+              <AudioControls
+                ambience={ambience}
+                volume={volume}
+                onChange={onAmbienceChange}
+                onChangeVolume={onVolumeChange}
+              />
             </div>
           </div>
 
@@ -252,6 +371,7 @@ export function PomodoroSession({ task }: { task: Task }) {
                   size="lg"
                   className="w-full justify-center"
                   onClick={toggle}
+                  disabled={flightIdle}
                 >
                   {isRunning ? <Pause size={15} /> : <Play size={15} />}
                   {isRunning ? t.pomodoro.pause : t.pomodoro.start}

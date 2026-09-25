@@ -11,7 +11,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
-import { Settings2 } from "lucide-react";
+import { Flame, Settings2 } from "lucide-react";
 import type { Task, TaskStatus, TodoSort } from "@/types";
 import { STATUS_ORDER, cn, parseISODate } from "@/lib/utils";
 import { useData } from "@/providers/data-provider";
@@ -80,6 +80,24 @@ export function KanbanBoard() {
     }
     return tasks.filter((task) => task.groupId === effectiveFilter);
   }, [tasks, effectiveFilter]);
+
+  const focusByGroup = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const task of tasks) {
+      const key = task.groupId ?? PERSONAL;
+      map.set(key, (map.get(key) ?? 0) + (task.focusMinutes ?? 0));
+    }
+    return map;
+  }, [tasks]);
+
+  const topFocusGroup = useMemo(() => {
+    let best: { key: string; minutes: number } | null = null;
+    for (const [key, minutes] of focusByGroup) {
+      if (minutes <= 0) continue;
+      if (!best || minutes > best.minutes) best = { key, minutes };
+    }
+    return best;
+  }, [focusByGroup]);
 
   const columns = useMemo(() => {
     const sortTodo = (list: Task[]) => {
@@ -176,6 +194,16 @@ export function KanbanBoard() {
         : "border-white/10 bg-white/[0.03] text-muted hover:border-white/25 hover:text-foreground",
     );
 
+  const focusBadge = (minutes: number) =>
+    minutes > 0 ? (
+      <span className="ml-1 font-mono text-[10px] font-semibold text-amber-300/90">
+        {minutes}m
+      </span>
+    ) : null;
+
+  const classIsTop = (key: string) =>
+    topFocusGroup !== null && topFocusGroup.key === key && topFocusGroup.minutes > 0;
+
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col gap-4">
       <div className="flex items-center gap-3">
@@ -193,17 +221,27 @@ export function KanbanBoard() {
             onClick={() => setFilter(PERSONAL)}
           >
             {t.group.personal}
+            {focusBadge(focusByGroup.get(PERSONAL) ?? 0)}
           </button>
-          {groups.map((g) => (
-            <button
-              key={g.id}
-              type="button"
-              className={chip(effectiveFilter === g.id)}
-              onClick={() => setFilter(g.id)}
-            >
-              {g.name}
-            </button>
-          ))}
+          {groups.map((g) => {
+            const minutes = focusByGroup.get(g.id) ?? 0;
+            return (
+              <button
+                key={g.id}
+                type="button"
+                className={chip(effectiveFilter === g.id)}
+                onClick={() => setFilter(g.id)}
+              >
+                <span className="inline-flex items-center gap-1">
+                  {classIsTop(g.id) && (
+                    <Flame size={11} className="text-orange-400" aria-hidden />
+                  )}
+                  {g.name}
+                </span>
+                {focusBadge(minutes)}
+              </button>
+            );
+          })}
         </div>
         <Button
           variant="ghost"

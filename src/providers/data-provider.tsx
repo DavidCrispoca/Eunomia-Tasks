@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -23,6 +24,7 @@ import {
   defaultGroups,
   defaultTasks,
   defaultTimeBlocks,
+  isSeedDataset,
   localStorageStore,
 } from "@/lib/storage/local-storage-store";
 import { useSynced } from "@/lib/storage/synced";
@@ -113,6 +115,15 @@ function readRaw(key: string): string | null {
   }
 }
 
+function readJson<T>(key: string): T | null {
+  try {
+    const raw = readRaw(key);
+    return raw ? (JSON.parse(raw) as T) : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Serialización canónica (orden de claves estable) para comparar datasets. */
 function canonicalJson(value: unknown): string {
   return JSON.stringify(value, (_, current) =>
@@ -133,6 +144,25 @@ function hasRawValue(key: string, value: unknown): boolean {
   return raw !== null && canonicalJson(JSON.parse(raw)) === canonicalJson(value);
 }
 
+/**
+ * Decide si aceptar remoto (nube) sobre local para TASKS:
+ * - Nunca vacía la cuenta: una nube sin tareas no pisa datos locales.
+ * - Una nube que solo tiene semilla no pisa datos locales reales (evita la
+ *   pérdida del incidente de borrado masivo).
+ */
+function shouldAcceptRemoteTasks(local: Task[] | null, remote: Task[]): boolean {
+  if (!remote || remote.length === 0) return false;
+  if (
+    local &&
+    local.length > 0 &&
+    !isSeedDataset(local) &&
+    isSeedDataset(remote)
+  ) {
+    return false;
+  }
+  return true;
+}
+
 export function DataProvider({
   initialData,
   children,
@@ -145,6 +175,11 @@ export function DataProvider({
   const groups = useSynced<TaskGroup[]>(GROUPS_KEY, () => defaultGroups());
 
   const cloud = Boolean(initialData);
+  const cloudRef = useRef(cloud);
+  useEffect(() => {
+    cloudRef.current = cloud;
+  }, [cloud]);
+
   const hydrated = useRef(false);
 
   useEffect(() => {
@@ -157,12 +192,38 @@ export function DataProvider({
     }
   }, [cloud]);
 
-  // 1. Hidratar el almacén local con los datos del servidor en el primer render.
+  /**
+   * Persistir en la nube SOLO como resultado de una mutación del usuario.
+   * Nunca se persiste el estado de arranque/semilla ni la hidratación, que es
+   * lo que provocó el reemplazo destructivo del dataset en la nube.
+   */
+  const persistTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const schedulePersist = useCallback(
+    (nextTasks: Task[], nextBlocks: TimeBlock[], nextGroups: TaskGroup[]) => {
+      if (!cloudRef.current) return;
+      if (persistTimer.current) clearTimeout(persistTimer.current);
+      persistTimer.current = setTimeout(() => {
+        void persistCloudData(nextTasks, nextBlocks, nextGroups);
+      }, 700);
+    },
+    [],
+  );
+  useEffect(
+    () => () => {
+      if (persistTimer.current) clearTimeout(persistTimer.current);
+    },
+    [],
+  );
+
+  // Hidratar el almacén local con los datos del servidor en el primer render.
   useEffect(() => {
     if (!initialData || hydrated.current) return;
     hydrated.current = true;
     try {
-      if (!hasRawValue(TASKS_KEY, initialData.tasks)) {
+      if (
+        shouldAcceptRemoteTasks(readJson<Task[]>(TASKS_KEY), initialData.tasks) &&
+        !hasRawValue(TASKS_KEY, initialData.tasks)
+      ) {
         localStorageStore.saveTasks(initialData.tasks);
       }
       if (!hasRawValue(BLOCKS_KEY, initialData.blocks)) {
@@ -176,34 +237,30 @@ export function DataProvider({
     }
   }, [initialData]);
 
-  // 2. Persistir en la nube cada cambio (optimista + debounce).
-  const persistTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => {
-    if (!cloud) return;
-    if (persistTimer.current) clearTimeout(persistTimer.current);
-    persistTimer.current = setTimeout(() => {
-      void persistCloudData(tasks, blocks, groups);
-    }, 600);
-    return () => {
-      if (persistTimer.current) clearTimeout(persistTimer.current);
-    };
-  }, [tasks, blocks, groups, cloud]);
-
-  // 3. Sincronizar entre dispositivos: polling + focus por si cambió en la nube.
+  // Sincronizar entre dispositivos: polling + focus por si cambió en la nube.
   useEffect(() => {
     if (!cloud) return;
     const pull = async () => {
-      if (persistTimer.current) return; // no pisar una edición aún no persistida
       const data = await pullCloudData();
       if (!data) return;
-      if (!hasRawValue(TASKS_KEY, data.tasks)) {
-        localStorageStore.saveTasks(data.tasks);
-      }
-      if (!hasRawValue(BLOCKS_KEY, data.blocks)) {
-        localStorageStore.saveTimeBlocks(data.blocks);
-      }
-      if (!hasRawValue(GROUPS_KEY, data.groups)) {
-        localStorageStore.saveGroups(data.groups);
+      try {
+        if (
+          shouldAcceptRemoteTasks(
+            readJson<Task[]>(TASKS_KEY),
+            data.tasks,
+          ) &&
+          !hasRawValue(TASKS_KEY, data.tasks)
+        ) {
+          localStorageStore.saveTasks(data.tasks);
+        }
+        if (!hasRawValue(BLOCKS_KEY, data.blocks)) {
+          localStorageStore.saveTimeBlocks(data.blocks);
+        }
+        if (!hasRawValue(GROUPS_KEY, data.groups)) {
+          localStorageStore.saveGroups(data.groups);
+        }
+      } catch {
+        // lectura/escritura de almacenamiento no disponible
       }
     };
     const onFocus = () => void pull();
@@ -243,10 +300,12 @@ export function DataProvider({
           task,
         ];
         localStorageStore.saveTasks(nextTasks);
+        let nextBlocks = blocks;
         if (input.dueTime) {
-          const nextBlocks = reconcileTaskBlock(blocks, task, input.dueTime);
+          nextBlocks = reconcileTaskBlock(blocks, task, input.dueTime);
           if (nextBlocks !== blocks) localStorageStore.saveTimeBlocks(nextBlocks);
         }
+        schedulePersist(nextTasks, nextBlocks, groups);
         return task;
       },
       updateTask(id, patch) {
@@ -258,20 +317,26 @@ export function DataProvider({
         );
         localStorageStore.saveTasks(nextTasks);
         const datesChanged = "dueDate" in patch || "dueTime" in patch;
-        if (!datesChanged) return;
+        if (!datesChanged) {
+          schedulePersist(nextTasks, blocks, groups);
+          return;
+        }
 
         const next = { ...current, ...rest };
         const nextBlocks = reconcileTaskBlock(blocks, next, dueTime);
         if (nextBlocks !== blocks) localStorageStore.saveTimeBlocks(nextBlocks);
+        schedulePersist(nextTasks, nextBlocks, groups);
       },
       deleteTask(id) {
-        localStorageStore.saveTasks(tasks.filter((t) => t.id !== id));
-        localStorageStore.saveTimeBlocks(
-          blocks.filter((b) => b.taskId !== id),
-        );
+        const nextTasks = tasks.filter((t) => t.id !== id);
+        const nextBlocks = blocks.filter((b) => b.taskId !== id);
+        localStorageStore.saveTasks(nextTasks);
+        localStorageStore.saveTimeBlocks(nextBlocks);
+        schedulePersist(nextTasks, nextBlocks, groups);
       },
       setTasks(next) {
         localStorageStore.saveTasks(next);
+        schedulePersist(next, blocks, groups);
       },
       addTimeBlock(input) {
         const block: TimeBlock = {
@@ -283,46 +348,57 @@ export function DataProvider({
           taskId: input.taskId,
           color: input.color ?? "default",
         };
-        localStorageStore.saveTimeBlocks([...blocks, block]);
+        const nextBlocks = [...blocks, block];
+        localStorageStore.saveTimeBlocks(nextBlocks);
+        schedulePersist(tasks, nextBlocks, groups);
         return block;
       },
       updateTimeBlock(id, patch) {
-        localStorageStore.saveTimeBlocks(
-          blocks.map((b) => (b.id === id ? { ...b, ...patch } : b)),
-        );
+        const nextBlocks = blocks.map((b) => (b.id === id ? { ...b, ...patch } : b));
+        localStorageStore.saveTimeBlocks(nextBlocks);
+        schedulePersist(tasks, nextBlocks, groups);
       },
       deleteTimeBlock(id) {
-        localStorageStore.saveTimeBlocks(blocks.filter((b) => b.id !== id));
+        const nextBlocks = blocks.filter((b) => b.id !== id);
+        localStorageStore.saveTimeBlocks(nextBlocks);
+        schedulePersist(tasks, nextBlocks, groups);
       },
       setTimeBlocks(next) {
         localStorageStore.saveTimeBlocks(next);
+        schedulePersist(tasks, next, groups);
       },
       addGroup(name) {
         const group: TaskGroup = {
           id: uid(),
           name: name.trim(),
         };
-        localStorageStore.saveGroups([...groups, group]);
+        const nextGroups = [...groups, group];
+        localStorageStore.saveGroups(nextGroups);
+        schedulePersist(tasks, blocks, nextGroups);
         return group;
       },
       updateGroup(id, patch) {
-        localStorageStore.saveGroups(
-          groups.map((g) => (g.id === id ? { ...g, ...patch } : g)),
+        const nextGroups = groups.map((g) =>
+          g.id === id ? { ...g, ...patch } : g,
         );
+        localStorageStore.saveGroups(nextGroups);
+        schedulePersist(tasks, blocks, nextGroups);
       },
       deleteGroup(id) {
-        localStorageStore.saveGroups(groups.filter((g) => g.id !== id));
-        localStorageStore.saveTasks(
-          tasks.map((t) =>
-            t.groupId === id ? { ...t, groupId: undefined } : t,
-          ),
+        const nextTasks = tasks.map((t) =>
+          t.groupId === id ? { ...t, groupId: undefined } : t,
         );
+        const nextGroups = groups.filter((g) => g.id !== id);
+        localStorageStore.saveTasks(nextTasks);
+        localStorageStore.saveGroups(nextGroups);
+        schedulePersist(nextTasks, blocks, nextGroups);
       },
       setGroups(next) {
         localStorageStore.saveGroups(next);
+        schedulePersist(tasks, blocks, next);
       },
     }),
-    [tasks, blocks, groups],
+    [tasks, blocks, groups, schedulePersist],
   );
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

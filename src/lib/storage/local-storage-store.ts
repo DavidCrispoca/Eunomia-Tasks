@@ -1,5 +1,5 @@
 import type { Task, TaskGroup, TimeBlock } from "@/types";
-import { hhmmToMinutes, toISODate } from "@/lib/utils";
+import { hhmmToMinutes } from "@/lib/utils";
 import type { DataStore } from "@/lib/storage/store";
 
 export const TASKS_KEY = "eunomia:tasks";
@@ -97,9 +97,29 @@ export function defaultGroups(): TaskGroup[] {
   return [];
 }
 
+/**
+ * Detecta si una lista de items tiene únicamente tareas "de arranque" (viejas
+ * o actuales). Sirve de candado para no reemplazar datos reales del usuario
+ * por el dataset de semilla (identificadas por su id `seed-*` o su título).
+ */
+export function isSeedDataset<T extends { id: string; title?: string }>(
+  items: T[],
+): boolean {
+  if (items.length === 0) return false;
+  const seed = defaultTasks();
+  if (items.length > seed.length) return false;
+  const ids = new Set(seed.map((t) => t.id));
+  const titles = new Set(seed.map((t) => t.title));
+  return items.every(
+    (it) => ids.has(it.id) || (it.title !== undefined && titles.has(it.title)),
+  );
+}
+
 function seedTasks(): Task[] {
   const now = new Date();
-  const base = toISODate(now);
+  // Fecha UTC (no local) para que el SSR del servidor y el cliente hidraten
+  // con el mismo día, evitando errores de hydration al cargar por primera vez.
+  const base = now.toISOString().slice(0, 10);
   return [
     {
       id: "seed-review-briefing",
@@ -145,7 +165,8 @@ function seedTasks(): Task[] {
 
 function seedTimeBlocks(): TimeBlock[] {
   const now = new Date();
-  const today = toISODate(now);
+  // Misma estrategia que seedTasks: fecha UTC estable entre servidor y cliente.
+  const today = now.toISOString().slice(0, 10);
   const start = new Date(now);
   start.setHours(9, 0, 0, 0);
   const end = new Date(start.getTime() + 60 * 60 * 1000);

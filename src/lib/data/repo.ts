@@ -7,6 +7,7 @@ import {
   defaultGroups,
   defaultTasks,
   defaultTimeBlocks,
+  isSeedDataset,
 } from "@/lib/storage/local-storage-store";
 import {
   blockFromRow,
@@ -168,6 +169,17 @@ export async function replaceAllForUser(
 ): Promise<boolean> {
   const db = supabaseAdmin();
   if (!db) return false;
+  // Candado anti-pérdida: si el dataset entrante parece la semilla de arranque
+  // pero la cuenta ya tiene datos reales, aborta el reemplazo (no borrar).
+  if (isSeedDataset(tasks)) {
+    const existing = await getDatasetForUser(userId);
+    if (existing && existing.tasks.length > 0 && !isSeedDataset(existing.tasks)) {
+      console.error(
+        "[Eunomia] Reemplazo abortado: dataset entrante parece semilla y la cuenta tiene datos reales.",
+      );
+      return false;
+    }
+  }
   const delBlocks = await db.from("time_blocks").delete().eq("user_id", userId);
   if (delBlocks.error) return false;
   const delTasks = await db.from("tasks").delete().eq("user_id", userId);

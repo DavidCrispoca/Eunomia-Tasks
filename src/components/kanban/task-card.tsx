@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { CalendarDays, Check, FolderOpen, StickyNote } from "lucide-react";
+import { CalendarDays, Check, Clock, FolderOpen, StickyNote } from "lucide-react";
 import type { Task } from "@/types";
 import { PRIORITY_TEXT, STATUS_DOT } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -101,6 +101,12 @@ export function TaskCard({ task, onOpen, onToggleDone, overlay }: TaskCardProps)
             {group.name}
           </span>
         )}
+        {task.focusMinutes ? (
+          <span className="inline-flex items-center gap-1 font-mono text-[11px] text-amber-300/90">
+            <Clock size={11} />
+            {task.focusMinutes} min
+          </span>
+        ) : null}
         {task.dueDate && (
           <span
             className={cn(
