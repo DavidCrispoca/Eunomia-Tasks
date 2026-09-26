@@ -9,14 +9,14 @@ import {
 import { cn } from "@/lib/utils";
 
 const baseField =
-  "w-full rounded-lg border border-white/10 bg-surface-2 px-2.5 text-sm text-foreground placeholder:text-muted transition-[border-color,box-shadow,background-color] duration-200 ease-out-expo focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-amber-500/25";
+  "w-full rounded-lg border border-white/10 bg-surface-2 px-3 text-base placeholder:text-muted transition-[border-color,box-shadow,background-color] duration-200 ease-out-expo focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-amber-500/25 max-md:text-base";
 
 export const Input = forwardRef<
   HTMLInputElement,
   InputHTMLAttributes<HTMLInputElement>
 >(function Input({ className, ...props }, ref) {
   return (
-    <input ref={ref} className={cn(baseField, "h-8", className)} {...props} />
+    <input ref={ref} className={cn(baseField, "h-10 min-h-[44px]", className)} {...props} />
   );
 });
 
@@ -27,7 +27,7 @@ export const Textarea = forwardRef<
   return (
     <textarea
       ref={ref}
-      className={cn(baseField, "min-h-[80px] resize-y py-2 leading-relaxed", className)}
+      className={cn(baseField, "min-h-[80px] resize-y py-3 leading-relaxed", className)}
       {...props}
     />
   );
@@ -40,11 +40,11 @@ export const Select = forwardRef<
   return (
     <select
       ref={ref}
-      className={cn(baseField, "h-8 cursor-pointer pr-7 appearance-none bg-no-repeat", className)}
+      className={cn(baseField, "h-10 min-h-[44px] cursor-pointer pr-10 appearance-none bg-no-repeat", className)}
       style={{
         backgroundImage:
           "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%239b9a97' stroke-width='1.5' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
-        backgroundPosition: "right 8px center",
+        backgroundPosition: "right 12px center",
       }}
       {...props}
     >

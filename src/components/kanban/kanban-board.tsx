@@ -204,20 +204,26 @@ export function KanbanBoard() {
   const classIsTop = (key: string) =>
     topFocusGroup !== null && topFocusGroup.key === key && topFocusGroup.minutes > 0;
 
-  return (
+  const STATUS_LABELS: Record<TaskStatus, string> = {
+  todo: "Por hacer",
+  doing: "En curso",
+  done: "Hecho",
+};
+
+return (
     <div className="flex h-full min-h-0 flex-1 flex-col gap-4">
       <div className="flex items-center gap-3">
-        <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto pb-1">
+        <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto pb-1 min-h-[44px]">
           <button
             type="button"
-            className={chip(effectiveFilter === null)}
+            className={cn(chip(effectiveFilter === null), "min-h-[44px] min-w-[44px] px-3 py-2")}
             onClick={() => setFilter(null)}
           >
             {t.group.all}
           </button>
           <button
             type="button"
-            className={chip(effectiveFilter === PERSONAL)}
+            className={cn(chip(effectiveFilter === PERSONAL), "min-h-[44px] min-w-[44px] px-3 py-2")}
             onClick={() => setFilter(PERSONAL)}
           >
             {t.group.personal}
@@ -229,7 +235,7 @@ export function KanbanBoard() {
               <button
                 key={g.id}
                 type="button"
-                className={chip(effectiveFilter === g.id)}
+                className={cn(chip(effectiveFilter === g.id), "min-h-[44px] min-w-[44px] px-3 py-2")}
                 onClick={() => setFilter(g.id)}
               >
                 <span className="inline-flex items-center gap-1">
@@ -245,8 +251,8 @@ export function KanbanBoard() {
         </div>
         <Button
           variant="ghost"
-          size="sm"
-          className="shrink-0 text-muted hover:border-amber-500/25 hover:bg-amber-500/5 hover:text-foreground"
+          size="md"
+          className="shrink-0 min-h-[44px]"
           onClick={() => setManagerOpen(true)}
         >
           <Settings2 size={14} />
@@ -254,14 +260,14 @@ export function KanbanBoard() {
         </Button>
       </div>
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCorners}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        onDragCancel={() => setActiveTask(null)}
-      >
-        <div className="flex h-full min-h-0 flex-1 items-stretch gap-4 overflow-x-auto scroll-px-4 pb-6 snap-x snap-proximity">
+      <div className="hidden md:flex h-full min-h-0 flex-1 items-stretch gap-4 overflow-x-auto scroll-px-4 pb-6 snap-x snap-proximity">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={() => setActiveTask(null)}
+        >
           {columns.map((column) => (
             <KanbanColumn
               key={column.status}
@@ -274,12 +280,55 @@ export function KanbanBoard() {
               onAddTask={openCreateTask}
             />
           ))}
-        </div>
+        </DndContext>
+      </div>
 
-        <DragOverlay dropAnimation={{ duration: 180 }}>
-          {activeTask ? <TaskCard task={activeTask} overlay /> : null}
-        </DragOverlay>
-      </DndContext>
+      <div className="md:hidden flex-1 min-h-0">
+        <div className="flex border-b border-white/10 overflow-x-auto pb-1" role="tablist">
+          {columns.map((column, index) => (
+            <button
+              key={column.status}
+              role="tab"
+              aria-selected={index === 0}
+              className={cn(
+                "shrink-0 px-4 py-2 text-sm font-medium border-b-2 transition-all duration-200",
+                index === 0
+                  ? "border-amber-400 text-amber-200"
+                  : "border-transparent text-muted hover:text-foreground"
+              )}
+              onClick={() => {}}
+            >
+              {t.kanban.columns[column.status] || STATUS_LABELS[column.status]}
+              <span className="ml-1.5 rounded-full bg-white/10 px-1.5 text-[10px] font-mono text-amber-300/90">
+                {column.tasks.length}
+              </span>
+            </button>
+          ))}
+        </div>
+        <div className="flex h-full min-h-0 items-stretch gap-4 overflow-x-auto scroll-px-4 pb-6 snap-x snap-mandatory">
+          {columns.map((column) => (
+            <div
+              key={column.status}
+              className="shrink-0 w-full min-w-[280px] snap-center"
+              role="tabpanel"
+            >
+              <KanbanColumn
+                status={column.status}
+                tasks={column.tasks}
+                sortMode={todoSort}
+                onSortModeChange={setTodoSort}
+                onOpenTask={openEditTask}
+                onToggleDone={handleToggleDone}
+                onAddTask={openCreateTask}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <DragOverlay dropAnimation={{ duration: 180 }}>
+        {activeTask ? <TaskCard task={activeTask} overlay /> : null}
+      </DragOverlay>
 
       <GroupManagerModal
         open={managerOpen}

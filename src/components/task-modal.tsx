@@ -93,14 +93,14 @@ export function TaskModal() {
         onClose={closeTaskDialog}
       />
       <form
-        className="flex flex-col gap-4 px-5 pb-5 pt-4"
+        className="flex flex-col gap-4 px-4 sm:px-5 pb-5 pt-4"
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
         }}
       >
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-muted">
+          <label className="text-sm font-medium text-muted">
             {t.task.title}
           </label>
           <Input
@@ -112,7 +112,7 @@ export function TaskModal() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-muted">
+          <label className="text-sm font-medium text-muted">
             {t.task.notes}
           </label>
           <Textarea
@@ -123,8 +123,8 @@ export function TaskModal() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="flex items-center gap-1.5 text-xs font-medium text-muted">
-            <FolderOpen size={12} /> {t.task.group}
+          <label className="flex items-center gap-1.5 text-sm font-medium text-muted">
+            <FolderOpen size={14} /> {t.task.group}
           </label>
           <Select
             value={groupId}
@@ -139,10 +139,10 @@ export function TaskModal() {
           </Select>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="flex flex-col gap-1.5">
-            <label className="flex items-center gap-1.5 text-xs font-medium text-muted">
-              <CalendarDays size={12} /> {t.task.dueDate}
+            <label className="flex items-center gap-1.5 text-sm font-medium text-muted">
+              <CalendarDays size={14} /> {t.task.dueDate}
             </label>
             <Input
               type="date"
@@ -153,8 +153,8 @@ export function TaskModal() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="flex items-center gap-1.5 text-xs font-medium text-muted">
-              <Clock size={12} /> {t.task.dueTime}
+            <label className="flex items-center gap-1.5 text-sm font-medium text-muted">
+              <Clock size={14} /> {t.task.dueTime}
             </label>
             <Input
               type="time"
@@ -165,10 +165,10 @@ export function TaskModal() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="flex flex-col gap-1.5">
-            <label className="flex items-center gap-1.5 text-xs font-medium text-muted">
-              <Flag size={12} /> {t.task.priority}
+            <label className="flex items-center gap-1.5 text-sm font-medium text-muted">
+              <Flag size={14} /> {t.task.priority}
             </label>
             <Select
               value={priority}
@@ -181,8 +181,8 @@ export function TaskModal() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="flex items-center gap-1.5 text-xs font-medium text-muted">
-              <Tags size={12} /> {t.task.status}
+            <label className="flex items-center gap-1.5 text-sm font-medium text-muted">
+              <Tags size={14} /> {t.task.status}
             </label>
             <Select
               value={status}
@@ -199,26 +199,26 @@ export function TaskModal() {
           <Link
             href={`/pomodoro/${editing.id}`}
             onClick={closeTaskDialog}
-            className="mt-1 flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 px-3 text-sm font-semibold text-black shadow-[0_4px_14px_rgba(249,115,22,0.25)] transition-all duration-200 ease-out-expo hover:brightness-110 hover:shadow-[0_0_25px_rgba(249,115,22,0.4)] active:scale-[0.98] active:duration-75"
+            className="mt-1 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 px-3 text-base font-semibold text-black shadow-[0_4px_14px_rgba(249,115,22,0.25)] transition-all duration-200 ease-out-expo hover:brightness-110 hover:shadow-[0_0_25px_rgba(249,115,22,0.4)] active:scale-[0.98] active:duration-75"
           >
-            <Timer size={15} />
+            <Timer size={16} />
             {t.task.startWork}
           </Link>
         )}
 
-        <div className="mt-1 flex items-center justify-between border-t border-white/10 pt-3">
+        <div className="mt-1 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/10 pt-3">
           {editing ? (
-            <Button variant="danger" type="button" onClick={handleDelete}>
+            <Button variant="danger" type="button" onClick={handleDelete} className="w-full sm:w-auto min-h-[44px]">
               {t.task.deleteTask}
             </Button>
           ) : (
-            <span />
+            <span className="w-full sm:w-auto" />
           )}
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" type="button" onClick={closeTaskDialog}>
+          <div className="flex flex-col sm:flex-row w-full gap-2">
+            <Button variant="ghost" type="button" onClick={closeTaskDialog} className="w-full min-h-[44px]">
               {t.common.cancel}
             </Button>
-            <Button type="submit" variant="primary" disabled={!canSave}>
+            <Button type="submit" variant="primary" disabled={!canSave} className="w-full min-h-[48px]">
               {t.common.save}
             </Button>
           </div>

@@ -18,12 +18,12 @@ export default function PomodoroPage() {
 
   if (!task || task.status === "done") {
     return (
-      <section className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-16 text-center shadow-[var(--inset-top)]">
+      <section className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-12 text-center shadow-[var(--inset-top)]">
         <p className="max-w-sm text-sm text-muted">
           {t.pomodoro.taskMissingHint}
         </p>
         <Link href="/kanban">
-          <Button variant="primary" size="sm">
+          <Button variant="primary" size="lg" className="min-h-[48px]">
             <ArrowLeft size={14} />
             {t.pomodoro.backToBoard}
           </Button>

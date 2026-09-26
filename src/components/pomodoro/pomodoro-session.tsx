@@ -165,22 +165,22 @@ export function PomodoroSession({ task }: { task: Task }) {
 
   return (
     <section className="flex flex-col gap-5">
-      <header className="flex items-start justify-between gap-4">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-xl font-semibold tracking-tight">
+          <h1 className="text-lg sm:text-xl font-semibold tracking-tight">
             <span className="text-gold-gradient">{t.pomodoro.title}</span>
           </h1>
-          <p className="text-[13px] text-muted">{t.pomodoro.subtitle}</p>
+          <p className="text-xs sm:text-[13px] text-muted">{t.pomodoro.subtitle}</p>
         </div>
         <Link href="/kanban">
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="md" className="min-h-[44px]">
             <ArrowLeft size={14} />
             {t.pomodoro.backToBoard}
           </Button>
         </Link>
       </header>
 
-      <div className="mx-auto flex w-full max-w-md flex-col gap-6">
+      <div className="mx-auto flex w-full max-w-md flex-col gap-6 px-2 sm:px-0">
         <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-6 shadow-[var(--inset-top),var(--app-shadow)]">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-amber-500/60 via-orange-500/25 to-transparent" />
 
@@ -211,7 +211,7 @@ export function PomodoroSession({ task }: { task: Task }) {
             </span>
           </div>
 
-          <div className="relative mx-auto h-52 w-52">
+          <div className="relative mx-auto h-52 w-52 sm:h-64 sm:w-64">
             <svg viewBox="0 0 200 200" className="absolute inset-0 h-full w-full -rotate-90">
               <circle
                 cx="100"
@@ -251,7 +251,7 @@ export function PomodoroSession({ task }: { task: Task }) {
             <div className="absolute inset-[7px] flex flex-col items-center justify-center gap-1.5 rounded-full bg-[#0c0e11]">
               <span
                 className={cn(
-                  "font-mono text-[44px] font-semibold leading-none tracking-tight",
+                  "font-mono text-5xl sm:text-[44px] font-semibold leading-none tracking-tight",
                   finished ? "text-amber-200" : "text-amber-100",
                 )}
               >
@@ -259,7 +259,7 @@ export function PomodoroSession({ task }: { task: Task }) {
               </span>
               <span
                 className={cn(
-                  "text-[11px] font-medium uppercase tracking-[0.2em]",
+                  "text-[11px] sm:text-[11px] font-medium uppercase tracking-[0.2em]",
                   finished ? "text-amber-300" : "text-muted",
                 )}
               >
@@ -279,7 +279,7 @@ export function PomodoroSession({ task }: { task: Task }) {
                 type="button"
                 disabled={Boolean(active)}
                 onClick={() => setMode(value)}
-                className={cn(modeButton(value), active && "cursor-not-allowed")}
+                className={cn(modeButton(value), "min-h-[44px] min-w-[44px]", active && "cursor-not-allowed")}
               >
                 {value === "simple" ? t.pomodoro.simple : t.pomodoro.flight}
               </button>
@@ -297,24 +297,24 @@ export function PomodoroSession({ task }: { task: Task }) {
                 <p className="mb-2.5 text-center text-[11px] font-medium uppercase tracking-widest text-muted">
                   {t.pomodoro.duration}
                 </p>
-                <div className="flex flex-wrap items-center justify-center gap-1.5">
-                  {PRESETS.map((minutes) => (
-                    <button
-                      key={minutes}
-                      type="button"
-                      disabled={isRunning}
-                      onClick={() => pick(minutes)}
-                      className={cn(
-                        "h-8 min-w-9 rounded-lg px-2 font-mono text-[12.5px] font-semibold transition-all duration-200 ease-out-expo active:scale-[0.97] active:duration-75 disabled:cursor-not-allowed disabled:opacity-40",
-                        duration === minutes
-                          ? "border border-amber-500/40 bg-amber-500/10 text-amber-300 shadow-[0_0_14px_rgba(245,158,11,0.15)]"
-                          : "border border-white/10 bg-surface-2 text-muted hover:border-amber-500/25 hover:text-foreground",
-                      )}
-                    >
-                      {minutes}
-                    </button>
-                  ))}
-                </div>
+<div className="flex flex-wrap items-center justify-center gap-2">
+                    {PRESETS.map((minutes) => (
+                      <button
+                        key={minutes}
+                        type="button"
+                        disabled={isRunning}
+                        onClick={() => pick(minutes)}
+                        className={cn(
+                          "min-h-[44px] min-w-[44px] rounded-lg px-3 font-mono text-base font-semibold transition-all duration-200 ease-out-expo active:scale-[0.97] active:duration-75 disabled:cursor-not-allowed disabled:opacity-40",
+                          duration === minutes
+                            ? "border border-amber-500/40 bg-amber-500/10 text-amber-300 shadow-[0_0_14px_rgba(245,158,11,0.15)]"
+                            : "border border-white/10 bg-surface-2 text-muted hover:border-amber-500/25 hover:text-foreground",
+                        )}
+                      >
+                        {minutes}
+                      </button>
+                    ))}
+                  </div>
               </>
             )}
           </div>
@@ -330,13 +330,14 @@ export function PomodoroSession({ task }: { task: Task }) {
             </div>
           </div>
 
-          <div className="mt-5 flex flex-col gap-2">
+          <div className="mt-5 flex flex-col gap-3">
             {finished ? (
               <>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Button
                     variant="subtle"
-                    className="flex-1 justify-center"
+                    size="lg"
+                    className="w-full sm:flex-1 justify-center min-h-[48px]"
                     onClick={() => choose("doing")}
                   >
                     <ArrowRight size={14} />
@@ -344,20 +345,21 @@ export function PomodoroSession({ task }: { task: Task }) {
                   </Button>
                   <Button
                     variant="primary"
-                    className="flex-1 justify-center"
+                    size="lg"
+                    className="w-full sm:flex-1 justify-center min-h-[48px]"
                     onClick={() => choose("done")}
                   >
                     <Check size={14} />
                     {t.pomodoro.markDone}
                   </Button>
                 </div>
-                <p className="pt-0.5 text-center text-[11px] text-muted">
+                <p className="pt-0.5 text-center text-sm text-muted">
                   {t.pomodoro.timeUpHint}
                 </p>
                 <Button
                   variant="ghost"
-                  size="sm"
-                  className="justify-center"
+                  size="md"
+                  className="w-full justify-center min-h-[44px]"
                   onClick={toggle}
                 >
                   <RotateCcw size={13} />
@@ -369,17 +371,17 @@ export function PomodoroSession({ task }: { task: Task }) {
                 <Button
                   variant="primary"
                   size="lg"
-                  className="w-full justify-center"
+                  className="w-full justify-center min-h-[56px] text-lg"
                   onClick={toggle}
                   disabled={flightIdle}
                 >
-                  {isRunning ? <Pause size={15} /> : <Play size={15} />}
+                  {isRunning ? <Pause size={18} /> : <Play size={18} />}
                   {isRunning ? t.pomodoro.pause : t.pomodoro.start}
                 </Button>
                 <Button
                   variant="ghost"
-                  size="sm"
-                  className="justify-center"
+                  size="md"
+                  className="w-full justify-center min-h-[44px]"
                   onClick={reset}
                 >
                   <RotateCcw size={13} />

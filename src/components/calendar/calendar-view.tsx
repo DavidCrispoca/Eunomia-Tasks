@@ -241,12 +241,13 @@ export function CalendarView() {
       onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveTask(null)}
     >
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-5 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="icon"
+              className="min-h-[44px] min-w-[44px]"
               onClick={() => setWeekOffset((w) => w - 1)}
               aria-label="Previous week"
             >
@@ -255,12 +256,13 @@ export function CalendarView() {
             <Button
               variant="ghost"
               size="icon"
+              className="min-h-[44px] min-w-[44px]"
               onClick={() => setWeekOffset((w) => w + 1)}
               aria-label="Next week"
             >
               <ChevronRight size={16} />
             </Button>
-            <Button variant="subtle" size="sm" onClick={() => setWeekOffset(0)}>
+            <Button variant="subtle" size="md" className="min-h-[44px]" onClick={() => setWeekOffset(0)}>
               {t.common.today}
             </Button>
           </div>
@@ -276,13 +278,13 @@ export function CalendarView() {
         <div className="flex flex-col gap-6 lg:flex-row">
           <div className="min-w-0 flex-1">
             <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.02] shadow-[var(--inset-top),var(--app-shadow)]">
-              <div className="min-w-[680px]">
-                <div className="flex border-b border-white/10">
+              <div className="min-w-[680px] sm:min-w-0">
+                <div className="flex border-b border-white/10 overflow-x-auto">
                   <div className="w-12 shrink-0" />
                   {weekDays.map(({ iso, date }) => (
                     <div
                       key={iso}
-                      className="flex flex-1 flex-col items-center gap-1 border-l border-white/10 py-2.5"
+                      className="flex flex-1 flex-col items-center gap-1 border-l border-white/10 py-2.5 min-w-[60px]"
                     >
                       <span className="font-mono text-[10.5px] font-medium uppercase tracking-widest text-muted">
                         {dayShort(weekdayOf(iso), lang)}
@@ -305,7 +307,7 @@ export function CalendarView() {
 
                 <div className="flex">
                   <div
-                    className="relative w-12 shrink-0"
+                    className="relative w-12 shrink-0 hidden sm:block"
                     style={{ height: contentHeight }}
                   >
                     {Array.from({ length: TOTAL_ROWS }, (_, r) => {
@@ -587,15 +589,15 @@ function UnscheduledTask({ task }: { task: Task }) {
           : undefined,
       }}
       className={cn(
-        "flex cursor-grab items-center gap-2 rounded-lg border border-white/10 bg-surface-2 px-2.5 py-2 text-[12.5px] shadow-[var(--inset-top)] transition-all duration-200 ease-out-expo hover:-translate-y-px hover:border-amber-500/35 hover:bg-surface-hover hover:shadow-[var(--inset-top),0_4px_16px_rgba(245,158,11,0.1)]",
+        "flex cursor-grab items-center gap-2 rounded-lg border border-white/10 bg-surface-2 px-3 py-2.5 text-sm shadow-[var(--inset-top)] transition-all duration-200 ease-out-expo hover:-translate-y-px hover:border-amber-500/35 hover:bg-surface-hover hover:shadow-[var(--inset-top),0_4px_16px_rgba(245,158,11,0.1)] min-h-[44px]",
         isDragging && "opacity-40 ring-1 ring-amber-500/30",
       )}
     >
-      <GripVertical size={13} className="shrink-0 text-amber-200/40" />
+      <GripVertical size={14} className="shrink-0 text-amber-200/40" />
       <span className="min-w-0 flex-1 truncate">{task.title}</span>
       <span
         className={cn(
-          "shrink-0 rounded-full px-1.5 py-0.5 font-mono text-[9.5px] font-semibold",
+          "shrink-0 rounded-full px-2 py-0.5 font-mono text-xs font-semibold",
           PRIORITY_TEXT[task.priority],
         )}
       >
@@ -648,7 +650,7 @@ function BlockModal({ open, block, onClose, onSave, onDelete }: BlockModalProps)
       />
       {block && (
         <form
-          className="flex flex-col gap-4 px-5 pb-5 pt-4"
+          className="flex flex-col gap-4 px-4 sm:px-5 pb-5 pt-4"
           onSubmit={(e) => {
             e.preventDefault();
             onSave({
@@ -662,23 +664,23 @@ function BlockModal({ open, block, onClose, onSave, onDelete }: BlockModalProps)
             onClose();
           }}
         >
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="date"
               value={date}
-              className="h-8 rounded-lg border border-white/10 bg-surface-2 px-2 text-sm text-foreground focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-amber-500/25 [color-scheme:dark]"
+              className="min-h-[44px] rounded-lg border border-white/10 bg-surface-2 px-3 text-sm text-foreground focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-amber-500/25 [color-scheme:dark]"
               onChange={(e) => setDate(e.target.value)}
             />
             <div className="flex flex-1 items-center gap-1.5">
-              <Select value={start} onChange={(e) => setStart(e.target.value)} aria-label={t.calendar.from}>
+              <Select value={start} onChange={(e) => setStart(e.target.value)} aria-label={t.calendar.from} className="min-h-[44px]">
                 {TIME_OPTIONS.map((o) => (
                   <option key={o} value={o}>
                     {o}
                   </option>
                 ))}
               </Select>
-              <span className="text-xs text-muted">–</span>
-              <Select value={end} onChange={(e) => setEnd(e.target.value)} aria-label={t.calendar.to}>
+              <span className="text-sm text-muted">–</span>
+              <Select value={end} onChange={(e) => setEnd(e.target.value)} aria-label={t.calendar.to} className="min-h-[44px]">
                 {TIME_OPTIONS.map((o) => (
                   <option key={o} value={o}>
                     {o}
@@ -689,7 +691,7 @@ function BlockModal({ open, block, onClose, onSave, onDelete }: BlockModalProps)
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-muted">
+            <label className="text-sm font-medium text-muted">
               {t.task.title}
             </label>
             <Input
@@ -700,7 +702,7 @@ function BlockModal({ open, block, onClose, onSave, onDelete }: BlockModalProps)
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-muted">
+            <label className="text-sm font-medium text-muted">
               {t.kanban.title}
             </label>
             <Select
@@ -717,7 +719,7 @@ function BlockModal({ open, block, onClose, onSave, onDelete }: BlockModalProps)
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-muted">Color</label>
+            <label className="text-sm font-medium text-muted">Color</label>
             <div className="flex items-center gap-2">
               {colors.map((c) => (
                 <button
@@ -725,7 +727,7 @@ function BlockModal({ open, block, onClose, onSave, onDelete }: BlockModalProps)
                   type="button"
                   onClick={() => setColor(c)}
                   className={cn(
-                    "h-5 w-5 rounded-full border shadow-[0_0_8px_rgba(0,0,0,0.4)] transition-transform hover:scale-110",
+                    "min-h-[44px] min-w-[44px] rounded-full border shadow-[0_0_8px_rgba(0,0,0,0.4)] transition-transform hover:scale-110",
                     BLOCK_COLORS[c].split(" ")[0],
                     color === c &&
                       "ring-2 ring-amber-400 ring-offset-2 ring-offset-background",
@@ -736,11 +738,12 @@ function BlockModal({ open, block, onClose, onSave, onDelete }: BlockModalProps)
             </div>
           </div>
 
-          <div className="mt-1 flex items-center justify-between border-t border-white/10 pt-3">
+          <div className="mt-1 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/10 pt-3">
             {!isNew ? (
               <Button
                 variant="danger"
                 type="button"
+                className="w-full sm:w-auto min-h-[44px]"
                 onClick={() => {
                   onDelete(block.id);
                   onClose();
@@ -749,13 +752,15 @@ function BlockModal({ open, block, onClose, onSave, onDelete }: BlockModalProps)
                 {t.calendar.deleteBlock}
               </Button>
             ) : (
-              <span />
+              <span className="w-full sm:w-auto" />
             )}
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" type="button" onClick={onClose}>
+            <div className="flex flex-col sm:flex-row w-full gap-2">
+              <Button variant="ghost" type="button" onClick={onClose} className="w-full min-h-[44px]">
                 {t.common.cancel}
               </Button>
-              <Button type="submit" variant="primary">{t.common.save}</Button>
+              <Button type="submit" variant="primary" className="w-full min-h-[48px]">
+                {t.common.save}
+              </Button>
             </div>
           </div>
         </form>

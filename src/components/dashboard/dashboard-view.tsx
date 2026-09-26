@@ -234,7 +234,7 @@ export function DashboardView() {
         )}
       </GlassCard>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 gap-4">
         <KpiCard
           label={t.dashboard.pending}
           icon={<ListTodo size={18} />}
@@ -267,7 +267,7 @@ export function DashboardView() {
         />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-3 lg:gap-4 lg:grid-cols-3">
         <GlassCard className="lg:col-span-2">
           <CardHeader icon={<CheckCheck size={13} />} iconClass="text-emerald-300" title={t.dashboard.deadlines} />
           {data.deadlines.length === 0 ? (
@@ -426,15 +426,15 @@ export function DashboardView() {
         </div>
       </div>
 
-      <div className="flex gap-2">
-        <Link href="/kanban" className="flex-1">
-          <Button variant="primary" size="sm" className="w-full justify-center">
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Link href="/kanban" className="sm:flex-1">
+          <Button variant="primary" size="lg" className="w-full justify-center min-h-[48px]">
             {t.dashboard.viewKanban}
             <ArrowRight size={14} />
           </Button>
         </Link>
-        <Link href="/calendar" className="flex-1">
-          <Button variant="subtle" size="sm" className="w-full justify-center">
+        <Link href="/calendar" className="sm:flex-1">
+          <Button variant="subtle" size="lg" className="w-full justify-center min-h-[48px]">
             {t.dashboard.viewCalendar}
           </Button>
         </Link>
@@ -514,14 +514,14 @@ function KpiCard({
   subtext?: string;
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] p-4 shadow-[var(--inset-top)] transition-all duration-200 ease-out-expo hover:-translate-y-0.5 hover:border-amber-500/30 hover:shadow-[var(--inset-top),0_4px_20px_rgba(245,158,11,0.12)]">
+    <div className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] p-3 sm:p-4 shadow-[var(--inset-top)] transition-all duration-200 ease-out-expo hover:-translate-y-0.5 hover:border-amber-500/30 hover:shadow-[var(--inset-top),0_4px_20px_rgba(245,158,11,0.12)] min-h-[44px]">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-amber-500/40 via-orange-500/15 to-transparent" />
       <div className="flex items-start justify-between gap-2">
-        <div className="flex flex-col gap-2">
-          <span className="text-xs font-medium text-muted">{label}</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-xs sm:text-sm font-medium text-muted">{label}</span>
           <span
             className={cn(
-              "font-mono text-2xl font-semibold leading-none",
+              "font-mono text-xl sm:text-2xl font-semibold leading-none",
               valueClass ?? "text-foreground",
             )}
           >
@@ -531,7 +531,7 @@ function KpiCard({
         {icon && (
           <span
             className={cn(
-              "grid h-9 w-9 shrink-0 place-items-center rounded-xl",
+              "grid h-8 w-8 shrink-0 place-items-center rounded-xl",
               iconClass,
             )}
           >
@@ -540,7 +540,7 @@ function KpiCard({
         )}
       </div>
       {subtext && (
-        <p className="mt-2.5 text-[11px] leading-snug text-muted">{subtext}</p>
+        <p className="mt-2 text-[11px] sm:text-[11px] leading-snug text-muted">{subtext}</p>
       )}
     </div>
   );

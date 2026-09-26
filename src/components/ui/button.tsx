@@ -22,10 +22,10 @@ const variants: Record<Variant, string> = {
 };
 
 const sizes: Record<Size, string> = {
-  sm: "h-7 px-2.5 text-[13px] rounded-lg gap-1.5 max-md:h-10 max-md:px-3",
-  md: "h-8 px-3 text-sm rounded-lg gap-2 max-md:h-10 max-md:px-3.5",
-  lg: "h-9 px-4 text-sm rounded-lg gap-2 max-md:h-11 max-md:px-5",
-  icon: "h-8 w-8 rounded-lg justify-center max-md:h-11 max-md:w-11",
+  sm: "h-7 px-2.5 text-[13px] rounded-lg gap-1.5 min-h-[44px] max-md:h-11 max-md:px-4 max-md:text-base",
+  md: "h-8 px-3 text-sm rounded-lg gap-2 min-h-[44px] max-md:h-11 max-md:px-4 max-md:text-base",
+  lg: "h-9 px-4 text-sm rounded-lg gap-2 min-h-[44px] max-md:h-12 max-md:px-5 max-md:text-base",
+  icon: "h-8 w-8 rounded-lg justify-center min-h-[44px] min-w-[44px] max-md:h-11 max-md:w-11",
 };
 
 export function buttonClasses(
