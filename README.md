@@ -75,6 +75,28 @@ datos se guardan en `localStorage`.
 - **`supabase/schema.sql`** — Esquema de base de datos (ejecutar en el SQL
   Editor de Supabase).
 
+## Trabajo pendiente
+
+> Detalle de cada punto en `SESSION-NOTES.md` (local, no se versiona).
+
+- **[ ] Revisar los sonidos del Pomodoro a fondo.** Los ocho ambientes
+  (`cabin`, `rain`, `white`, `brown`, `lofi`, `coffee`, `fireplace`) ya
+  reproducen y el bug de `green` está corregido, pero **no se ha evaluado la
+  calidad ni la mezcla**: falta comprobar que no saturan, que los loops no
+  tienen clicks audibles en los empalmes y que los niveles son comparables
+  entre sonidos. Revisar también que la mezcla con la música de Spotify no
+  sature.
+- **[ ] Arreglar el selector de idioma.** Preexistente y **no** causado por el
+  gate de hidratación: se verificó revirtiendo el commit con `git stash` y el
+  fallo persiste igual. Escribe `eunomia:lang` en `localStorage` y notifica
+  correctamente, pero la interfaz sigue en español tras recargar.
+- **[ ] Probar el arrastre entre columnas en móvil.** A 390 px solo cabe una
+  columna y dnd-kit no hace auto-scroll horizontal, así que el destino queda
+  fuera de pantalla. En escritorio está verificado en ambos sentidos.
+- **[ ] Considerar un hook de hidratación compartido** en lugar del
+  `useHydrated` local duplicado entre `pomodoro-chip.tsx` y la capa de
+  storage.
+
 ## Variables de entorno
 
 Copia `.env.example` a `.env.local`. Sin variables → modo demo local.
