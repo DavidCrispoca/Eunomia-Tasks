@@ -16,6 +16,7 @@ import {
   playBackgroundAudio,
   stopBackgroundAudio,
   updateAudioVolume,
+  playChimeSound,
 } from "@/lib/flight/audio";
 import type { AmbienceType } from "@/lib/flight/types";
 
@@ -114,35 +115,7 @@ function saveSession(session: StoredPomodoro | null) {
 }
 
 function playChime() {
-  try {
-    const Ctx =
-      window.AudioContext ??
-      (window as unknown as { webkitAudioContext?: typeof AudioContext })
-        .webkitAudioContext;
-    if (!Ctx) return;
-    const ctx = new Ctx();
-    const now = ctx.currentTime;
-    const notes: Array<[number, number]> = [
-      [523.25, 0],
-      [523.25, 0.22],
-      [659.25, 0.44],
-    ];
-    for (const [freq, offset] of notes) {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.0001, now + offset);
-      gain.gain.exponentialRampToValueAtTime(0.18, now + offset + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.32);
-      osc.connect(gain).connect(ctx.destination);
-      osc.start(now + offset);
-      osc.stop(now + offset + 0.34);
-    }
-    void ctx.resume();
-  } catch {
-    // Audio is a nice-to-have; never break the timer.
-  }
+  playChimeSound("complete");
 }
 
 /** Minutos efectivos de una sesión aún sin terminar. */
@@ -278,6 +251,7 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
       saveSession(created);
       setSession(created);
       setNow(Date.now());
+      playChimeSound("start");
       if (
         typeof window !== "undefined" &&
         "Notification" in window &&
@@ -301,6 +275,7 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     sessionRef.current = paused;
     saveSession(paused);
     setSession(paused);
+    playChimeSound("pause");
   }, []);
 
   const resume = useCallback(() => {
@@ -315,6 +290,7 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     saveSession(resumed);
     setSession(resumed);
     setNow(Date.now());
+    playChimeSound("start");
   }, []);
 
   const dismiss = useCallback(() => {

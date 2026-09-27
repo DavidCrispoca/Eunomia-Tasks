@@ -61,6 +61,9 @@ export function FlightControls({ disabled, onStart }: FlightControlsProps) {
         <span className="text-[11px] font-medium uppercase tracking-wider text-muted">
           {t.pomodoro.flight}
         </span>
+        <span className="ml-auto text-[9px] font-mono text-amber-500/60 tracking-widest uppercase">
+          PomodoroFlight
+        </span>
         <div className="ml-auto flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] p-0.5">
           {(["minutes", "route"] as const).map((pick) => (
             <button

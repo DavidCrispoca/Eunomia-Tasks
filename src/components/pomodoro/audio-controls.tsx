@@ -1,6 +1,17 @@
 "use client";
 
-import { CloudRain, Radio, Settings, Volume2, VolumeX, Wind } from "lucide-react";
+import {
+  CloudRain,
+  Coffee,
+  Flame,
+  Headphones,
+  Music2,
+  Radio,
+  Volume2,
+  VolumeX,
+  Waves,
+  Wind,
+} from "lucide-react";
 import type { AmbienceType } from "@/lib/flight/types";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n";
@@ -14,11 +25,22 @@ interface AudioControlsProps {
   compact?: boolean;
 }
 
-const OPTIONS: Array<{ type: AmbienceType; icon: typeof VolumeX }> = [
-  { type: "none", icon: VolumeX },
-  { type: "white", icon: Settings },
-  { type: "rain", icon: CloudRain },
-  { type: "engine", icon: Wind },
+const SPOTIFY_URL = "https://open.spotify.com/search/lo-fi%20study";
+
+const OPTIONS: Array<{
+  type: AmbienceType;
+  icon: typeof VolumeX;
+  labelKey: string;
+  descriptionKey: string;
+}> = [
+  { type: "none", icon: VolumeX, labelKey: "audioNone", descriptionKey: "audioNoneDesc" },
+  { type: "cabin", icon: Wind, labelKey: "audioCabin", descriptionKey: "audioCabinDesc" },
+  { type: "rain", icon: CloudRain, labelKey: "audioRain", descriptionKey: "audioRainDesc" },
+  { type: "white", icon: Waves, labelKey: "audioWhite", descriptionKey: "audioWhiteDesc" },
+  { type: "brown", icon: Headphones, labelKey: "audioBrown", descriptionKey: "audioBrownDesc" },
+  { type: "lofi", icon: Music2, labelKey: "audioLoFi", descriptionKey: "audioLoFiDesc" },
+  { type: "coffee", icon: Coffee, labelKey: "audioCoffee", descriptionKey: "audioCoffeeDesc" },
+  { type: "fireplace", icon: Flame, labelKey: "audioFireplace", descriptionKey: "audioFireplaceDesc" },
 ];
 
 export function AudioControls({
@@ -38,26 +60,39 @@ export function AudioControls({
           <Radio size={12} className={ambience !== "none" ? "text-amber-300" : "text-muted"} />
           {t.pomodoro.audio}
         </span>
-        <div className="flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] p-0.5">
-          {OPTIONS.map(({ type, icon: Icon }) => (
-            <button
-              key={type}
-              type="button"
-              disabled={disabled}
-              aria-label={t.pomodoro[`audio${capitalize(type)}` as "audioNone"]}
-              title={t.pomodoro[`audio${capitalize(type)}` as "audioNone"]}
-              onClick={() => onChange(type)}
-              className={cn(
-                "grid h-7 w-7 place-items-center rounded-full transition-all duration-200 ease-out-expo active:scale-95 disabled:cursor-not-allowed disabled:opacity-40",
-                ambience === type
-                  ? "bg-amber-500/15 text-amber-300 shadow-[inset_0_1px_0_var(--inset-top)]"
-                  : "text-muted hover:text-foreground",
-              )}
-            >
-              <Icon size={14} />
-            </button>
-          ))}
-        </div>
+        <a
+          href={SPOTIFY_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={t.pomodoro.audioSpotifyDesc}
+          className="flex items-center gap-1.5 rounded-full border border-green-500/25 bg-green-500/10 px-2.5 py-1 text-[10.5px] font-medium text-green-300 transition-colors hover:bg-green-500/20"
+        >
+          <Music2 size={12} />
+          Spotify
+        </a>
+      </div>
+
+      <div className="flex flex-wrap gap-1.5">
+        {OPTIONS.map(({ type, icon: Icon, labelKey, descriptionKey }) => (
+          <button
+            key={type}
+            type="button"
+            disabled={disabled}
+            title={t.pomodoro[descriptionKey as keyof typeof t.pomodoro]}
+            onClick={() => onChange(type)}
+            className={cn(
+              "flex min-h-11 items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-[11px] font-medium transition-all duration-200 ease-out-expo active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 max-sm:min-h-0",
+              ambience === type
+                ? "border-amber-500/40 bg-amber-500/15 text-amber-300 shadow-[inset_0_1px_0_var(--inset-top)]"
+                : "border-white/10 bg-white/[0.03] text-muted hover:border-white/20 hover:text-foreground",
+            )}
+          >
+            <Icon size={13} className="shrink-0" />
+            <span className="whitespace-nowrap">
+              {t.pomodoro[labelKey as keyof typeof t.pomodoro]}
+            </span>
+          </button>
+        ))}
       </div>
 
       <div className="flex items-center gap-2.5">
@@ -79,8 +114,4 @@ export function AudioControls({
       </div>
     </div>
   );
-}
-
-function capitalize(value: string): string {
-  return value.charAt(0).toUpperCase() + value.slice(1);
 }

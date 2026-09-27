@@ -14,7 +14,15 @@ export interface FlightInfo {
   durationMin: number;
 }
 
-export type AmbienceType = "none" | "white" | "rain" | "engine";
+export type AmbienceType =
+  | "none"
+  | "cabin"
+  | "rain"
+  | "white"
+  | "brown"
+  | "lofi"
+  | "coffee"
+  | "fireplace";
 
 export type FlightMode = "simple" | "flight";
 export type FlightPick = "minutes" | "route";

@@ -169,6 +169,11 @@ export function PomodoroSession({ task }: { task: Task }) {
         <div className="flex flex-col gap-1">
           <h1 className="text-lg sm:text-xl font-semibold tracking-tight">
             <span className="text-gold-gradient">{t.pomodoro.title}</span>
+            {modeInUse === "flight" && (
+              <span className="ml-2 text-[11px] font-mono text-amber-500/60 tracking-widest uppercase">
+                PomodoroFlight
+              </span>
+            )}
           </h1>
           <p className="text-xs sm:text-[13px] text-muted">{t.pomodoro.subtitle}</p>
         </div>
@@ -199,6 +204,7 @@ export function PomodoroSession({ task }: { task: Task }) {
               <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/25 bg-amber-500/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-amber-200">
                 <Plane size={10} />
                 {active.routeLabel}
+                <span className="ml-1 text-[9px] font-normal text-amber-500/70">PomodoroFlight</span>
               </span>
             )}
             <span
