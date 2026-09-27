@@ -31,7 +31,7 @@ export function TaskCard({ task, onOpen, onToggleDone, overlay }: TaskCardProps)
   return (
     <div
       className={cn(
-        "group relative flex cursor-grab flex-col gap-2 rounded-lg border border-white/10 bg-surface-2 p-2.5 shadow-[var(--inset-top)]",
+        "group relative flex cursor-default flex-col gap-2 rounded-lg border border-white/10 bg-surface-2 p-2.5 shadow-[var(--inset-top)] pl-8",
         "transition-all duration-200 ease-out-expo hover:-translate-y-0.5 hover:border-amber-500/40 hover:shadow-[var(--inset-top),0_4px_20px_rgba(245,158,11,0.12)] active:scale-[0.98] active:duration-75",
         overlay &&
           "rotate-1 scale-105 shadow-[0_10px_30px_rgba(245,158,11,0.25)] ring-1 ring-amber-500/30",

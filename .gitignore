@@ -30,6 +30,8 @@ opencode.json
 
 # perfiles de navegador de Playwright (sesiones locales)
 .playwright-profiles/
+# artefactos de verificación de Playwright MCP (screenshots, snapshots)
+/.playwright-mcp/
 
 # debug
 npm-debug.log*

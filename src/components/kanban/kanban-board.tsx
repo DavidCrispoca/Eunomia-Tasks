@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
   MouseSensor,
   TouchSensor,
-  closestCorners,
+  pointerWithin,
+  rectIntersection,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -58,12 +59,27 @@ export function KanbanBoard() {
   const [filter, setFilter] = useState<string | null>(null);
   const [managerOpen, setManagerOpen] = useState(false);
   const [todoSort, setTodoSort] = useState<TodoSort>("dueAsc");
+  const [activeTab, setActiveTab] = useState<TaskStatus>("todo");
+  const columnRefs = useRef<Partial<Record<TaskStatus, HTMLDivElement | null>>>({});
 
   const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 4 } }),
     useSensor(TouchSensor, {
-      activationConstraint: { delay: 250, tolerance: 8 },
+      activationConstraint: { delay: 120, tolerance: 8 },
     }),
+  );
+
+  // pointerWithin elige el contenedor bajo el cursor: es lo que hace fiable
+  // soltar en una columna vacía (rectIntersection exige solape real).
+  const collisionDetection = useCallback<typeof pointerWithin>(
+    (args) => {
+      const withinPointer = pointerWithin(args);
+      if (withinPointer.length > 0) return withinPointer;
+      // Respaldo: si el puntero no cae squarely en un droppable (p.ej. por
+      // scrolls) usamos la intersección de rectángulos más cercana.
+      return rectIntersection(args);
+    },
+    [],
   );
 
   const effectiveFilter =
@@ -146,30 +162,29 @@ export function KanbanBoard() {
       targetStatus = overTask.status;
     }
 
-    const sortActive = todoSort !== "manual" && targetStatus !== "done";
-    if (sortActive) {
-      if (dragged.status !== "todo") {
-        setTasks(
-          tasks.map((task) =>
-            task.id === dragged.id ? { ...task, status: "todo" } : task,
-          ),
-        );
-      }
-      return;
-    }
-
-    const sameColumnNoIndex = targetStatus === dragged.status && overIsColumn;
-    if (sameColumnNoIndex) return;
-
     const rest = tasks.filter((t) => t.id !== dragged.id);
     const column = rest
       .filter((t) => t.status === targetStatus)
       .sort((a, b) => a.order - b.order);
 
+    // Soltada sobre sí misma sin cambio de columna: nada que hacer.
     let index = column.findIndex((t) => t.id === over.id);
-    if (overIsColumn || index < 0) index = column.length;
+    if (overIsColumn || index < 0) {
+      index = column.length;
+    } else if (String(over.id) === String(active.id)) {
+      return;
+    }
 
-    column.splice(index, 0, { ...dragged, status: targetStatus });
+    const moved: Task = {
+      ...dragged,
+      status: targetStatus,
+      completedAt:
+        targetStatus === "done"
+          ? (dragged.completedAt ?? new Date().toISOString())
+          : undefined,
+    };
+
+    column.splice(index, 0, moved);
     const reordered = column.map((t, i) => ({ ...t, order: i }));
     const next = [...rest.filter((t) => t.status !== targetStatus), ...reordered];
     setTasks(next);
@@ -260,17 +275,60 @@ return (
         </Button>
       </div>
 
-      <div className="hidden md:flex h-full min-h-0 flex-1 items-stretch gap-4 overflow-x-auto scroll-px-4 pb-6 snap-x snap-proximity">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCorners}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          onDragCancel={() => setActiveTask(null)}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={collisionDetection}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={() => setActiveTask(null)}
+      >
+        {/* Barra de pestañas: solo móvil. Navega el carrusel de columnas. */}
+        <div
+          className="flex shrink-0 overflow-x-auto border-b border-white/10 pb-1 md:hidden"
+          role="tablist"
         >
+          {columns.map((column) => (
+            <button
+              key={column.status}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === column.status}
+              className={cn(
+                "shrink-0 border-b-2 px-4 py-2 text-sm font-medium transition-all duration-200",
+                activeTab === column.status
+                  ? "border-amber-400 text-amber-200"
+                  : "border-transparent text-muted hover:text-foreground",
+              )}
+              onClick={() => {
+                setActiveTab(column.status);
+                columnRefs.current[column.status]?.scrollIntoView({
+                  behavior: "smooth",
+                  inline: "center",
+                  block: "nearest",
+                });
+              }}
+            >
+              {t.kanban.columns[column.status] || STATUS_LABELS[column.status]}
+              <span className="ml-1.5 rounded-full bg-white/10 px-1.5 font-mono text-[10px] text-amber-300/90">
+                {column.tasks.length}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/*
+          Un ÚNICO conjunto de columnas para desktop y móvil.
+          Antes se renderizaban ambos a la vez y ambos registraban droppables
+          con el mismo id en dnd-kit; el montículo oculto (display:none, rect
+          0x0) ganaba el registro y por eso over siempre era null.
+        */}
+        <div className="flex min-h-0 flex-1 snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-4 pb-6 md:snap-proximity">
           {columns.map((column) => (
             <KanbanColumn
               key={column.status}
+              ref={(node) => {
+                columnRefs.current[column.status] = node;
+              }}
               status={column.status}
               tasks={column.tasks}
               sortMode={todoSort}
@@ -280,55 +338,12 @@ return (
               onAddTask={openCreateTask}
             />
           ))}
-        </DndContext>
-      </div>
-
-      <div className="md:hidden flex-1 min-h-0">
-        <div className="flex border-b border-white/10 overflow-x-auto pb-1" role="tablist">
-          {columns.map((column, index) => (
-            <button
-              key={column.status}
-              role="tab"
-              aria-selected={index === 0}
-              className={cn(
-                "shrink-0 px-4 py-2 text-sm font-medium border-b-2 transition-all duration-200",
-                index === 0
-                  ? "border-amber-400 text-amber-200"
-                  : "border-transparent text-muted hover:text-foreground"
-              )}
-              onClick={() => {}}
-            >
-              {t.kanban.columns[column.status] || STATUS_LABELS[column.status]}
-              <span className="ml-1.5 rounded-full bg-white/10 px-1.5 text-[10px] font-mono text-amber-300/90">
-                {column.tasks.length}
-              </span>
-            </button>
-          ))}
         </div>
-        <div className="flex h-full min-h-0 items-stretch gap-4 overflow-x-auto scroll-px-4 pb-6 snap-x snap-mandatory">
-          {columns.map((column) => (
-            <div
-              key={column.status}
-              className="shrink-0 w-full min-w-[280px] snap-center"
-              role="tabpanel"
-            >
-              <KanbanColumn
-                status={column.status}
-                tasks={column.tasks}
-                sortMode={todoSort}
-                onSortModeChange={setTodoSort}
-                onOpenTask={openEditTask}
-                onToggleDone={handleToggleDone}
-                onAddTask={openCreateTask}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
 
-      <DragOverlay dropAnimation={{ duration: 180 }}>
-        {activeTask ? <TaskCard task={activeTask} overlay /> : null}
-      </DragOverlay>
+        <DragOverlay dropAnimation={{ duration: 180 }}>
+          {activeTask ? <TaskCard task={activeTask} overlay /> : null}
+        </DragOverlay>
+      </DndContext>
 
       <GroupManagerModal
         open={managerOpen}

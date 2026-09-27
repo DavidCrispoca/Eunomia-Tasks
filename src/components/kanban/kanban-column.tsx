@@ -1,5 +1,6 @@
 "use client";
 
+import { forwardRef } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -24,24 +25,34 @@ interface KanbanColumnProps {
   onAddTask: (status: TaskStatus) => void;
 }
 
-export function KanbanColumn({
-  status,
-  tasks,
-  sortMode,
-  onSortModeChange,
-  onOpenTask,
-  onToggleDone,
-  onAddTask,
-}: KanbanColumnProps) {
-  const { t } = useLanguage();
-  const { setNodeRef, isOver } = useDroppable({ id: `column:${status}` });
-  const sorted =
-    sortMode === "manual"
-      ? [...tasks].sort((a, b) => a.order - b.order)
-      : tasks;
+export const KanbanColumn = forwardRef<HTMLDivElement, KanbanColumnProps>(
+  function KanbanColumn(
+    {
+      status,
+      tasks,
+      sortMode,
+      onSortModeChange,
+      onOpenTask,
+      onToggleDone,
+      onAddTask,
+    },
+    ref,
+  ) {
+    const { t } = useLanguage();
+    const { setNodeRef, isOver } = useDroppable({ id: `column:${status}` });
+    const sorted =
+      sortMode === "manual"
+        ? [...tasks].sort((a, b) => a.order - b.order)
+        : tasks;
 
-  return (
-    <div className="flex min-w-[300px] flex-1 flex-col snap-start">
+    const setRefs = (node: HTMLDivElement | null) => {
+      setNodeRef(node);
+      if (typeof ref === "function") ref(node);
+      else if (ref) ref.current = node;
+    };
+
+    return (
+      <div className="flex w-full min-w-[280px] shrink-0 snap-center flex-col md:min-w-[300px] md:flex-1 md:snap-start">
       <div className="mb-2 flex items-center gap-2 px-1.5">
         <span
           className={cn("h-2 w-2 rounded-full", STATUS_DOT[status])}
@@ -59,9 +70,9 @@ export function KanbanColumn({
       </div>
 
       <div
-        ref={setNodeRef}
+        ref={setRefs}
         className={cn(
-          "flex-1 min-h-0 overflow-y-auto rounded-2xl border border-white/5 bg-white/[0.02] p-1.5 shadow-[var(--inset-top-soft)] transition-[border-color,box-shadow,background-color] duration-200 ease-out-expo",
+          "flex-1 min-h-[200px] overflow-y-auto rounded-2xl border border-white/5 bg-white/[0.02] p-1.5 shadow-[var(--inset-top-soft)] transition-[border-color,box-shadow,background-color] duration-200 ease-out-expo",
           isOver &&
             "border-amber-500/50 bg-amber-500/[0.06] shadow-[var(--inset-top),inset_0_0_28px_rgba(245,158,11,0.06)]",
         )}
@@ -101,6 +112,7 @@ export function KanbanColumn({
           </div>
         </SortableContext>
       </div>
-    </div>
-  );
-}
+      </div>
+    );
+  },
+);
