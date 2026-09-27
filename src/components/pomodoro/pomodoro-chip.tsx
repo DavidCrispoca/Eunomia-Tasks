@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useSyncExternalStore } from "react";
 import {
   ArrowUpRight,
   CheckCircle2,
@@ -15,14 +16,29 @@ import { useLanguage } from "@/lib/i18n";
 import type { TaskStatus } from "@/types";
 import { Button } from "@/components/ui/button";
 
+const noopSubscribe = () => () => {};
+
+/**
+ * La sesión vive en localStorage, así que el servidor siempre la ve como `null`.
+ * Renderizamos el chip solo tras hidratación para que el árbol coincida.
+ */
+function useHydrated() {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
+}
+
 export function PomodoroChip() {
   const router = useRouter();
   const { t } = useLanguage();
   const { session, remainingMs, elapsedPct, dismiss } = usePomodoro();
   const { updateTask } = useData();
+  const hydrated = useHydrated();
 
   const active = session;
-  if (!active) return null;
+  if (!active || !hydrated) return null;
 
   const isRunning = active.status === "running";
   const isFinished = active.status === "finished";

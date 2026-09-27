@@ -117,8 +117,8 @@ export function isSeedDataset<T extends { id: string; title?: string }>(
 
 function seedTasks(): Task[] {
   const now = new Date();
-  // Fecha UTC (no local) para que el SSR del servidor y el cliente hidraten
-  // con el mismo día, evitando errores de hydration al cargar por primera vez.
+  // Fecha en UTC para que la semilla sea estable dentro del mismo día
+  // independientemente de la zona horaria del runtime.
   const base = now.toISOString().slice(0, 10);
   return [
     {
