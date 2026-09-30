@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Sora } from "next/font/google";
 import { AppProviders } from "@/providers/app-providers";
 import { getSessionUser } from "@/lib/auth/cookies";
 import { loadCloudData } from "@/lib/data/actions";
@@ -15,6 +15,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const sora = Sora({
+  variable: "--font-sora",
+  subsets: ["latin"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Eunomia Tasks",
   description:
@@ -22,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [{ media: "(prefers-color-scheme: dark)", color: "#090A0C" }],
+  themeColor: [{ media: "(prefers-color-scheme: dark)", color: "#080d1f" }],
 };
 
 export default async function RootLayout(props: LayoutProps<"/">) {
@@ -32,7 +38,7 @@ export default async function RootLayout(props: LayoutProps<"/">) {
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${sora.variable} h-full antialiased`}
     >
       <body className="h-full flex flex-col">
         <AppProviders initialUser={user} initialData={cloudData}>

@@ -73,7 +73,7 @@ export function PomodoroChip() {
         transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
       >
         <div
-          className="relative overflow-hidden rounded-xl border border-white/10 bg-[#090a0c]/85 text-sm shadow-[inset_0_1px_0_var(--inset-top),inset_0_-1px_0_var(--inset-top-soft),0_12px_32px_-12px_rgba(0,0,0,0.7)] backdrop-blur-xl"
+          className="relative overflow-hidden rounded-xl border border-white/[0.12] bg-white/[0.06] text-sm shadow-[var(--clay-drop),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl"
           role={isActive ? "button" : "status"}
           tabIndex={isActive ? 0 : undefined}
           onClick={isActive ? open : undefined}
@@ -89,21 +89,21 @@ export function PomodoroChip() {
           }
         >
           <div
-            className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-amber-400/80 via-amber-400/40 to-transparent"
+            className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-violet-400/90 via-indigo-400/45 to-transparent"
             style={{ width: `${elapsedPct}%` }}
           />
           <div className="flex flex-col gap-2.5 px-4 py-3">
             <div className="flex items-center gap-2.5">
               <span className="relative flex size-2">
                 {isRunning && (
-                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-amber-400 opacity-60" />
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-violet-400 opacity-60" />
                 )}
                 <span
                   className={`relative inline-flex size-2 rounded-full ${
                     isRunning
-                      ? "bg-amber-400"
+                      ? "bg-violet-400"
                       : paused
-                        ? "bg-amber-300/60"
+                        ? "bg-violet-300/60"
                         : "bg-emerald-400"
                   }`}
                 />
@@ -112,13 +112,13 @@ export function PomodoroChip() {
                 {active.title}
               </span>
               {active.mode === "flight" && active.routeLabel && (
-                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/25 bg-amber-500/10 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-amber-200">
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-violet-500/35 bg-violet-500/15 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-violet-200">
                   <Plane size={9} />
                   {active.routeLabel}
                 </span>
               )}
               {isActive ? (
-                <span className="ml-1 font-mono text-sm tabular-nums text-amber-200">
+                <span className="ml-1 font-mono text-sm tabular-nums text-violet-200">
                   {time}
                 </span>
               ) : (
@@ -127,7 +127,7 @@ export function PomodoroChip() {
                 </span>
               )}
               {isActive && !paused && (
-                <ArrowUpRight className="size-3.5 text-amber-300/70" />
+                <ArrowUpRight className="size-3.5 text-violet-300/80" />
               )}
             </div>
 

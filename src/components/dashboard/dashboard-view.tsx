@@ -29,17 +29,17 @@ import { toISODate, todayISO } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const PRIORITY_DOT: Record<Task["priority"], string> = {
-  low: "bg-amber-300/70",
-  medium: "bg-amber-400",
+  low: "bg-violet-300/70",
+  medium: "bg-violet-400",
   high: "bg-orange-500",
 };
 
 const BLOCK_DOT: Record<NonNullable<TimeBlock["color"]>, string> = {
-  default: "text-amber-200",
+  default: "text-violet-300",
   green: "text-emerald-300",
   orange: "text-orange-300",
-  red: "text-[#ff8a4d]",
-  blue: "text-amber-100",
+  red: "text-rose-400",
+  blue: "text-indigo-300",
 };
 
 interface DeadlineRow {
@@ -111,9 +111,9 @@ export function DashboardView() {
             kind === "overdue"
               ? t.dashboard.overdueBadge
               : kind === "today"
-                ? `· ${t.dashboard.todayBadge} ·`
+                ? `Â· ${t.dashboard.todayBadge} Â·`
                 : kind === "tomorrow"
-                  ? `· ${t.dashboard.tomorrowBadge} ·`
+                  ? `Â· ${t.dashboard.tomorrowBadge} Â·`
                   : "",
         };
       });
@@ -165,8 +165,8 @@ export function DashboardView() {
 
   if (!data.hasTasks) {
     return (
-      <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/[0.02] px-6 py-16 shadow-[var(--inset-top)]">
-        <span className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 text-black shadow-[0_0_20px_rgba(245,158,11,0.35)]">
+      <div className="glass glass-hover flex flex-col items-center justify-center gap-3 rounded-2xl px-6 py-16">
+        <span className="animate-float grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-[0_8px_24px_rgba(63,118,216,0.35),inset_0_1px_0_rgba(255,255,255,0.3)]">
           <Sparkles size={22} />
         </span>
         <p className="max-w-sm text-sm text-muted">{t.dashboard.noData}</p>
@@ -189,7 +189,7 @@ export function DashboardView() {
               {t.common.today}
             </p>
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-lg font-semibold tracking-tight text-amber-100/95">
+              <h2 className="text-lg font-semibold tracking-tight font-display text-violet-100">
                 {dayFull(weekdayOf(todayISO()), lang)},{" "}
                 {formatShortDate(todayISO(), lang)}
               </h2>
@@ -209,15 +209,15 @@ export function DashboardView() {
           <div className="w-full sm:w-72">
             <div className="mb-1.5 flex items-center justify-between gap-2 text-[11px]">
               <span className="text-muted">{t.dashboard.focus}</span>
-              <span className="shrink-0 font-mono text-amber-200">
+              <span className="shrink-0 font-mono text-violet-300">
                 {data.dueToday === 0
                   ? t.dashboard.nothingToday
                   : t.dashboard.todayProgress(data.dueTodayDone, data.dueToday)}
               </span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-white/[0.06] shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]">
+            <div className="h-2 overflow-hidden rounded-full bg-white/[0.06] shadow-[inset_1px_2px_4px_rgba(0,0,0,0.5)]">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-600 transition-all duration-500 ease-out-expo"
+                className="h-full rounded-full bg-gradient-to-r from-violet-500 to-indigo-600 transition-all duration-500 ease-out-expo"
                 style={{
                   width: data.dueToday > 0 ? `${(data.dueTodayDone / data.dueToday) * 100}%` : "0%",
                 }}
@@ -227,7 +227,7 @@ export function DashboardView() {
         </div>
 
         {data.overdueCount > 0 && (
-          <div className="mt-4 flex items-center gap-2 rounded-lg border border-[#ff4500]/25 bg-[#ff4500]/[0.06] px-3 py-2 text-[12.5px] text-[#ff8a4d]">
+          <div className="mt-4 flex items-center gap-2 rounded-lg border border-rose-500/25 bg-rose-500/[0.06] px-3 py-2 text-[12.5px] text-rose-300">
             <AlertTriangle size={14} className="shrink-0" />
             <span className="min-w-0 flex-1">{t.dashboard.overdueAlert(data.overdueCount)}</span>
           </div>
@@ -238,31 +238,31 @@ export function DashboardView() {
         <KpiCard
           label={t.dashboard.pending}
           icon={<ListTodo size={18} />}
-          iconClass="bg-gradient-to-br from-amber-400 to-orange-600 text-black shadow-[0_0_14px_rgba(245,158,11,0.4)]"
+          iconClass="bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-[0_6px_18px_rgba(63,118,216,0.35)]"
           value={String(data.pendingCount)}
-          valueClass="text-amber-200"
+          valueClass="text-violet-200"
         />
         <KpiCard
           label={t.dashboard.overdueLabel}
           icon={<AlertTriangle size={18} />}
-          iconClass="bg-gradient-to-br from-[#ff4500] to-orange-600 text-white shadow-[0_0_14px_rgba(255,69,0,0.45)]"
+          iconClass="bg-gradient-to-br from-rose-600 to-rose-800 text-white shadow-[0_6px_18px_rgba(244,63,94,0.35)]"
           value={String(data.overdueCount)}
-          valueClass={data.overdueCount > 0 ? "text-[#ff8a4d]" : "text-foreground"}
+          valueClass={data.overdueCount > 0 ? "text-rose-300" : "text-foreground"}
           subtext={t.dashboard.overdueHint}
         />
         <KpiCard
           label={t.dashboard.thisWeek}
           icon={<Timer size={18} />}
-          iconClass="bg-gradient-to-br from-amber-400 to-orange-600 text-black shadow-[0_0_14px_rgba(245,158,11,0.4)]"
+          iconClass="bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-[0_6px_18px_rgba(63,118,216,0.35)]"
           value={String(data.pendingThisWeek)}
-          valueClass="text-amber-200"
+          valueClass="text-violet-200"
         />
         <KpiCard
           label={t.dashboard.todayBlocks}
           icon={<CalendarClock size={18} />}
-          iconClass="bg-gradient-to-br from-amber-400 to-orange-600 text-black shadow-[0_0_14px_rgba(245,158,11,0.4)]"
+          iconClass="bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-[0_6px_18px_rgba(63,118,216,0.35)]"
           value={String(data.todayBlocks.length)}
-          valueClass="text-amber-200"
+          valueClass="text-violet-200"
           subtext={data.todayBlocks.length === 0 ? t.dashboard.noBlocksToday : undefined}
         />
       </div>
@@ -280,11 +280,11 @@ export function DashboardView() {
                 <li
                   key={row.id}
                   className={cn(
-                    "flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-[13.5px] transition-colors hover:border-white/10 hover:bg-white/[0.03]",
+                    "flex items-center gap-3 rounded-xl border px-3 py-2.5 text-[13.5px] transition-all duration-200 hover:translate-x-0.5 hover:border-white/10 hover:bg-white/[0.03]",
                     row.kind === "overdue" &&
-                      "border-[#ff4500]/20 bg-[#ff4500]/[0.05] hover:border-[#ff4500]/30",
+                      "border-rose-500/20 bg-rose-500/[0.05] hover:border-rose-500/30",
                     row.kind === "today" &&
-                      "border-amber-500/20 bg-amber-500/[0.06] hover:border-amber-500/35",
+                      "border-violet-500/20 bg-violet-500/[0.06] hover:border-violet-500/35",
                   )}
                 >
                   <span
@@ -305,10 +305,10 @@ export function DashboardView() {
                     className={cn(
                       "shrink-0 font-mono text-[11px]",
                       row.kind === "overdue"
-                        ? "text-[#ff8a4d]"
+                        ? "text-rose-300"
                         : row.kind === "upcoming"
                           ? "text-muted"
-                          : "text-amber-200",
+                          : "text-violet-300",
                     )}
                   >
                     {row.badge && <>{row.badge}&nbsp;</>}
@@ -327,7 +327,7 @@ export function DashboardView() {
 
         <div className="flex flex-col gap-4">
           <GlassCard>
-            <CardHeader icon={<Timer size={13} />} iconClass="text-amber-300" title={t.dashboard.weekLoad} />
+            <CardHeader icon={<Timer size={13} />} iconClass="text-violet-300" title={t.dashboard.weekLoad} />
             <WeekBars perDay={data.perDay} maxDay={data.maxDay} lang={lang} />
             <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-2.5 text-[11px] text-muted">
               <span>
@@ -339,7 +339,7 @@ export function DashboardView() {
           <GlassCard>
             <CardHeader
               icon={<Clock size={13} />}
-              iconClass="text-amber-300"
+              iconClass="text-violet-300"
               title={t.dashboard.focusByClass}
             />
             <p className="mb-3 mt-[-6px] text-[11px] leading-snug text-muted/80">
@@ -360,7 +360,7 @@ export function DashboardView() {
                         <span
                           className={cn(
                             "inline-flex min-w-0 items-center gap-1 truncate text-[12.5px]",
-                            isTop ? "font-semibold text-amber-200" : "text-muted",
+                            isTop ? "font-semibold text-violet-200" : "text-muted",
                           )}
                         >
                           {isTop && (
@@ -368,17 +368,17 @@ export function DashboardView() {
                           )}
                           <span className="truncate">{entry.name}</span>
                         </span>
-                        <span className="shrink-0 font-mono text-[11px] text-amber-100/90">
+                        <span className="shrink-0 font-mono text-[11px] text-violet-100/90">
                           {entry.minutes} {t.calendar.minutes}
                         </span>
                       </div>
-                      <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06] shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]">
+                      <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06] shadow-[inset_1px_2px_4px_rgba(0,0,0,0.5)]">
                         <div
                           className={cn(
                             "h-full rounded-full transition-all duration-500 ease-out-expo",
                             isTop
-                              ? "bg-gradient-to-r from-amber-400 to-orange-500"
-                              : "bg-amber-500/40",
+                              ? "bg-gradient-to-r from-violet-500 to-indigo-600"
+                              : "bg-violet-500/40",
                           )}
                           style={{
                             width: `${Math.max(4, (entry.minutes / max) * 100)}%`,
@@ -393,7 +393,7 @@ export function DashboardView() {
           </GlassCard>
 
           <GlassCard className="h-full">
-            <CardHeader icon={<CalendarClock size={13} />} iconClass="text-amber-300" title={t.dashboard.todayBlocks} />
+            <CardHeader icon={<CalendarClock size={13} />} iconClass="text-violet-300" title={t.dashboard.todayBlocks} />
             {data.todayBlocks.length === 0 ? (
               <p className="py-6 text-center text-xs text-muted">
                 {t.dashboard.noBlocksToday}
@@ -413,7 +413,7 @@ export function DashboardView() {
                       aria-hidden
                     />
                     <span className="shrink-0 font-mono text-[10.5px] text-muted">
-                      {block.start}–{block.end}
+                      {block.start}â€“{block.end}
                     </span>
                     <span className="min-w-0 flex-1 truncate text-foreground/90">
                       {block.title}
@@ -467,18 +467,18 @@ function WeekBars({
             <span
               className={cn(
                 "font-mono text-[8px] leading-none",
-                isToday ? "text-amber-300" : "text-muted/70",
+                isToday ? "text-violet-300" : "text-muted/70",
               )}
             >
               {day.count > 0 ? day.count : ""}
             </span>
             <span
               className={cn(
-                "w-full rounded-t-sm",
+                "w-full rounded-t-md",
                 isToday
-                  ? "bg-gradient-to-t from-amber-500 to-orange-400 shadow-[0_0_8px_rgba(245,158,11,0.4)]"
+                  ? "bg-gradient-to-t from-violet-500 to-indigo-600 shadow-[0_0_10px_rgba(63,118,216,0.4)]"
                   : day.count > 0
-                    ? "bg-amber-500/40"
+                    ? "bg-violet-500/40"
                     : "bg-white/[0.06]",
               )}
               style={{ height: `${barHeight}px` }}
@@ -486,7 +486,7 @@ function WeekBars({
             <span
               className={cn(
                 "font-mono text-[8px] uppercase leading-none",
-                isToday ? "text-amber-300" : "text-muted/70",
+                isToday ? "text-violet-300" : "text-muted/70",
               )}
             >
               {dayShort(perDay.indexOf(day), lang).slice(0, 2)}
@@ -514,14 +514,14 @@ function KpiCard({
   subtext?: string;
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] p-3 sm:p-4 shadow-[var(--inset-top)] transition-all duration-200 ease-out-expo hover:-translate-y-0.5 hover:border-amber-500/30 hover:shadow-[var(--inset-top),0_4px_20px_rgba(245,158,11,0.12)] min-h-[44px]">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-amber-500/40 via-orange-500/15 to-transparent" />
+    <div className="group glass glass-hover relative overflow-hidden rounded-2xl p-3 sm:p-4 min-h-[44px]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-500/50 via-indigo-500/25 to-transparent" />
       <div className="flex items-start justify-between gap-2">
         <div className="flex flex-col gap-1.5">
           <span className="text-xs sm:text-sm font-medium text-muted">{label}</span>
           <span
             className={cn(
-              "font-mono text-xl sm:text-2xl font-semibold leading-none",
+              "font-mono text-xl sm:text-2xl font-semibold leading-none text-tabular",
               valueClass ?? "text-foreground",
             )}
           >
@@ -531,7 +531,7 @@ function KpiCard({
         {icon && (
           <span
             className={cn(
-              "grid h-8 w-8 shrink-0 place-items-center rounded-xl",
+              "grid h-8 w-8 shrink-0 place-items-center rounded-xl transition-transform duration-300 ease-out-expo group-hover:scale-110 group-hover:-rotate-3",
               iconClass,
             )}
           >
@@ -556,10 +556,11 @@ function GlassCard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] p-4 shadow-[var(--inset-top)] transition-all duration-200 ease-out-expo hover:border-amber-500/25 hover:shadow-[var(--inset-top),0_4px_20px_rgba(245,158,11,0.08)]",
+        "glass glass-hover relative overflow-hidden rounded-2xl p-4",
         className,
       )}
     >
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-500/50 via-indigo-500/25 to-transparent" />
       {children}
     </div>
   );
@@ -575,10 +576,10 @@ function CardHeader({
   iconClass?: string;
 }) {
   return (
-    <h3 className="mb-3 flex items-center gap-2 text-[13px] font-semibold tracking-tight">
+    <h3 className="mb-3 flex items-center gap-2 text-[13px] font-semibold tracking-tight font-display">
       <span
         className={cn(
-          "grid h-5 w-5 place-items-center rounded-md border border-white/10 bg-white/[0.04]",
+          "grid h-5 w-5 place-items-center rounded-md glass-pill",
           iconClass,
         )}
       >

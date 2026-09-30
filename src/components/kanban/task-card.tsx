@@ -31,12 +31,10 @@ export function TaskCard({ task, onOpen, onToggleDone, overlay }: TaskCardProps)
   return (
     <div
       className={cn(
-        "group relative flex cursor-default flex-col gap-2 rounded-lg border border-white/10 bg-surface-2 p-2.5 shadow-[var(--inset-top)] pl-8",
-        "transition-all duration-200 ease-out-expo hover:-translate-y-0.5 hover:border-amber-500/40 hover:shadow-[var(--inset-top),0_4px_20px_rgba(245,158,11,0.12)] active:scale-[0.98] active:duration-75",
-        overlay &&
-          "rotate-1 scale-105 shadow-[0_10px_30px_rgba(245,158,11,0.25)] ring-1 ring-amber-500/30",
-        Done &&
-          "border-emerald-400/20 opacity-70 hover:shadow-[var(--inset-top),0_4px_20px_rgba(52,211,153,0.12)]",
+        "group glass glass-hover relative flex cursor-default flex-col gap-2 rounded-2xl p-2.5 pl-8",
+        "active:scale-[0.98] active:duration-75",
+        overlay && "rotate-1 scale-[1.03] ring-1 ring-violet-500/40",
+        Done && "border-emerald-400/20 opacity-70",
       )}
       onClick={onOpen}
       role="button"
@@ -48,15 +46,15 @@ export function TaskCard({ task, onOpen, onToggleDone, overlay }: TaskCardProps)
         }
       }}
     >
-      {Done && (
+      {(overlay || isOverdue) && (
         <span
-          className="pointer-events-none absolute inset-x-0 top-0 h-px rounded-full bg-gradient-to-r from-emerald-400/50 via-amber-400/40 to-transparent"
+          className="pointer-events-none absolute inset-x-0 top-0 h-px rounded-full bg-gradient-to-r from-violet-400/70 via-indigo-400/40 to-transparent"
           aria-hidden
         />
       )}
       {task.priority === "high" && !Done && (
         <span
-          className="pointer-events-none absolute inset-y-2 left-0 w-0.5 rounded-full bg-gradient-to-b from-orange-500 to-amber-400 opacity-80"
+          className="pointer-events-none absolute inset-y-2 left-0 w-0.5 rounded-full bg-gradient-to-b from-violet-500 to-indigo-500 opacity-80"
           aria-hidden
         />
       )}
@@ -65,10 +63,10 @@ export function TaskCard({ task, onOpen, onToggleDone, overlay }: TaskCardProps)
           type="button"
           aria-label={t.common.markDone}
           className={cn(
-            "mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border transition-all",
+            "mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border transition-all duration-200",
             Done
-              ? "border-transparent bg-gradient-to-br from-emerald-400 to-emerald-500 text-black shadow-[0_0_8px_rgba(52,211,153,0.6)]"
-              : "border-white/20 hover:border-amber-400",
+              ? "border-transparent bg-gradient-to-br from-emerald-300 to-emerald-500 text-neutral-900 shadow-[0_0_10px_rgba(99,184,166,0.55)]"
+              : "border-white/20 hover:border-violet-400 hover:scale-110",
           )}
           onClick={(e) => {
             e.stopPropagation();
@@ -96,13 +94,13 @@ export function TaskCard({ task, onOpen, onToggleDone, overlay }: TaskCardProps)
 
       <div className="flex flex-wrap items-center gap-1.5 pl-6">
         {group && (
-          <span className="inline-flex items-center gap-1 font-mono text-[11px] text-amber-200/70">
+          <span className="inline-flex items-center gap-1 font-mono text-[11px] text-violet-300/70">
             <FolderOpen size={11} />
             {group.name}
           </span>
         )}
         {task.focusMinutes ? (
-          <span className="inline-flex items-center gap-1 font-mono text-[11px] text-amber-300/90">
+          <span className="inline-flex items-center gap-1 font-mono text-[11px] text-violet-300/90">
             <Clock size={11} />
             {task.focusMinutes} min
           </span>
@@ -112,7 +110,7 @@ export function TaskCard({ task, onOpen, onToggleDone, overlay }: TaskCardProps)
             className={cn(
               "inline-flex items-center gap-1 font-mono text-[11px]",
               isOverdue
-                ? "font-medium text-[#ff8a4d]"
+                ? "font-medium text-rose-300"
                 : "text-muted",
             )}
           >

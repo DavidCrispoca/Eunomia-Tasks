@@ -32,7 +32,7 @@ export function Sidebar({ onOpenPalette }: { onOpenPalette: () => void }) {
         </Link>
       </div>
 
-      <nav className="relative mt-4 flex flex-col gap-1 px-2.5">
+      <nav className="relative mt-4 flex flex-col gap-1.5 px-2.5">
         {items.map((item) => {
           const active = isActive(item.href);
           return (
@@ -40,18 +40,18 @@ export function Sidebar({ onOpenPalette }: { onOpenPalette: () => void }) {
               key={item.href}
               href={item.href}
               className={cn(
-                "group relative flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13.5px] transition-all duration-200 ease-out-expo",
+                "group relative flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-[13.5px] transition-all duration-200 ease-out-expo",
                 active
-                  ? "border border-amber-500/20 bg-amber-500/10 text-amber-100 shadow-[0_0_18px_rgba(245,158,11,0.08)]"
+                  ? "border border-violet-500/25 bg-violet-500/15 text-violet-100 shadow-[0_4px_18px_rgba(90,140,240,0.18),inset_0_1px_0_rgba(255,255,255,0.08)]"
                   : "border border-transparent text-muted hover:bg-white/5 hover:text-foreground",
               )}
             >
               {active && (
-                <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-gradient-to-b from-amber-400 to-orange-600 shadow-[0_0_8px_rgba(245,158,11,0.7)]" />
+                <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-gradient-to-b from-violet-400 to-indigo-600 shadow-[0_0_10px_rgba(63,118,216,0.7)]" />
               )}
               <item.icon
                 size={15}
-                className={cn("shrink-0", active && "text-amber-400")}
+                className={cn("shrink-0", active && "text-violet-300")}
               />
               {item.label}
             </Link>
@@ -63,21 +63,21 @@ export function Sidebar({ onOpenPalette }: { onOpenPalette: () => void }) {
         <button
           type="button"
           onClick={onOpenPalette}
-          className="flex items-center gap-2.5 rounded-lg border border-white/5 bg-white/[0.03] px-2.5 py-1.5 text-[13px] text-muted transition-all duration-200 ease-out-expo hover:border-amber-500/25 hover:bg-amber-500/5 hover:text-foreground active:scale-[0.99] active:duration-75"
+          className="flex items-center gap-2.5 rounded-xl border border-white/5 bg-white/[0.03] px-2.5 py-1.5 text-[13px] text-muted transition-all duration-200 ease-out-expo hover:border-violet-500/30 hover:bg-violet-500/5 hover:text-foreground active:scale-[0.99] active:duration-75"
         >
           <Search size={14} />
           {t.common.search}
-          <kbd className="ml-auto rounded-md border border-white/10 bg-black/30 px-1.5 py-0.5 font-mono text-[10px] text-amber-200/80">
-            ⌘K
+          <kbd className="ml-auto rounded-md border border-white/10 bg-black/30 px-1.5 py-0.5 font-mono text-[10px] text-violet-300/90">
+            âŒ˜K
           </kbd>
         </button>
         <SidebarRow
           icon={
-            <span className="rounded bg-gradient-to-br from-amber-400 to-orange-600 px-1 text-[9px] font-bold text-black">
+            <span className="rounded bg-gradient-to-br from-violet-600 to-indigo-600 px-1 text-[9px] font-bold text-white shadow-[0_2px_8px_rgba(63,118,216,0.4)]">
               {lang === "es" ? "EN" : "ES"}
             </span>
           }
-          label={lang === "es" ? "English" : "Español"}
+          label={lang === "es" ? "English" : "EspaÃ±ol"}
           onClick={toggleLanguage}
         />
         <Button

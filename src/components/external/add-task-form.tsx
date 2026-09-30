@@ -19,8 +19,8 @@ export function AddTaskForm({ token }: { token: string | null }) {
 
   if (!token) {
     return (
-      <div className="surface-gold-gradient relative overflow-hidden rounded-xl border border-white/10 shadow-[var(--inset-top),var(--app-shadow-lg)]">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/70 to-transparent" />
+      <div className="surface-gold-gradient relative overflow-hidden rounded-2xl border border-white/10 shadow-[var(--glass-drop),var(--app-shadow-lg)]">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-400/80 via-indigo-500/35 to-transparent" />
         <div className="relative p-6 sm:p-7 text-center">
           <h1 className="text-lg sm:text-[20px] font-semibold tracking-tight">
             <span className="text-gold-gradient">{t.emailAdd.invalidTitle}</span>
@@ -30,7 +30,7 @@ export function AddTaskForm({ token }: { token: string | null }) {
           </p>
           <Link
             href="/"
-            className="mt-5 inline-flex min-h-[44px] items-center rounded-lg border border-white/10 bg-surface-2 px-4 text-sm text-foreground transition-colors hover:border-amber-500/30 hover:bg-surface-hover"
+            className="mt-5 inline-flex min-h-[44px] items-center rounded-full glass px-5 text-sm text-foreground transition-colors hover:border-violet-300/40 hover:bg-white/[0.09]"
           >
             {t.emailAdd.backToApp}
           </Link>
@@ -41,11 +41,11 @@ export function AddTaskForm({ token }: { token: string | null }) {
 
   if (status === "added") {
     return (
-      <div className="surface-gold-gradient relative overflow-hidden rounded-xl border border-white/10 shadow-[var(--inset-top),var(--app-shadow-lg)]">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/70 to-transparent" />
+      <div className="surface-gold-gradient relative overflow-hidden rounded-2xl border border-white/10 shadow-[var(--glass-drop),var(--app-shadow-lg)]">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-400/80 via-indigo-500/35 to-transparent" />
         <div className="relative p-6 sm:p-7 text-center">
-          <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-amber-400 to-orange-600 text-xl font-bold text-black">
-            ✓
+          <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-xl font-bold text-white shadow-[0_6px_18px_rgba(63,118,216,0.4)]">
+            âœ“
           </div>
           <h1 className="text-lg sm:text-[20px] font-semibold tracking-tight">
             <span className="text-gold-gradient">{t.emailAdd.successTitle}</span>
@@ -70,7 +70,7 @@ export function AddTaskForm({ token }: { token: string | null }) {
             </Button>
             <Link
               href="/login"
-              className="inline-flex min-h-[44px] w-full items-center justify-center rounded-lg border border-white/10 bg-surface-2 px-4 text-sm text-foreground transition-colors hover:border-amber-500/30 hover:bg-surface-hover"
+              className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full glass px-5 text-sm text-foreground transition-colors hover:border-violet-300/40 hover:bg-white/[0.09]"
             >
               {t.emailAdd.loginNow}
             </Link>
@@ -104,14 +104,14 @@ export function AddTaskForm({ token }: { token: string | null }) {
   };
 
   return (
-    <div className="surface-gold-gradient relative overflow-hidden rounded-xl border border-white/10 shadow-[var(--inset-top),var(--app-shadow-lg)]">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/70 to-transparent" />
+    <div className="surface-gold-gradient relative overflow-hidden rounded-2xl border border-white/10 shadow-[var(--glass-drop),var(--app-shadow-lg)]">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-400/80 via-indigo-500/35 to-transparent" />
       <div className="relative p-6 sm:p-7">
         <div className="mb-6">
-          <span className="mb-2 inline-flex items-center rounded-full border border-amber-500/25 bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-200/90">
+          <span className="mb-2 inline-flex items-center rounded-full border border-violet-500/30 bg-violet-500/10 px-2.5 py-0.5 text-xs font-medium text-violet-200/90">
             {t.emailAdd.badge}
           </span>
-          <h1 className="text-lg sm:text-[20px] font-semibold tracking-tight">
+          <h1 className="text-lg sm:text-[20px] font-semibold tracking-tight font-display">
             <span className="text-gold-gradient">{t.emailAdd.title}</span>
           </h1>
           <p className="mt-1 text-sm leading-relaxed text-muted">
@@ -122,7 +122,7 @@ export function AddTaskForm({ token }: { token: string | null }) {
         <form onSubmit={submit} className="flex flex-col gap-4">
           <label className="block">
             <span className="mb-1.5 block text-sm font-medium text-muted">
-              {t.task.title} <span className="text-amber-400">*</span>
+              {t.task.title} <span className="text-violet-400">*</span>
             </span>
             <Input
               value={title}
@@ -179,13 +179,13 @@ export function AddTaskForm({ token }: { token: string | null }) {
           </label>
 
           {status === "error" && (
-            <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm leading-relaxed text-red-200/90">
+            <p className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-sm leading-relaxed text-rose-200/90">
               {t.emailAdd.submitError}
             </p>
           )}
 
           <Button type="submit" variant="primary" size="lg" className="min-h-[48px]" disabled={status === "submitting" || !title.trim()}>
-            {status === "submitting" ? "…" : t.common.save}
+            {status === "submitting" ? "â€¦" : t.common.save}
           </Button>
 
           <p className="text-center text-sm text-muted">{t.emailAdd.noteSaved}</p>

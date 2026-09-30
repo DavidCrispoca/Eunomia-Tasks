@@ -57,11 +57,11 @@ export function FlightControls({ disabled, onStart }: FlightControlsProps) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
-        <Plane size={13} className="text-amber-300" />
+        <Plane size={13} className="text-violet-300" />
         <span className="text-[11px] font-medium uppercase tracking-wider text-muted">
           {t.pomodoro.flight}
         </span>
-        <span className="ml-auto text-[9px] font-mono text-amber-500/60 tracking-widest uppercase">
+        <span className="ml-auto text-[9px] font-mono text-violet-500/70 tracking-widest uppercase">
           PomodoroFlight
         </span>
         <div className="ml-auto flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] p-0.5">
@@ -74,7 +74,7 @@ export function FlightControls({ disabled, onStart }: FlightControlsProps) {
               className={cn(
                 "rounded-full px-2.5 py-1 text-[11px] font-medium transition-all duration-200 ease-out-expo",
                 mode === pick
-                  ? "bg-amber-500/15 text-amber-200"
+                  ? "bg-violet-500/20 text-violet-200"
                   : "text-muted hover:text-foreground",
               )}
             >
@@ -127,22 +127,22 @@ export function FlightControls({ disabled, onStart }: FlightControlsProps) {
                       disabled={ongoing}
                       onClick={() => setSelected(rec)}
                       className={cn(
-                        "flex w-full items-center gap-3 rounded-lg border px-3 py-2 text-left transition-all duration-200 ease-out-expo",
+                        "flex w-full items-center gap-3 rounded-xl glass px-3 py-2 text-left transition-all duration-200 ease-out-expo",
                         active
-                          ? "border-amber-500/40 bg-amber-500/10 shadow-[0_0_14px_rgba(245,158,11,0.12)]"
-                          : "border-white/10 bg-white/[0.02] hover:border-amber-500/25 hover:bg-white/[0.04]",
+                          ? "border-violet-500/45 bg-violet-500/15 shadow-[0_4px_18px_rgba(90,140,240,0.22)]"
+                          : "hover:border-violet-500/25",
                       )}
                     >
                       <Compass
                         size={14}
-                        className={active ? "text-amber-300" : "text-muted"}
+                        className={active ? "text-violet-300" : "text-muted"}
                       />
-                      <span className="font-mono text-[13px] font-semibold text-amber-100">
+                      <span className="font-mono text-[13px] font-semibold text-violet-100">
                         {routeLabel(rec)}
                       </span>
                       <span className="ml-auto flex items-center gap-2 font-mono text-[11px] text-muted">
                         <span>{formatKm(rec.distanceKm)}</span>
-                        <span className="text-amber-200">
+                        <span className="text-violet-200">
                           {formatFlightDuration(rec.durationMin)}
                         </span>
                       </span>
@@ -168,7 +168,7 @@ export function FlightControls({ disabled, onStart }: FlightControlsProps) {
               <option value="">{t.pomodoro.selectAirport}</option>
               {AIRPORTS.map((a) => (
                 <option key={a.iata} value={a.iata}>
-                  {a.iata} · {a.city} ({a.country})
+                  {a.iata} Â· {a.city} ({a.country})
                 </option>
               ))}
             </Select>
@@ -186,19 +186,19 @@ export function FlightControls({ disabled, onStart }: FlightControlsProps) {
               <option value="">{t.pomodoro.selectAirport}</option>
               {AIRPORTS.map((a) => (
                 <option key={a.iata} value={a.iata}>
-                  {a.iata} · {a.city} ({a.country})
+                  {a.iata} Â· {a.city} ({a.country})
                 </option>
               ))}
             </Select>
           </label>
 
-          <div className="flex items-center justify-between rounded-lg border border-amber-500/20 bg-amber-500/[0.05] px-3 py-2.5">
-            <span className="flex items-center gap-1.5 text-[12px] text-amber-200/90">
+          <div className="flex items-center justify-between rounded-xl border border-violet-500/25 bg-violet-500/[0.07] px-3 py-2.5">
+            <span className="flex items-center gap-1.5 text-[12px] text-violet-200/90">
               <Compass size={13} />
               {t.pomodoro.flightDuration}
             </span>
-            <span className="font-mono text-[13px] font-semibold text-amber-200">
-              {flight ? formatFlightDuration(flight.durationMin) : "——"}
+            <span className="font-mono text-[13px] font-semibold text-violet-200">
+              {flight ? formatFlightDuration(flight.durationMin) : "â€”â€”"}
             </span>
           </div>
         </div>

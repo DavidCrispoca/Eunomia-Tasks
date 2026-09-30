@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
 import { MobileNav } from "@/components/layout/mobile-nav";
@@ -33,7 +33,11 @@ export default function DashboardLayout({
   return (
     <PomodoroProvider>
       <div className="flex h-full overflow-hidden">
-        <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[320px] glow-mask" />
+        <div className="aurora" aria-hidden>
+          <div className="aurora-blob aurora-blob--a" />
+          <div className="aurora-blob aurora-blob--b" />
+          <div className="aurora-blob aurora-blob--c" />
+        </div>
         <div className="hidden shrink-0 lg:flex">
           <Sidebar onOpenPalette={() => setPaletteOpen(true)} />
         </div>
@@ -71,17 +75,28 @@ function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const reduceMotion = useReducedMotion();
   return (
-    <motion.div
-      key={pathname}
-      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={
-        reduceMotion
-          ? { duration: 0 }
-          : { duration: 0.3, ease: [0.16, 1, 0.3, 1] }
-      }
-    >
-      {children}
-    </motion.div>
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={pathname}
+        initial={
+          reduceMotion
+            ? { opacity: 0 }
+            : { opacity: 0, y: 14, scale: 0.998, filter: "blur(4px)" }
+        }
+        animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+        exit={
+          reduceMotion
+            ? { opacity: 0 }
+            : { opacity: 0, y: -8, scale: 0.999, filter: "blur(3px)" }
+        }
+        transition={
+          reduceMotion
+            ? { duration: 0 }
+            : { duration: 0.32, ease: [0.16, 1, 0.3, 1] }
+        }
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
   );
 }

@@ -3,7 +3,8 @@ import { cn } from "@/lib/utils";
 export function Logo({ className }: { className?: string }) {
   return (
     <span className={cn("inline-flex items-center gap-2", className)}>
-      <span className="grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-br from-amber-400 to-orange-600 text-black shadow-[0_0_14px_rgba(245,158,11,0.4)]">
+      <span className="relative grid h-6 w-6 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-[0_4px_16px_rgba(63,118,216,0.35),inset_0_1px_0_rgba(255,255,255,0.4),inset_0_-2px_4px_rgba(0,0,0,0.25)]">
+        <span className="absolute inset-0 rounded-full ring-1 ring-inset ring-white/20" aria-hidden />
         <svg
           width="14"
           height="14"
@@ -20,8 +21,9 @@ export function Logo({ className }: { className?: string }) {
         </svg>
       </span>
       <span className="text-[15px] font-semibold tracking-tight">
-        <span className="text-gold-gradient">Eunomia</span>{" "}
-        <span className="text-white/70">Tasks</span>
+        <span className="t-shimmer" data-text="Eunomia Tasks">
+          Eunomia Tasks
+        </span>
       </span>
     </span>
   );

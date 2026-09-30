@@ -114,13 +114,13 @@ export function CalendarView() {
   const weekLabel = useMemo(() => {
     const start = formatShortDate(toISODate(weekStart), lang);
     const end = formatShortDate(toISODate(addDays(weekStart, 6)), lang);
-    return `${start} – ${end} · ${weekStart.getFullYear()}`;
+    return `${start} â€“ ${end} Â· ${weekStart.getFullYear()}`;
   }, [weekStart, lang]);
 
   const weekStartISO = toISODate(weekStart);
   const weekEndISO = toISODate(addDays(weekStart, 6));
 
-  // Estado de la conexión con Google Calendar (oculto en modo demo).
+  // Estado de la conexiÃ³n con Google Calendar (oculto en modo demo).
   useEffect(() => {
     if (isDemo) return;
     let cancelled = false;
@@ -266,7 +266,7 @@ export function CalendarView() {
               {t.common.today}
             </Button>
           </div>
-          <span className="font-mono text-sm font-medium text-amber-100/90">
+          <span className="font-display font-mono text-sm font-medium text-violet-100/90">
             {weekLabel}
           </span>
         </div>
@@ -277,7 +277,7 @@ export function CalendarView() {
 
         <div className="flex flex-col gap-6 lg:flex-row">
           <div className="min-w-0 flex-1">
-            <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.02] shadow-[var(--inset-top),var(--app-shadow)]">
+            <div className="glass-deep overflow-x-auto rounded-2xl">
               <div className="min-w-[680px] sm:min-w-0">
                 <div className="flex border-b border-white/10 overflow-x-auto">
                   <div className="w-12 shrink-0" />
@@ -293,7 +293,7 @@ export function CalendarView() {
                         className={cn(
                           "grid h-7 w-7 place-items-center rounded-full font-mono text-sm font-semibold",
                           isSameDay(date, new Date()) &&
-                            "bg-gradient-to-br from-amber-400 to-orange-600 text-black shadow-[0_0_12px_rgba(245,158,11,0.5)]",
+                            "bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-[0_4px_16px_rgba(63,118,216,0.45),inset_0_1px_0_rgba(255,255,255,0.35)]",
                         )}
                       >
                         {date.getDate()}
@@ -316,7 +316,7 @@ export function CalendarView() {
                       return (
                         <span
                           key={minute}
-                          className="absolute right-2 -translate-y-full font-mono text-[10px] italic leading-5 text-amber-200/50"
+                          className="absolute right-2 -translate-y-full font-mono text-[10px] italic leading-5 text-violet-200/50"
                           style={{ top: r * ROW_HEIGHT }}
                         >
                           {minutesToHHMM(minute)}
@@ -350,13 +350,13 @@ export function CalendarView() {
           </div>
 
           <aside className="w-full shrink-0 lg:w-64">
-            <div className="surface-gold-gradient relative overflow-hidden rounded-2xl border border-white/10 p-3 shadow-[var(--inset-top),var(--app-shadow)]">
+            <div className="surface-gold-gradient relative overflow-hidden rounded-2xl border border-white/10 p-3 shadow-[var(--glass-drop)]">
               <div className="glow-mask pointer-events-none absolute inset-0" />
               <div className="mb-2 flex items-center gap-2 px-1">
-                <span className="text-[13px] font-semibold tracking-tight">
+                <span className="text-[13px] font-semibold tracking-tight font-display">
                   <span className="text-gold-gradient">{t.calendar.unscheduled}</span>
                 </span>
-                <span className="rounded-md border border-amber-500/25 bg-amber-500/10 px-1.5 font-mono text-[11px] text-amber-300">
+                <span className="rounded-md border border-violet-500/25 bg-violet-500/10 px-1.5 font-mono text-[11px] text-violet-300">
                   {unscheduled.length}
                 </span>
               </div>
@@ -383,8 +383,8 @@ export function CalendarView() {
 
       <DragOverlay dropAnimation={{ duration: 150 }}>
         {activeTask ? (
-          <div className="cursor-grabbing rotate-1 scale-105 rounded-lg border border-amber-500/40 bg-surface-2 px-3 py-2 text-sm shadow-[0_10px_30px_rgba(245,158,11,0.25)]">
-            <span className="font-medium text-amber-100">{activeTask.title}</span>
+          <div className="cursor-grabbing rotate-1 scale-105 rounded-xl border border-violet-500/50 glass px-3 py-2 text-sm shadow-[0_12px_34px_rgba(90,140,240,0.4)]">
+            <span className="font-medium text-violet-100">{activeTask.title}</span>
           </div>
         ) : null}
       </DragOverlay>
@@ -408,7 +408,7 @@ interface DayColumnProps {
   onCreateBlock: (date: string) => void;
 }
 
-/** Recorte del evento de Google a la rejilla del día (por si cruza días). */
+/** Recorte del evento de Google a la rejilla del dÃ­a (por si cruza dÃ­as). */
 interface GoogleSpan {
   top: number;
   height: number;
@@ -455,8 +455,8 @@ function DayColumn({
       ref={setNodeRef}
       className={cn(
         "group relative flex-1 cursor-crosshair border-l border-white/10 transition-colors",
-        isToday && "bg-amber-500/[0.03]",
-        isOver && "bg-amber-500/[0.07] shadow-[inset_0_0_28px_rgba(245,158,11,0.08)]",
+        isToday && "bg-violet-500/[0.05]",
+        isOver && "bg-violet-500/[0.09] shadow-[inset_0_0_32px_rgba(90,140,240,0.1)]",
       )}
       style={{ height: TOTAL_ROWS * ROW_HEIGHT }}
     >
@@ -488,7 +488,7 @@ function DayColumn({
                 {t.calendar.google.badge}
               </span>
               <Clock size={9} />
-              {toHoursMinutes(new Date(event.start))}–
+              {toHoursMinutes(new Date(event.start))}â€“
               {toHoursMinutes(new Date(event.end))}
             </span>
           </>
@@ -533,7 +533,7 @@ function DayColumn({
               key={block.id}
               type="button"
               className={cn(
-                "absolute inset-x-1 relative z-[1] overflow-hidden rounded-lg border px-2 py-1 text-left text-[11px] leading-tight shadow-sm transition-[transform,box-shadow] duration-200 ease-out-expo hover:scale-[1.02] hover:shadow-[0_4px_16px_rgba(245,158,11,0.15)] active:scale-[0.98]",
+                "absolute inset-x-1 relative z-[1] overflow-hidden rounded-lg border px-2 py-1 text-left text-[11px] leading-tight shadow-[0_3px_10px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.06)] transition-[transform,box-shadow] duration-200 ease-out-expo hover:scale-[1.02] hover:shadow-[0_6px_20px_rgba(90,140,240,0.28),inset_0_1px_0_rgba(255,255,255,0.06)] active:scale-[0.98]",
                 BLOCK_COLORS[block.color ?? "default"],
               )}
               style={{ top: top + 1, height: height - 2 }}
@@ -546,7 +546,7 @@ function DayColumn({
               <span className="line-clamp-2 font-medium pl-1.5">{block.title}</span>
               <span className="flex items-center gap-1 pl-1.5 font-mono text-[10px] opacity-70">
                 <Clock size={9} />
-                {block.start}–{block.end}
+                {block.start}â€“{block.end}
               </span>
             </button>
           );
@@ -554,8 +554,8 @@ function DayColumn({
 
       <button
         type="button"
-        aria-label={`${date} ＋`}
-        className="absolute bottom-1.5 right-1.5 grid h-8 w-8 place-items-center rounded-lg border border-white/10 bg-black/40 text-muted opacity-100 shadow-sm transition-all duration-200 ease-out-expo hover:border-amber-500/40 hover:text-amber-400 sm:opacity-0 sm:group-hover:opacity-100 active:scale-[0.92] active:duration-75"
+        aria-label={`${date} ï¼‹`}
+        className="absolute bottom-1.5 right-1.5 grid h-8 w-8 place-items-center rounded-full border border-white/[0.12] bg-white/[0.06] text-muted opacity-100 shadow-[var(--inset-top)] backdrop-blur-md transition-all duration-200 ease-out-expo hover:border-violet-400/50 hover:text-violet-300 sm:opacity-0 sm:group-hover:opacity-100 active:scale-[0.92] active:duration-75"
         onClick={() => onCreateBlock(date)}
       >
         <CalendarPlus size={13} />
@@ -589,11 +589,11 @@ function UnscheduledTask({ task }: { task: Task }) {
           : undefined,
       }}
       className={cn(
-        "flex cursor-grab items-center gap-2 rounded-lg border border-white/10 bg-surface-2 px-3 py-2.5 text-sm shadow-[var(--inset-top)] transition-all duration-200 ease-out-expo hover:-translate-y-px hover:border-amber-500/35 hover:bg-surface-hover hover:shadow-[var(--inset-top),0_4px_16px_rgba(245,158,11,0.1)] min-h-[44px]",
-        isDragging && "opacity-40 ring-1 ring-amber-500/30",
+        "flex cursor-grab items-center gap-2 rounded-xl glass px-3 py-2.5 text-sm transition-all duration-200 ease-out-expo hover:border-violet-300/40 hover:bg-white/[0.09] min-h-[44px]",
+        isDragging && "opacity-40 ring-1 ring-violet-500/40",
       )}
     >
-      <GripVertical size={14} className="shrink-0 text-amber-200/40" />
+      <GripVertical size={14} className="shrink-0 text-violet-300/50" />
       <span className="min-w-0 flex-1 truncate">{task.title}</span>
       <span
         className={cn(
@@ -668,7 +668,7 @@ function BlockModal({ open, block, onClose, onSave, onDelete }: BlockModalProps)
             <input
               type="date"
               value={date}
-              className="min-h-[44px] rounded-lg border border-white/10 bg-surface-2 px-3 text-sm text-foreground focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-amber-500/25 [color-scheme:dark]"
+              className="min-h-[44px] rounded-lg border border-white/[0.12] bg-white/[0.04] px-3 text-sm text-foreground backdrop-blur-md transition-[border-color,box-shadow,background-color] duration-200 ease-out-expo focus:border-violet-400/70 focus:outline-none focus:ring-2 focus:ring-violet-400/20 [color-scheme:dark]"
               onChange={(e) => setDate(e.target.value)}
             />
             <div className="flex flex-1 items-center gap-1.5">
@@ -679,7 +679,7 @@ function BlockModal({ open, block, onClose, onSave, onDelete }: BlockModalProps)
                   </option>
                 ))}
               </Select>
-              <span className="text-sm text-muted">–</span>
+              <span className="text-sm text-muted">â€“</span>
               <Select value={end} onChange={(e) => setEnd(e.target.value)} aria-label={t.calendar.to} className="min-h-[44px]">
                 {TIME_OPTIONS.map((o) => (
                   <option key={o} value={o}>
@@ -709,7 +709,7 @@ function BlockModal({ open, block, onClose, onSave, onDelete }: BlockModalProps)
               value={taskId}
               onChange={(e) => setTaskId(e.target.value)}
             >
-              <option value="">—</option>
+              <option value="">â€”</option>
               {tasks.map((task) => (
                 <option key={task.id} value={task.id}>
                   {task.title}
@@ -727,10 +727,10 @@ function BlockModal({ open, block, onClose, onSave, onDelete }: BlockModalProps)
                   type="button"
                   onClick={() => setColor(c)}
                   className={cn(
-                    "min-h-[44px] min-w-[44px] rounded-full border shadow-[0_0_8px_rgba(0,0,0,0.4)] transition-transform hover:scale-110",
+                    "min-h-[44px] min-w-[44px] rounded-full border shadow-[0_4px_10px_rgba(0,0,0,0.45)] transition-transform hover:scale-110",
                     BLOCK_COLORS[c].split(" ")[0],
                     color === c &&
-                      "ring-2 ring-amber-400 ring-offset-2 ring-offset-background",
+                      "ring-2 ring-violet-400 ring-offset-2 ring-offset-background",
                   )}
                   aria-label={c}
                 />

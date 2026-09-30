@@ -58,10 +58,10 @@ export const KanbanColumn = forwardRef<HTMLDivElement, KanbanColumnProps>(
           className={cn("h-2 w-2 rounded-full", STATUS_DOT[status])}
           aria-hidden
         />
-        <h3 className="text-[13px] font-semibold tracking-tight">
+        <h3 className="text-[13px] font-semibold tracking-tight font-display">
           {t.kanban.columns[status]}
         </h3>
-        <span className="rounded-md border border-white/10 bg-white/[0.04] px-1.5 font-mono text-[11px] text-amber-200/80">
+        <span className="rounded-md border border-white/10 bg-white/[0.04] px-1.5 font-mono text-[11px] text-violet-300/90 text-tabular">
           {sorted.length}
         </span>
         {status === "todo" && (
@@ -72,9 +72,9 @@ export const KanbanColumn = forwardRef<HTMLDivElement, KanbanColumnProps>(
       <div
         ref={setRefs}
         className={cn(
-          "flex-1 min-h-[200px] overflow-y-auto rounded-2xl border border-white/5 bg-white/[0.02] p-1.5 shadow-[var(--inset-top-soft)] transition-[border-color,box-shadow,background-color] duration-200 ease-out-expo",
+          "flex-1 min-h-[200px] overflow-y-auto rounded-2xl glass-deep p-1.5 transition-[border-color,box-shadow,background-color] duration-200 ease-out-expo",
           isOver &&
-            "border-amber-500/50 bg-amber-500/[0.06] shadow-[var(--inset-top),inset_0_0_28px_rgba(245,158,11,0.06)]",
+            "border-violet-500/60 bg-violet-500/[0.07] shadow-[inset_3px_3px_10px_rgba(90,140,240,0.08),inset_-3px_-3px_10px_rgba(0,0,0,0.4)]",
         )}
       >
         <SortableContext
@@ -103,7 +103,7 @@ export const KanbanColumn = forwardRef<HTMLDivElement, KanbanColumnProps>(
             <Button
               variant="ghost"
               size="sm"
-              className="mt-1 justify-start text-muted hover:border-amber-500/25 hover:bg-amber-500/5 hover:text-foreground max-md:h-10 max-md:border max-md:border-white/10 max-md:bg-white/[0.03]"
+              className="mt-1 justify-start text-muted hover:border-violet-500/30 hover:bg-violet-500/5 hover:text-foreground max-md:h-10 max-md:border max-md:border-white/10 max-md:bg-white/[0.03]"
               onClick={() => onAddTask(status)}
             >
               <Plus size={14} />

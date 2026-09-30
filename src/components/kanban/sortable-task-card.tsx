@@ -55,8 +55,8 @@ export function SortableTaskCard({
       style={style}
       {...safeAttributes}
       className={cn(
-        "group/card relative rounded-lg",
-        isDragging && "z-10 opacity-30 ring-2 ring-amber-500/40",
+        "group/card relative rounded-2xl",
+        isDragging && "z-10 opacity-30 ring-2 ring-violet-500/50",
       )}
     >
       <TaskCard
@@ -74,7 +74,7 @@ export function SortableTaskCard({
         type="button"
         {...listeners}
         aria-label="Arrastrar tarea"
-        className="absolute left-1 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 touch-none select-none items-center justify-center rounded-lg text-muted opacity-50 transition-all duration-200 hover:bg-white/5 hover:text-foreground hover:opacity-100 active:cursor-grabbing active:bg-white/10 group-hover/card:opacity-100 max-sm:opacity-70"
+        className="absolute left-1 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 touch-none select-none items-center justify-center rounded-full text-muted opacity-50 transition-all duration-200 hover:bg-white/5 hover:text-foreground hover:opacity-100 active:cursor-grabbing active:bg-white/10 group-hover/card:opacity-100 max-sm:opacity-70"
       >
         <GripVertical size={18} />
       </button>

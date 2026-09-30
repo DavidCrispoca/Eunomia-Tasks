@@ -70,13 +70,13 @@ export function KanbanBoard() {
   );
 
   // pointerWithin elige el contenedor bajo el cursor: es lo que hace fiable
-  // soltar en una columna vacía (rectIntersection exige solape real).
+  // soltar en una columna vacÃ­a (rectIntersection exige solape real).
   const collisionDetection = useCallback<typeof pointerWithin>(
     (args) => {
       const withinPointer = pointerWithin(args);
       if (withinPointer.length > 0) return withinPointer;
       // Respaldo: si el puntero no cae squarely en un droppable (p.ej. por
-      // scrolls) usamos la intersección de rectángulos más cercana.
+      // scrolls) usamos la intersecciÃ³n de rectÃ¡ngulos mÃ¡s cercana.
       return rectIntersection(args);
     },
     [],
@@ -167,7 +167,7 @@ export function KanbanBoard() {
       .filter((t) => t.status === targetStatus)
       .sort((a, b) => a.order - b.order);
 
-    // Soltada sobre sí misma sin cambio de columna: nada que hacer.
+    // Soltada sobre sÃ­ misma sin cambio de columna: nada que hacer.
     let index = column.findIndex((t) => t.id === over.id);
     if (overIsColumn || index < 0) {
       index = column.length;
@@ -205,13 +205,13 @@ export function KanbanBoard() {
     cn(
       "shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200 ease-out-expo",
       active
-        ? "border-amber-500/50 bg-amber-500/10 text-amber-200"
+        ? "border-violet-500/50 bg-violet-500/15 text-violet-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_4px_14px_rgba(90,140,240,0.18)]"
         : "border-white/10 bg-white/[0.03] text-muted hover:border-white/25 hover:text-foreground",
     );
 
   const focusBadge = (minutes: number) =>
     minutes > 0 ? (
-      <span className="ml-1 font-mono text-[10px] font-semibold text-amber-300/90">
+      <span className="ml-1 font-mono text-[10px] font-semibold text-violet-300/90">
         {minutes}m
       </span>
     ) : null;
@@ -282,7 +282,7 @@ return (
         onDragEnd={handleDragEnd}
         onDragCancel={() => setActiveTask(null)}
       >
-        {/* Barra de pestañas: solo móvil. Navega el carrusel de columnas. */}
+        {/* Barra de pestaÃ±as: solo mÃ³vil. Navega el carrusel de columnas. */}
         <div
           className="flex shrink-0 overflow-x-auto border-b border-white/10 pb-1 md:hidden"
           role="tablist"
@@ -296,7 +296,7 @@ return (
               className={cn(
                 "shrink-0 border-b-2 px-4 py-2 text-sm font-medium transition-all duration-200",
                 activeTab === column.status
-                  ? "border-amber-400 text-amber-200"
+                  ? "border-violet-400 text-violet-200"
                   : "border-transparent text-muted hover:text-foreground",
               )}
               onClick={() => {
@@ -309,7 +309,7 @@ return (
               }}
             >
               {t.kanban.columns[column.status] || STATUS_LABELS[column.status]}
-              <span className="ml-1.5 rounded-full bg-white/10 px-1.5 font-mono text-[10px] text-amber-300/90">
+              <span className="ml-1.5 rounded-full bg-white/10 px-1.5 font-mono text-[10px] text-violet-300/90">
                 {column.tasks.length}
               </span>
             </button>
@@ -317,9 +317,9 @@ return (
         </div>
 
         {/*
-          Un ÚNICO conjunto de columnas para desktop y móvil.
+          Un ÃšNICO conjunto de columnas para desktop y mÃ³vil.
           Antes se renderizaban ambos a la vez y ambos registraban droppables
-          con el mismo id en dnd-kit; el montículo oculto (display:none, rect
+          con el mismo id en dnd-kit; el montÃ­culo oculto (display:none, rect
           0x0) ganaba el registro y por eso over siempre era null.
         */}
         <div className="flex min-h-0 flex-1 snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-4 pb-6 md:snap-proximity">

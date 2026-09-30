@@ -68,7 +68,7 @@ export function TodoSortSelect({ value, onChange }: TodoSortSelectProps) {
         className={cn(
           "group inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium transition-all duration-200 ease-out-expo active:scale-[0.97] active:duration-75",
           active
-            ? "border-amber-500/50 bg-amber-500/10 text-amber-200 shadow-[0_0_14px_rgba(245,158,11,0.15)]"
+            ? "border-violet-500/50 bg-violet-500/15 text-violet-200 shadow-[0_4px_14px_rgba(90,140,240,0.2),inset_0_1px_0_rgba(255,255,255,0.08)]"
             : "border-white/10 bg-white/[0.03] text-muted hover:border-white/25 hover:bg-white/[0.06] hover:text-foreground",
         )}
       >
@@ -78,7 +78,7 @@ export function TodoSortSelect({ value, onChange }: TodoSortSelectProps) {
           className={cn(
             "transition-transform duration-200 ease-out-expo",
             open && "rotate-180",
-            active && "text-amber-300",
+            active && "text-violet-300",
           )}
         />
         <span className="max-w-[120px] truncate">{labels[value]}</span>
@@ -92,9 +92,9 @@ export function TodoSortSelect({ value, onChange }: TodoSortSelectProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.97 }}
             transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute right-0 top-full z-40 mt-2 w-60 overflow-hidden rounded-xl border border-white/10 bg-[#0c0d10]/95 shadow-[0_14px_38px_rgba(0,0,0,0.55)] backdrop-blur-xl"
+            className="absolute right-0 top-full z-40 mt-2 w-60 overflow-hidden rounded-2xl glass-deep shadow-[0_14px_38px_rgba(0,0,0,0.6)]"
           >
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-amber-500/50 via-orange-500/25 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-500/70 via-indigo-500/35 to-transparent" />
             <p className="px-3 pb-1 pt-2.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted/70">
               {t.kanban.sortHint}
             </p>
@@ -108,12 +108,12 @@ export function TodoSortSelect({ value, onChange }: TodoSortSelectProps) {
                     role="menuitemradio"
                     aria-checked={selected}
                     onClick={() => select(option)}
-                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[12.5px] transition-colors duration-150 ease-out-expo hover:bg-amber-500/10 hover:text-amber-200 active:scale-[0.99]"
+                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[12.5px] transition-colors duration-150 ease-out-expo hover:bg-violet-500/10 hover:text-violet-200 active:scale-[0.99]"
                   >
                     <span
                       className={cn(
                         "min-w-0 flex-1 truncate transition-colors",
-                        selected ? "font-medium text-amber-200" : "text-foreground",
+                        selected ? "font-medium text-violet-200" : "text-foreground",
                       )}
                     >
                       {labels[option]}
@@ -122,7 +122,7 @@ export function TodoSortSelect({ value, onChange }: TodoSortSelectProps) {
                       className={cn(
                         "grid h-3.5 w-3.5 shrink-0 place-items-center rounded-full border transition-all duration-200 ease-out-expo",
                         selected
-                          ? "border-transparent bg-gradient-to-br from-amber-400 to-orange-500 text-black shadow-[0_0_8px_rgba(245,158,11,0.4)]"
+                          ? "border-transparent bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-[0_0_10px_rgba(63,118,216,0.4)]"
                           : "border-white/15",
                       )}
                     >

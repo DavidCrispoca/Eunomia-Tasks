@@ -57,7 +57,7 @@ export function AudioControls({
     <div className="flex flex-col gap-2.5">
       <div className="flex items-center justify-between gap-2">
         <span className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-muted">
-          <Radio size={12} className={ambience !== "none" ? "text-amber-300" : "text-muted"} />
+          <Radio size={12} className={ambience !== "none" ? "text-violet-300" : "text-muted"} />
           {t.pomodoro.audio}
         </span>
         <a
@@ -83,7 +83,7 @@ export function AudioControls({
             className={cn(
               "flex min-h-11 items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-[11px] font-medium transition-all duration-200 ease-out-expo active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 max-sm:min-h-0",
               ambience === type
-                ? "border-amber-500/40 bg-amber-500/15 text-amber-300 shadow-[inset_0_1px_0_var(--inset-top)]"
+                ? "border-violet-500/45 bg-violet-500/15 text-violet-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
                 : "border-white/10 bg-white/[0.03] text-muted hover:border-white/20 hover:text-foreground",
             )}
           >
@@ -106,7 +106,7 @@ export function AudioControls({
           disabled={disabled}
           onChange={(e) => onChangeVolume(parseFloat(e.target.value))}
           aria-label={t.pomodoro.volume}
-          className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-white/10 accent-amber-400 disabled:cursor-not-allowed disabled:opacity-40"
+          className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-white/10 accent-violet-500 disabled:cursor-not-allowed disabled:opacity-40"
         />
         <span className={cn("w-9 shrink-0 text-right font-mono text-[10.5px]", compact ? "text-muted" : "text-muted/80")}>
           {Math.round(volume * 100)}%

@@ -1,33 +1,134 @@
 @import "tailwindcss";
 
 :root {
-  --app-bg: #090a0c;
-  --app-surface-1: #111318;
-  --app-surface-2: #181b22;
-  --app-surface-hover: #222630;
-  --app-border: rgba(255, 255, 255, 0.1);
-  --app-border-strong: rgba(255, 255, 255, 0.22);
-  --app-foreground: #f3f4f6;
-  --app-muted: #9ca3af;
+  /* Midnight navy backplate · Eunomia: orden, disciplina y armonía */
+  --app-bg: #050a16;
+  --app-surface-1: #0b1226;
+  --app-surface-2: #101a38;
+  --app-surface-hover: #17224a;
+  --app-border: rgba(230, 240, 255, 0.12);
+  --app-border-strong: rgba(230, 240, 255, 0.3);
+  --app-foreground: #f4f8ff;
+  --app-muted: #8ea1c1;
   --app-faint: rgba(255, 255, 255, 0.05);
-  --app-accent: #f59e0b;
-  --app-accent-hover: #fbbf24;
-  --app-accent-soft: rgba(245, 158, 11, 0.12);
-  --app-green: #34d399;
-  --app-orange: #f97316;
-  --app-red: #ff4500;
-  --app-blue: #fbbf24;
-  --app-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
-  --app-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.7);
-  --app-glow: 0 4px 20px rgba(245, 158, 11, 0.12);
-  --inset-top: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --inset-top-soft: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  --app-accent: #5a8cf0;
+  --app-accent-hover: #8ab8ff;
+  --app-accent-soft: rgba(90, 140, 240, 0.16);
+  --app-green: #449d8a;
+  --app-orange: #d3a65a;
+  --app-red: #ff5f7a;
+  --app-blue: #8cb4ff;
+  --app-shadow: 0 10px 30px rgba(2, 6, 16, 0.45);
+  --app-shadow-lg: 0 24px 80px rgba(2, 6, 16, 0.55);
+  --app-glow: 0 6px 24px rgba(90, 140, 240, 0.2);
+  --inset-top: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --inset-top-soft: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  /* Glass volume: frosted panels over navy-ice */
+  --glass-drop: 0 14px 40px -10px rgba(2, 6, 16, 0.6);
+  --glass-inner: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  --glass-shadow: var(--glass-drop), var(--glass-inner);
+  --glass-blur: blur(20px) saturate(160%);
+  /* Shimmer sweep for brand + page titles (pure CSS, no JS) */
+  --shimmer-dur: 2800ms;
+  --shimmer-base: #a9c4f0;
+  --shimmer-highlight: #ffffff;
+  --shimmer-band: 400%;
+  --shimmer-ease: linear;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @theme inline {
-  /* Motion curve: fast to the point, haptic settle */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@theme {
+  --font-sans: var(--font-sora), var(--font-geist-sans), ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-sora), var(--font-geist-sans), ui-sans-serif,
+    system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Brand ramp · Azur hielo (orden y claridad; re-themes el amber) */
+  --color-amber-50: #eef4ff;
+  --color-amber-100: #e0ebff;
+  --color-amber-200: #c7dbff;
+  --color-amber-300: #a4c1ff;
+  --color-amber-400: #82abff;
+  --color-amber-500: #5a8cf0;
+  --color-amber-600: #3c6fd6;
+  --color-amber-700: #2f54a8;
+  --color-amber-800: #27407d;
+  --color-amber-900: #1b2e5c;
+
+  /* Violeta Tailwind unificado con la marca (azur) */
+  --color-violet-50: #eef4ff;
+  --color-violet-100: #e0ebff;
+  --color-violet-200: #c7dbff;
+  --color-violet-300: #a4c1ff;
+  --color-violet-400: #82abff;
+  --color-violet-500: #5a8cf0;
+  --color-violet-600: #3c6fd6;
+  --color-violet-700: #2f54a8;
+  --color-violet-800: #27407d;
+  --color-violet-900: #1b2e5c;
+
+  /* Azur profundo para gradientes (profundidad navy) */
+  --color-indigo-50: #eaeffc;
+  --color-indigo-100: #dde7ff;
+  --color-indigo-200: #bfd1fd;
+  --color-indigo-300: #95b5fb;
+  --color-indigo-400: #6c96f2;
+  --color-indigo-500: #4a77e0;
+  --color-indigo-600: #3560c7;
+  --color-indigo-700: #2a4a9c;
+  --color-indigo-800: #203a75;
+  --color-indigo-900: #162b56;
+
+  /* Logro sereno · bronce cálido (disciplina/enfoque, re-themes el orange) */
+  --color-orange-100: #faf1df;
+  --color-orange-200: #f5e3bd;
+  --color-orange-300: #edcf94;
+  --color-orange-400: #e0b36b;
+  --color-orange-500: #d3a65a;
+  --color-orange-600: #ab7f3e;
+  --color-orange-700: #86602f;
+  --color-orange-800: #644722;
+  --color-orange-900: #47341a;
+
+  /* Denim · azul grisáceo (el former fuchsia, sin rosa) */
+  --color-fuchsia-50: #eef2fb;
+  --color-fuchsia-100: #dfe7f6;
+  --color-fuchsia-200: #c2d0ee;
+  --color-fuchsia-300: #9cb3e3;
+  --color-fuchsia-400: #7190d2;
+  --color-fuchsia-500: #5672b6;
+  --color-fuchsia-600: #445b96;
+  --color-fuchsia-700: #374a79;
+  --color-fuchsia-800: #2b3a5e;
+  --color-fuchsia-900: #1e2a46;
+
+  /* Hielo · azul claro informativo (el former neón cyan) */
+  --color-cyan-100: #e5f1fb;
+  --color-cyan-200: #cde4f8;
+  --color-cyan-300: #a3d0f2;
+  --color-cyan-400: #72b6e8;
+  --color-cyan-500: #4f96d6;
+  --color-cyan-600: #3e78b4;
+  --color-cyan-700: #325f8e;
+  --color-cyan-800: #29496c;
+  --color-cyan-900: #1d3552;
+
+  /* Armonía · aguamarina serena (completar = calma, el former mint) */
+  --color-emerald-100: #e5f6f2;
+  --color-emerald-200: #cee9e0;
+  --color-emerald-300: #9ad3c6;
+  --color-emerald-400: #63b8a6;
+  --color-emerald-500: #449d8a;
+  --color-emerald-600: #357d6e;
+
+  --color-brand: #3c6fd6;
+  --color-brand-soft: rgba(90, 140, 240, 0.16);
+  --color-neon: #72b6e8;
 }
 
 @theme inline {
@@ -50,8 +151,6 @@
   --color-warning: var(--app-orange);
   --color-danger: var(--app-red);
   --color-info: var(--app-blue);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 html,
@@ -60,9 +159,26 @@ body {
 }
 
 body {
-  background: var(--app-bg);
+  background-color: var(--app-bg);
+  background-image:
+    radial-gradient(
+      1100px 520px at 88% -12%,
+      rgba(54, 96, 196, 0.28),
+      transparent 62%
+    ),
+    radial-gradient(
+      900px 500px at -12% 32%,
+      rgba(31, 56, 110, 0.16),
+      transparent 60%
+    ),
+    radial-gradient(
+      820px 620px at 50% 116%,
+      rgba(90, 140, 240, 0.09),
+      transparent 62%
+    );
+  background-attachment: fixed;
   color: var(--app-foreground);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+  font-family: var(--font-sora), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -83,43 +199,268 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(164, 193, 255, 0.22);
   border-radius: 8px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(245, 158, 11, 0.4);
+  background: rgba(90, 140, 240, 0.5);
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
-/* Signature text gradient */
+/* ---------- Brand gradients ---------- */
+/* Signature text gradient: blanco hielo → azur → navy (professional white) */
 .text-gold-gradient {
   background: linear-gradient(
-    90deg,
-    #fde68a 0%,
-    #fbbf24 45%,
-    #f97316 100%
+    110deg,
+    #f2f7ff 0%,
+    #7fa6ff 48%,
+    #27407d 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-/* Signature surface gradient (dark gold) */
+/* Brand surface gradient: frosted navy sheen */
 .surface-gold-gradient {
-  background: linear-gradient(to bottom, #1e222b 0%, #12141a 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.09),
+    rgba(10, 18, 40, 0.35) 30%,
+    rgba(20, 32, 71, 0.22)
+  );
+  backdrop-filter: blur(24px) saturate(150%);
 }
 
-/* Subtle glow mask for ambient backgrounds */
+/* Ambient deep-azure glow mask */
 .glow-mask {
   background: radial-gradient(
     circle at top,
-    rgba(245, 158, 11, 0.15) 0%,
+    rgba(53, 96, 199, 0.18) 0%,
+    rgba(53, 96, 199, 0.05) 45%,
     transparent 70%
   );
+}
+
+/* ---------- Frosted glass material ---------- */
+.glass {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.075),
+    rgba(255, 255, 255, 0.03) 55%,
+    rgba(255, 255, 255, 0.045)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-deep {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.02)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(26px) saturate(170%);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px) saturate(150%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* Haptic lift for interactive frosted panels */
+.glass-hover {
+  transition: transform 0.24s var(--ease-out-expo), box-shadow 0.24s var(--ease-out-expo),
+    border-color 0.24s var(--ease-out-expo), background-color 0.24s var(--ease-out-expo);
+}
+.glass-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(164, 193, 255, 0.45);
+  background-color: rgba(255, 255, 255, 0.06);
+  box-shadow: var(--glass-drop), var(--glass-inner),
+    0 14px 34px -12px rgba(90, 140, 240, 0.4);
+}
+.glass-hover:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ---------- Ambient aurora ---------- */
+.aurora {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  opacity: 0.68;
+  background: radial-gradient(circle, var(--blob-c, #5a8cf0) 0%, transparent 68%);
+  animation: aurora-drift 18s ease-in-out infinite alternate;
+}
+.aurora-blob--a {
+  --blob-c: rgba(54, 96, 196, 0.5);
+  width: 480px;
+  height: 480px;
+  top: -140px;
+  left: -80px;
+  animation-duration: 17s;
+}
+.aurora-blob--b {
+  --blob-c: rgba(22, 43, 86, 0.42);
+  width: 420px;
+  height: 420px;
+  top: 12%;
+  right: -140px;
+  animation-delay: -6s;
+  animation-duration: 21s;
+}
+.aurora-blob--c {
+  --blob-c: rgba(90, 140, 240, 0.34);
+  width: 380px;
+  height: 380px;
+  bottom: -120px;
+  left: 32%;
+  animation-delay: -12s;
+  animation-duration: 24s;
+}
+
+@keyframes aurora-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(46px, -34px, 0) scale(1.12);
+  }
+  100% {
+    transform: translate3d(-30px, 30px, 0) scale(0.94);
+  }
+}
+
+/* ---------- Micro-interactions ---------- */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(90, 140, 240, 0.4);
+  }
+  60% {
+    box-shadow: 0 0 0 9px rgba(90, 140, 240, 0);
+  }
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2.4s var(--ease-out-expo) infinite;
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+.animate-float {
+  animation: float-y 5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 180% 0;
+  }
+  100% {
+    background-position: -80% 0;
+  }
+}
+/* ---------- Shimmer text (titles + brand) ---------- */
+/* Two-layer: base text renders in --shimmer-base; ::before duplicates the
+   string via attr(data-text), clips a transparent → highlight → transparent
+   band to the glyphs and sweeps it across with background-position. */
+.t-shimmer {
+  position: relative;
+  display: inline-block;
+  color: var(--shimmer-base);
+}
+
+.t-shimmer::before {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 40%,
+    var(--shimmer-highlight) 50%,
+    transparent 60%,
+    transparent 100%
+  );
+  background-size: var(--shimmer-band) 100%;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: t-shimmer var(--shimmer-dur) var(--shimmer-ease) infinite;
+}
+
+@keyframes t-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-shimmer::before {
+    animation: none !important;
+  }
+}
+
+/* ---------- Professional type & interaction ---------- */
+/* Contadores y métricas: números tabulares (ancho estable, look corporativo) */
+.text-tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Enlace sutil con subrayado que se desliza */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 1px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: currentColor;
+  opacity: 0.5;
+  transition: transform 0.32s var(--ease-out-expo);
+}
+.link-underline:hover::after {
+  transform: scaleX(1);
+}
+
+/* Foco de teclado profesional (a11y): anillo azur sobre el navy */
+:where(button, a, input, select, textarea, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid rgba(138, 184, 255, 0.85);
+  outline-offset: 2px;
 }
 
 /* Haptic response: confirm the touch of every interactive surface */

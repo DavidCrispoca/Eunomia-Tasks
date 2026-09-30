@@ -37,31 +37,44 @@ export function Modal({ open, onClose, children, className, labelledBy }: ModalP
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
+          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
           <motion.div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 bg-[#03060f]/70 backdrop-blur-lg"
             onClick={onClose}
             aria-hidden
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.28 }}
           />
           <motion.div
             role="dialog"
             aria-modal="true"
             className={cn(
-              "relative z-10 my-auto w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-[#090a0c]/80 shadow-[var(--app-shadow-lg)] backdrop-blur-xl",
+              "relative z-10 my-auto w-full max-w-md overflow-hidden rounded-2xl glass shadow-[var(--app-shadow-lg)]",
               className,
             )}
             aria-labelledby={labelledBy}
-            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 22, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.97 }}
             transition={
               reduceMotion
                 ? { duration: 0 }
-                : { duration: 0.18, ease: [0.16, 1, 0.3, 1] }
+                : { y: { type: "spring", stiffness: 380, damping: 30 }, opacity: { duration: 0.24 }, scale: { type: "spring", stiffness: 380, damping: 30 } }
             }
           >
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-amber-500/60 via-orange-500/25 to-transparent" />
+            <motion.div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-white/70 via-violet-400/45 to-transparent"
+              initial={reduceMotion ? {} : { scaleX: 0, opacity: 0 }}
+              animate={reduceMotion ? {} : { scaleX: 1, opacity: 1 }}
+              transition={
+                reduceMotion ? { duration: 0 } : { delay: 0.12, duration: 0.45, ease: [0.16, 1, 0.3, 1] }
+              }
+              style={{ transformOrigin: "left" }}
+            />
             {children}
           </motion.div>
         </motion.div>

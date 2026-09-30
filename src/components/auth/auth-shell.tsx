@@ -5,7 +5,14 @@ import { LangSwitch } from "@/components/auth/lang-switch";
 export function AuthShell({ children }: { children: ReactNode }) {
   return (
     <div className="relative flex h-full flex-col overflow-hidden bg-background">
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[380px] glow-mask" />
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[420px]">
+        <div className="aurora absolute inset-0 overflow-hidden">
+          <div className="aurora-blob aurora-blob--a" />
+          <div className="aurora-blob aurora-blob--b" />
+          <div className="aurora-blob aurora-blob--c" />
+        </div>
+        <div className="glow-mask absolute inset-0" />
+      </div>
       <header className="relative z-10 flex items-center justify-between px-6 py-5">
         <Logo />
         <LangSwitch />
