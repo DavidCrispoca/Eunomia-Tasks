@@ -15,18 +15,6 @@ bloque `email` con `smtpConfigured`/`smtpHost`/`smtpUser`/`smtpPass`/`sender`/`r
 > `EMAIL_FROM`) en Vercel — lo confirma `smtpConfigured:false` en `/api/health`.
 > Pasos exactos en `PROCESO.md` (22-09) y `SETUP.md` (§4.1 y §8).
 
-## Ejecutar en local
-
-```bash
-npm install
-cp .env.example .env.local   # rellena las variables
-npm run dev
-```
-
-Abre http://localhost:3000. **Sin variables de entorno** la app funciona en
-**modo demo local**: cualquier correo + contraseña (≥ 6 caracteres) sirve y los
-datos se guardan en `localStorage`.
-
 ## Qué incluye
 
 - **Inicio / Dashboard**: métricas (pendientes, completadas hoy, % a tiempo,
@@ -71,17 +59,6 @@ datos se guardan en `localStorage`.
   respetando `prefers-reduced-motion`.
 - **i18n Español/Inglés**.
 
-## Documentación
-
-- **`DESIGN.md`** — Sistema visual: tokens y materiales de superficie, botones,
-  tipografía, movimiento y checklist de UI nueva.
-- **`SETUP.md`** — Runbook paso a paso para crear las cuentas, rellenar las
-  variables y hacer el deploy en Vercel (todo en la capa gratuita).
-- **`PLAN.md`** — Especificación, estado de implementación y hoja de ruta.
-- **`PROCESO.md`** — Bitácora de cambios con contexto (local, no se versiona).
-- **`supabase/schema.sql`** — Esquema de base de datos (ejecutar en el SQL
-  Editor de Supabase).
-
 ## Trabajo pendiente
 
 > Detalle de cada punto en `SESSION-NOTES.md` (local, no se versiona).
@@ -103,28 +80,6 @@ datos se guardan en `localStorage`.
 - **[ ] Considerar un hook de hidratación compartido** en lugar del
   `useHydrated` local duplicado entre `pomodoro-chip.tsx` y la capa de
   storage.
-
-## Variables de entorno
-
-Copia `.env.example` a `.env.local`. Sin variables → modo demo local.
-
-> En Vercel, las variables `NEXT_PUBLIC_*` se inyectan **al compilar**: si las
-> añades/cambias debes hacer **redeploy**. Verifica el estado con
-> `GET /api/health` (ver `SETUP.md` → 5.1).
-
-| Variable                               | Uso                                                                       |
-| -------------------------------------- | ------------------------------------------------------------------------- |
-| `SESSION_SECRET`                       | Firma de la cookie de sesión (`openssl rand -base64 32`)                  |
-| `NEXT_PUBLIC_SUPABASE_URL`             | URL del proyecto Supabase (backend de datos)                              |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY`        | Anon key pública                                                          |
-| `SUPABASE_SERVICE_ROLE_KEY`            | Service role (solo servidor; nunca enviar al cliente)                     |
-| `RESEND_API_KEY`                       | Envío por Resend (usado solo si no hay SMTP)                              |
-| `EMAIL_FROM`                           | Remitente (`Eunomia Tasks <no-reply@dominio>`; con Gmail = `SMTP_USER`)   |
-| `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` | Envío por SMTP si está configurado (p. ej. `smtp.gmail.com` / `465` / `true`); gana sobre Resend |
-| `SMTP_USER` / `SMTP_PASS`              | Gmail con 2FA + «Contraseña de aplicaciones»                              |
-| `MAIL_HOUR`                            | Hora local (0–23) del envío diario (default 8; los lunes, resumen semanal)|
-| `APP_URL`                              | URL pública para los enlaces firmados del correo                          |
-| `CRON_SECRET`                          | Protege el cron (debe tener valor no vacío)                               |
 
 ## Estructura
 
@@ -166,38 +121,3 @@ npm run start    # servir el build
 npm run lint     # ESLint (Next.js)
 ```
 
-## Desarrollo con Opencode
-
-Opencode es el asistente de IA usado para desarrollar este proyecto. Sus
-capacidades se configuran en `opencode.json` (MCPs) y en `.opencode/skills/` y
-`.agents/skills/` (skills). Ver también `AGENTS.md`, que incluye el mapa
-completo y se carga en cada sesión.
-
-### MCP servers
-
-| Server       | Tipo   | Para qué sirve                                        | Setup |
-| ------------ | ------ | ----------------------------------------------------- | ----- |
-| `playwright` | local  | Navegador automatizado: E2E, debugging visual, verificar la UI | Ya configurado y conectado |
-| `supabase`   | remote | Gestión del proyecto Supabase (tablas, SQL, Edge Functions, tipos TS, advisories de seguridad) | Autenticar una vez: `opencode mcp auth supabase` |
-
-Para autenticar el MCP de Supabase: `opencode mcp auth supabase` (abre el
-navegador con tu cuenta de Supabase). Verifica con
-`opencode mcp auth list` y `opencode mcp list`.
-
-### Skills
-
-| Skill                     | Origen                  | Qué activa                                                                 |
-| ------------------------- | ----------------------- | -------------------------------------------------------------------------- |
-| `web-clean-architecture`  | `.opencode/skills/`     | Arquitectura limpia web/Next.js: separar UI/lógica/datos, TS estricto sin `any`, Zod, encapsular Supabase en services/actions. |
-| `clawscan`                | `.opencode/skills/`     | Auditoría de seguridad (skills, plugins, MCP, `.env`) con `npx @openclaw/clawscan`. |
-| `design-taste-frontend`   | `.agents/skills/`       | Frontend anti-slop (landing, portfolios, rediseños).                     |
-| `high-end-visual-design`  | `.agents/skills/`       | Diseño visual premium (tipografía, sombras, animaciones).                |
-| `minimalist-ui`           | `.agents/skills/`       | Interfaces editoriales minimalistas (monocromo cálido).                  |
-| `image-to-code`           | `.agents/skills/`       | De imagen de diseño a código para tareas visuales.                       |
-| `stitch-design-taste`     | `.agents/skills/`       | Generar `DESIGN.md` con estándares de UI (Google Stitch).                |
-| `full-output-enforcement` | `.agents/skills/`       | Generación de código completa, sin truncar.                              |
-| `find-skills`             | global                  | Descubrir e instalar skills adicionales.                                 |
-
-> Notas: los cambios en `opencode.json` y en skills/MCPs se cargan al **reiniciar
-> opencode** (la config no se relee en caliente). Las skills se activan con el
-> tool `skill` del asistente.
