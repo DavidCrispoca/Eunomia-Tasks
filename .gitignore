@@ -63,3 +63,5 @@ credentials.*
 # no subir documentación Markdown al repo
 *.md
 !README.md
+# capturas de Playwright (artefactos de verificacion)
+*.png

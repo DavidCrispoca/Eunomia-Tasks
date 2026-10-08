@@ -18,7 +18,7 @@ export default function PomodoroPage() {
 
   if (!task || task.status === "done") {
     return (
-      <section className="glass flex flex-col items-center justify-center gap-4 rounded-2xl px-4 py-12 text-center">
+      <section className="surface flex flex-col items-center justify-center gap-4 rounded-xl px-4 py-12 text-center">
         <p className="max-w-sm text-sm text-muted">
           {t.pomodoro.taskMissingHint}
         </p>

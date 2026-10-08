@@ -68,7 +68,7 @@ export function TodoSortSelect({ value, onChange }: TodoSortSelectProps) {
         className={cn(
           "group inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium transition-all duration-200 ease-out-expo active:scale-[0.97] active:duration-75",
           active
-            ? "border-violet-500/50 bg-violet-500/15 text-violet-200 shadow-[0_4px_14px_rgba(90,140,240,0.2),inset_0_1px_0_rgba(255,255,255,0.08)]"
+            ? "border-violet-500/50 bg-violet-500/15 text-violet-200"
             : "border-white/10 bg-white/[0.03] text-muted hover:border-white/25 hover:bg-white/[0.06] hover:text-foreground",
         )}
       >
@@ -92,9 +92,8 @@ export function TodoSortSelect({ value, onChange }: TodoSortSelectProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.97 }}
             transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute right-0 top-full z-40 mt-2 w-60 overflow-hidden rounded-2xl glass-deep shadow-[0_14px_38px_rgba(0,0,0,0.6)]"
+            className="surface-raised absolute right-0 top-full z-40 mt-2 w-60 overflow-hidden rounded-xl"
           >
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-500/70 via-indigo-500/35 to-transparent" />
             <p className="px-3 pb-1 pt-2.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted/70">
               {t.kanban.sortHint}
             </p>
@@ -122,7 +121,7 @@ export function TodoSortSelect({ value, onChange }: TodoSortSelectProps) {
                       className={cn(
                         "grid h-3.5 w-3.5 shrink-0 place-items-center rounded-full border transition-all duration-200 ease-out-expo",
                         selected
-                          ? "border-transparent bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-[0_0_10px_rgba(63,118,216,0.4)]"
+                          ? "border-transparent bg-brand text-white"
                           : "border-white/15",
                       )}
                     >

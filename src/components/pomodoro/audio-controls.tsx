@@ -83,7 +83,7 @@ export function AudioControls({
             className={cn(
               "flex min-h-11 items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-[11px] font-medium transition-all duration-200 ease-out-expo active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 max-sm:min-h-0",
               ambience === type
-                ? "border-violet-500/45 bg-violet-500/15 text-violet-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                ? "border-violet-500/45 bg-violet-500/15 text-violet-200"
                 : "border-white/10 bg-white/[0.03] text-muted hover:border-white/20 hover:text-foreground",
             )}
           >

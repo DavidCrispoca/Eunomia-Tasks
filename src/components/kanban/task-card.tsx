@@ -31,7 +31,7 @@ export function TaskCard({ task, onOpen, onToggleDone, overlay }: TaskCardProps)
   return (
     <div
       className={cn(
-        "group glass glass-hover relative flex cursor-default flex-col gap-2 rounded-2xl p-2.5 pl-8",
+        "group surface surface-hover relative flex cursor-default flex-col gap-2 rounded-xl p-2.5 pl-8",
         "active:scale-[0.98] active:duration-75",
         overlay && "rotate-1 scale-[1.03] ring-1 ring-violet-500/40",
         Done && "border-emerald-400/20 opacity-70",
@@ -46,15 +46,9 @@ export function TaskCard({ task, onOpen, onToggleDone, overlay }: TaskCardProps)
         }
       }}
     >
-      {(overlay || isOverdue) && (
-        <span
-          className="pointer-events-none absolute inset-x-0 top-0 h-px rounded-full bg-gradient-to-r from-violet-400/70 via-indigo-400/40 to-transparent"
-          aria-hidden
-        />
-      )}
       {task.priority === "high" && !Done && (
         <span
-          className="pointer-events-none absolute inset-y-2 left-0 w-0.5 rounded-full bg-gradient-to-b from-violet-500 to-indigo-500 opacity-80"
+          className="pointer-events-none absolute inset-y-2 left-0 w-0.5 rounded-full bg-orange-500/70"
           aria-hidden
         />
       )}
@@ -65,7 +59,7 @@ export function TaskCard({ task, onOpen, onToggleDone, overlay }: TaskCardProps)
           className={cn(
             "mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border transition-all duration-200",
             Done
-              ? "border-transparent bg-gradient-to-br from-emerald-300 to-emerald-500 text-neutral-900 shadow-[0_0_10px_rgba(99,184,166,0.55)]"
+              ? "border-transparent bg-emerald-500 text-neutral-950"
               : "border-white/20 hover:border-violet-400 hover:scale-110",
           )}
           onClick={(e) => {

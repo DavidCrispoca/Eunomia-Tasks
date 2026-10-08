@@ -35,11 +35,13 @@ const PRIORITY_DOT: Record<Task["priority"], string> = {
 };
 
 const BLOCK_DOT: Record<NonNullable<TimeBlock["color"]>, string> = {
-  default: "text-violet-300",
+  default: "text-amber-300",
   green: "text-emerald-300",
-  orange: "text-orange-300",
-  red: "text-rose-400",
-  blue: "text-indigo-300",
+  orange: "text-orange-400",
+  red: "text-red-400",
+  blue: "text-cyan-300",
+  brand: "text-violet-300",
+  teal: "text-teal-300",
 };
 
 interface DeadlineRow {
@@ -165,8 +167,8 @@ export function DashboardView() {
 
   if (!data.hasTasks) {
     return (
-      <div className="glass glass-hover flex flex-col items-center justify-center gap-3 rounded-2xl px-6 py-16">
-        <span className="animate-float grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-[0_8px_24px_rgba(63,118,216,0.35),inset_0_1px_0_rgba(255,255,255,0.3)]">
+      <div className="surface surface-hover flex flex-col items-center justify-center gap-3 rounded-xl px-6 py-16">
+        <span className="grid h-12 w-12 place-items-center rounded-xl bg-brand-soft text-violet-300">
           <Sparkles size={22} />
         </span>
         <p className="max-w-sm text-sm text-muted">{t.dashboard.noData}</p>
@@ -215,9 +217,9 @@ export function DashboardView() {
                   : t.dashboard.todayProgress(data.dueTodayDone, data.dueToday)}
               </span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-white/[0.06] shadow-[inset_1px_2px_4px_rgba(0,0,0,0.5)]">
+            <div className="h-2 overflow-hidden rounded-full bg-white/[0.06]">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-violet-500 to-indigo-600 transition-all duration-500 ease-out-expo"
+                className="h-full rounded-full bg-brand transition-all duration-500 ease-out-expo"
                 style={{
                   width: data.dueToday > 0 ? `${(data.dueTodayDone / data.dueToday) * 100}%` : "0%",
                 }}
@@ -238,14 +240,14 @@ export function DashboardView() {
         <KpiCard
           label={t.dashboard.pending}
           icon={<ListTodo size={18} />}
-          iconClass="bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-[0_6px_18px_rgba(63,118,216,0.35)]"
+          iconClass="bg-brand-soft text-violet-300"
           value={String(data.pendingCount)}
           valueClass="text-violet-200"
         />
         <KpiCard
           label={t.dashboard.overdueLabel}
           icon={<AlertTriangle size={18} />}
-          iconClass="bg-gradient-to-br from-rose-600 to-rose-800 text-white shadow-[0_6px_18px_rgba(244,63,94,0.35)]"
+          iconClass="bg-rose-500/10 text-rose-300"
           value={String(data.overdueCount)}
           valueClass={data.overdueCount > 0 ? "text-rose-300" : "text-foreground"}
           subtext={t.dashboard.overdueHint}
@@ -253,14 +255,14 @@ export function DashboardView() {
         <KpiCard
           label={t.dashboard.thisWeek}
           icon={<Timer size={18} />}
-          iconClass="bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-[0_6px_18px_rgba(63,118,216,0.35)]"
+          iconClass="bg-teal-400/10 text-teal-300"
           value={String(data.pendingThisWeek)}
-          valueClass="text-violet-200"
+          valueClass="text-teal-200"
         />
         <KpiCard
           label={t.dashboard.todayBlocks}
           icon={<CalendarClock size={18} />}
-          iconClass="bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-[0_6px_18px_rgba(63,118,216,0.35)]"
+          iconClass="bg-brand-soft text-violet-300"
           value={String(data.todayBlocks.length)}
           valueClass="text-violet-200"
           subtext={data.todayBlocks.length === 0 ? t.dashboard.noBlocksToday : undefined}
@@ -364,7 +366,7 @@ export function DashboardView() {
                           )}
                         >
                           {isTop && (
-                            <Flame size={11} className="shrink-0 text-orange-400" aria-hidden />
+                            <Flame size={11} className="shrink-0 text-gold-400" aria-hidden />
                           )}
                           <span className="truncate">{entry.name}</span>
                         </span>
@@ -372,13 +374,13 @@ export function DashboardView() {
                           {entry.minutes} {t.calendar.minutes}
                         </span>
                       </div>
-                      <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06] shadow-[inset_1px_2px_4px_rgba(0,0,0,0.5)]">
+                      <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
                         <div
                           className={cn(
                             "h-full rounded-full transition-all duration-500 ease-out-expo",
                             isTop
-                              ? "bg-gradient-to-r from-violet-500 to-indigo-600"
-                              : "bg-violet-500/40",
+                              ? "bg-gold-400"
+                              : "bg-violet-500/30",
                           )}
                           style={{
                             width: `${Math.max(4, (entry.minutes / max) * 100)}%`,
@@ -476,7 +478,7 @@ function WeekBars({
               className={cn(
                 "w-full rounded-t-md",
                 isToday
-                  ? "bg-gradient-to-t from-violet-500 to-indigo-600 shadow-[0_0_10px_rgba(63,118,216,0.4)]"
+                  ? "bg-brand"
                   : day.count > 0
                     ? "bg-violet-500/40"
                     : "bg-white/[0.06]",
@@ -514,8 +516,7 @@ function KpiCard({
   subtext?: string;
 }) {
   return (
-    <div className="group glass glass-hover relative overflow-hidden rounded-2xl p-3 sm:p-4 min-h-[44px]">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-500/50 via-indigo-500/25 to-transparent" />
+    <div className="group surface surface-hover relative rounded-xl p-3 sm:p-4 min-h-[44px]">
       <div className="flex items-start justify-between gap-2">
         <div className="flex flex-col gap-1.5">
           <span className="text-xs sm:text-sm font-medium text-muted">{label}</span>
@@ -531,7 +532,7 @@ function KpiCard({
         {icon && (
           <span
             className={cn(
-              "grid h-8 w-8 shrink-0 place-items-center rounded-xl transition-transform duration-300 ease-out-expo group-hover:scale-110 group-hover:-rotate-3",
+              "grid h-8 w-8 shrink-0 place-items-center rounded-lg",
               iconClass,
             )}
           >
@@ -556,11 +557,10 @@ function GlassCard({
   return (
     <div
       className={cn(
-        "glass glass-hover relative overflow-hidden rounded-2xl p-4",
+        "surface surface-hover relative rounded-xl p-4",
         className,
       )}
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-500/50 via-indigo-500/25 to-transparent" />
       {children}
     </div>
   );
@@ -579,7 +579,7 @@ function CardHeader({
     <h3 className="mb-3 flex items-center gap-2 text-[13px] font-semibold tracking-tight font-display">
       <span
         className={cn(
-          "grid h-5 w-5 place-items-center rounded-md glass-pill",
+          "grid h-5 w-5 place-items-center rounded-md chip",
           iconClass,
         )}
       >

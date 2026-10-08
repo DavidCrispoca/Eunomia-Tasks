@@ -19,18 +19,17 @@ export function AddTaskForm({ token }: { token: string | null }) {
 
   if (!token) {
     return (
-      <div className="surface-gold-gradient relative overflow-hidden rounded-2xl border border-white/10 shadow-[var(--glass-drop),var(--app-shadow-lg)]">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-400/80 via-indigo-500/35 to-transparent" />
+      <div className="surface-raised relative overflow-hidden rounded-2xl">
         <div className="relative p-6 sm:p-7 text-center">
-          <h1 className="text-lg sm:text-[20px] font-semibold tracking-tight">
-            <span className="text-gold-gradient">{t.emailAdd.invalidTitle}</span>
+          <h1 className="text-lg sm:text-[20px] font-semibold tracking-tight text-foreground">
+            {t.emailAdd.invalidTitle}
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-muted">
             {t.emailAdd.invalidBody}
           </p>
           <Link
             href="/"
-            className="mt-5 inline-flex min-h-[44px] items-center rounded-full glass px-5 text-sm text-foreground transition-colors hover:border-violet-300/40 hover:bg-white/[0.09]"
+            className="mt-5 inline-flex min-h-[44px] items-center rounded-lg surface px-5 text-sm text-foreground transition-colors hover:bg-surface-hover"
           >
             {t.emailAdd.backToApp}
           </Link>
@@ -41,14 +40,13 @@ export function AddTaskForm({ token }: { token: string | null }) {
 
   if (status === "added") {
     return (
-      <div className="surface-gold-gradient relative overflow-hidden rounded-2xl border border-white/10 shadow-[var(--glass-drop),var(--app-shadow-lg)]">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-400/80 via-indigo-500/35 to-transparent" />
+      <div className="surface-raised relative overflow-hidden rounded-2xl">
         <div className="relative p-6 sm:p-7 text-center">
-          <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-xl font-bold text-white shadow-[0_6px_18px_rgba(63,118,216,0.4)]">
+          <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-full bg-brand text-xl font-bold text-white">
             âœ“
           </div>
-          <h1 className="text-lg sm:text-[20px] font-semibold tracking-tight">
-            <span className="text-gold-gradient">{t.emailAdd.successTitle}</span>
+          <h1 className="text-lg sm:text-[20px] font-semibold tracking-tight text-foreground">
+            {t.emailAdd.successTitle}
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-muted">
             {t.emailAdd.successBody}
@@ -70,7 +68,7 @@ export function AddTaskForm({ token }: { token: string | null }) {
             </Button>
             <Link
               href="/login"
-              className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full glass px-5 text-sm text-foreground transition-colors hover:border-violet-300/40 hover:bg-white/[0.09]"
+              className="inline-flex min-h-[44px] w-full items-center justify-center rounded-lg surface px-5 text-sm text-foreground transition-colors hover:bg-surface-hover"
             >
               {t.emailAdd.loginNow}
             </Link>
@@ -104,15 +102,14 @@ export function AddTaskForm({ token }: { token: string | null }) {
   };
 
   return (
-    <div className="surface-gold-gradient relative overflow-hidden rounded-2xl border border-white/10 shadow-[var(--glass-drop),var(--app-shadow-lg)]">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-400/80 via-indigo-500/35 to-transparent" />
+    <div className="surface-raised relative overflow-hidden rounded-2xl">
       <div className="relative p-6 sm:p-7">
         <div className="mb-6">
           <span className="mb-2 inline-flex items-center rounded-full border border-violet-500/30 bg-violet-500/10 px-2.5 py-0.5 text-xs font-medium text-violet-200/90">
             {t.emailAdd.badge}
           </span>
-          <h1 className="text-lg sm:text-[20px] font-semibold tracking-tight font-display">
-            <span className="text-gold-gradient">{t.emailAdd.title}</span>
+          <h1 className="text-lg sm:text-[20px] font-semibold tracking-tight font-display text-foreground">
+            {t.emailAdd.title}
           </h1>
           <p className="mt-1 text-sm leading-relaxed text-muted">
             {t.emailAdd.subtitle}

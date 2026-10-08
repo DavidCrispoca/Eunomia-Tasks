@@ -27,14 +27,11 @@ export function AuthForm({ mode, demo }: { mode: "login" | "register"; demo: boo
     mode === "login" ? t.auth.loginSubtitle : t.auth.registerSubtitle;
 
   return (
-    <div className="surface-gold-gradient relative overflow-hidden rounded-2xl border border-white/10 shadow-[var(--glass-drop),var(--app-shadow-lg)]">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/80 to-transparent" />
+    <div className="surface-raised relative overflow-hidden rounded-2xl">
       <div className="relative p-6 sm:p-7">
         <div className="mb-6">
-          <h1 className="text-lg sm:text-[20px] font-semibold tracking-tight font-display">
-            <span className="t-shimmer" data-text={title}>
-              {title}
-            </span>
+          <h1 className="text-lg sm:text-[20px] font-semibold tracking-tight font-display text-foreground">
+            {title}
           </h1>
           <p className="mt-1 text-xs sm:text-[13px] text-muted">{subtitle}</p>
         </div>

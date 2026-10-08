@@ -24,15 +24,14 @@ export function Sidebar({ onOpenPalette }: { onOpenPalette: () => void }) {
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <aside className="surface-gold-gradient relative flex h-full w-[224px] shrink-0 flex-col border-r border-white/10">
-      <div className="glow-mask pointer-events-none absolute inset-0" />
+    <aside className="relative flex h-full w-[224px] shrink-0 flex-col border-r border-white/[0.08] bg-surface-1">
       <div className="relative px-4 pb-2 pt-5">
         <Link href="/">
           <Logo />
         </Link>
       </div>
 
-      <nav className="relative mt-4 flex flex-col gap-1.5 px-2.5">
+      <nav className="relative mt-4 flex flex-col gap-1 px-2.5">
         {items.map((item) => {
           const active = isActive(item.href);
           return (
@@ -40,14 +39,14 @@ export function Sidebar({ onOpenPalette }: { onOpenPalette: () => void }) {
               key={item.href}
               href={item.href}
               className={cn(
-                "group relative flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-[13.5px] transition-all duration-200 ease-out-expo",
+                "group relative flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13.5px] transition-all duration-200 ease-out-expo",
                 active
-                  ? "border border-violet-500/25 bg-violet-500/15 text-violet-100 shadow-[0_4px_18px_rgba(90,140,240,0.18),inset_0_1px_0_rgba(255,255,255,0.08)]"
+                  ? "bg-brand-soft text-violet-100"
                   : "border border-transparent text-muted hover:bg-white/5 hover:text-foreground",
               )}
             >
               {active && (
-                <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-gradient-to-b from-violet-400 to-indigo-600 shadow-[0_0_10px_rgba(63,118,216,0.7)]" />
+                <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-brand" />
               )}
               <item.icon
                 size={15}
@@ -59,21 +58,21 @@ export function Sidebar({ onOpenPalette }: { onOpenPalette: () => void }) {
         })}
       </nav>
 
-      <div className="relative mt-auto flex flex-col gap-0.5 border-t border-white/10 px-2.5 py-3">
+      <div className="relative mt-auto flex flex-col gap-0.5 border-t border-white/[0.08] px-2.5 py-3">
         <button
           type="button"
           onClick={onOpenPalette}
-          className="flex items-center gap-2.5 rounded-xl border border-white/5 bg-white/[0.03] px-2.5 py-1.5 text-[13px] text-muted transition-all duration-200 ease-out-expo hover:border-violet-500/30 hover:bg-violet-500/5 hover:text-foreground active:scale-[0.99] active:duration-75"
+          className="flex items-center gap-2.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-2.5 py-1.5 text-[13px] text-muted transition-all duration-200 ease-out-expo hover:border-violet-500/30 hover:bg-white/5 hover:text-foreground active:scale-[0.99] active:duration-75"
         >
           <Search size={14} />
           {t.common.search}
-          <kbd className="ml-auto rounded-md border border-white/10 bg-black/30 px-1.5 py-0.5 font-mono text-[10px] text-violet-300/90">
+          <kbd className="ml-auto rounded-md border border-steel/30 bg-black/30 px-1.5 py-0.5 font-mono text-[10px] text-steel">
             âŒ˜K
           </kbd>
         </button>
         <SidebarRow
           icon={
-            <span className="rounded bg-gradient-to-br from-violet-600 to-indigo-600 px-1 text-[9px] font-bold text-white shadow-[0_2px_8px_rgba(63,118,216,0.4)]">
+            <span className="rounded bg-surface-2 px-1 text-[9px] font-bold text-violet-300">
               {lang === "es" ? "EN" : "ES"}
             </span>
           }

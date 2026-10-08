@@ -19,7 +19,6 @@ export default async function AddTaskPage(props: {
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden bg-background">
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[380px] glow-mask" />
       <header className="relative z-10 flex items-center justify-between px-6 py-5">
         <Logo />
         <LangSwitch />

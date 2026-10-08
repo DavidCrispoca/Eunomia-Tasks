@@ -40,7 +40,7 @@ export function Modal({ open, onClose, children, className, labelledBy }: ModalP
           transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
           <motion.div
-            className="fixed inset-0 bg-[#03060f]/70 backdrop-blur-lg"
+            className="fixed inset-0 bg-[#05070d]/75"
             onClick={onClose}
             aria-hidden
             initial={{ opacity: 0 }}
@@ -52,29 +52,19 @@ export function Modal({ open, onClose, children, className, labelledBy }: ModalP
             role="dialog"
             aria-modal="true"
             className={cn(
-              "relative z-10 my-auto w-full max-w-md overflow-hidden rounded-2xl glass shadow-[var(--app-shadow-lg)]",
+              "surface-raised relative z-10 my-auto w-full max-w-md overflow-hidden rounded-xl",
               className,
             )}
             aria-labelledby={labelledBy}
-            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 22, scale: 0.95 }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 22, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.97 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.99 }}
             transition={
               reduceMotion
                 ? { duration: 0 }
                 : { y: { type: "spring", stiffness: 380, damping: 30 }, opacity: { duration: 0.24 }, scale: { type: "spring", stiffness: 380, damping: 30 } }
             }
           >
-            <motion.div
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-white/70 via-violet-400/45 to-transparent"
-              initial={reduceMotion ? {} : { scaleX: 0, opacity: 0 }}
-              animate={reduceMotion ? {} : { scaleX: 1, opacity: 1 }}
-              transition={
-                reduceMotion ? { duration: 0 } : { delay: 0.12, duration: 0.45, ease: [0.16, 1, 0.3, 1] }
-              }
-              style={{ transformOrigin: "left" }}
-            />
             {children}
           </motion.div>
         </motion.div>

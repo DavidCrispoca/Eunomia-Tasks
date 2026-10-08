@@ -64,14 +64,21 @@ datos se guardan en `localStorage`.
   enrutar (ver `SETUP.md` §4.1).*
 - **Playwright E2E**: `scripts/e2e.mjs` automatiza pruebas con Chrome del sistema
   u OperaGX (health / login / enlace firmado `/add` / Gmail).
-- **i18n Español/Inglés** y sistema visual nocturno obsidiana & oro ámbar
-  (ver `DESIGN.md`).
+- **Sistema visual "Ink Surface + Brand Azure"** (`DESIGN.md`): tema oscuro sobrio,
+  superficies sólidas con jerarquía (`surface`/`raised`/`chip`), marca azul
+  `#3E6AE0` para acciones y navegación activa, botones `rounded-[10px]`, números
+  tabulares en métricas y transiciones animadas entre páginas y modales, siempre
+  respetando `prefers-reduced-motion`.
+- **i18n Español/Inglés**.
 
 ## Documentación
 
+- **`DESIGN.md`** — Sistema visual: tokens y materiales de superficie, botones,
+  tipografía, movimiento y checklist de UI nueva.
 - **`SETUP.md`** — Runbook paso a paso para crear las cuentas, rellenar las
   variables y hacer el deploy en Vercel (todo en la capa gratuita).
 - **`PLAN.md`** — Especificación, estado de implementación y hoja de ruta.
+- **`PROCESO.md`** — Bitácora de cambios con contexto (local, no se versiona).
 - **`supabase/schema.sql`** — Esquema de base de datos (ejecutar en el SQL
   Editor de Supabase).
 

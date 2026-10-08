@@ -199,7 +199,7 @@ export function TaskModal() {
           <Link
             href={`/pomodoro/${editing.id}`}
             onClick={closeTaskDialog}
-            className="mt-1 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-5 text-base font-semibold text-white shadow-[0_6px_20px_rgba(63,118,216,0.35)] transition-all duration-200 ease-out-expo hover:brightness-110 hover:shadow-[0_0_28px_rgba(63,118,216,0.5)] active:scale-[0.98] active:duration-75"
+            className="mt-1 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[10px] bg-brand px-5 text-base font-semibold text-white transition-colors duration-200 ease-out-expo hover:bg-brand-hover active:scale-[0.98] active:duration-75"
           >
             <Timer size={16} />
             {t.task.startWork}

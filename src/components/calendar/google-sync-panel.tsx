@@ -94,7 +94,7 @@ export function GoogleSyncPanel({ state, onStateChange }: GoogleSyncPanelProps) 
   }
 
   return (
-    <div className="glass rounded-xl px-3.5 py-2.5">
+    <div className="surface rounded-xl px-3.5 py-2.5">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <CalendarCheck size={15} className="shrink-0 text-violet-300/90" />
         {state.connected ? (

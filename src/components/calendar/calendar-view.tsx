@@ -277,7 +277,7 @@ export function CalendarView() {
 
         <div className="flex flex-col gap-6 lg:flex-row">
           <div className="min-w-0 flex-1">
-            <div className="glass-deep overflow-x-auto rounded-2xl">
+            <div className="surface overflow-x-auto rounded-xl">
               <div className="min-w-[680px] sm:min-w-0">
                 <div className="flex border-b border-white/10 overflow-x-auto">
                   <div className="w-12 shrink-0" />
@@ -293,7 +293,7 @@ export function CalendarView() {
                         className={cn(
                           "grid h-7 w-7 place-items-center rounded-full font-mono text-sm font-semibold",
                           isSameDay(date, new Date()) &&
-                            "bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-[0_4px_16px_rgba(63,118,216,0.45),inset_0_1px_0_rgba(255,255,255,0.35)]",
+                            "bg-brand text-white",
                         )}
                       >
                         {date.getDate()}
@@ -350,11 +350,10 @@ export function CalendarView() {
           </div>
 
           <aside className="w-full shrink-0 lg:w-64">
-            <div className="surface-gold-gradient relative overflow-hidden rounded-2xl border border-white/10 p-3 shadow-[var(--glass-drop)]">
-              <div className="glow-mask pointer-events-none absolute inset-0" />
+            <div className="surface relative rounded-xl p-3">
               <div className="mb-2 flex items-center gap-2 px-1">
-                <span className="text-[13px] font-semibold tracking-tight font-display">
-                  <span className="text-gold-gradient">{t.calendar.unscheduled}</span>
+                <span className="text-[13px] font-semibold tracking-tight font-display text-foreground">
+                  {t.calendar.unscheduled}
                 </span>
                 <span className="rounded-md border border-violet-500/25 bg-violet-500/10 px-1.5 font-mono text-[11px] text-violet-300">
                   {unscheduled.length}
@@ -383,7 +382,7 @@ export function CalendarView() {
 
       <DragOverlay dropAnimation={{ duration: 150 }}>
         {activeTask ? (
-          <div className="cursor-grabbing rotate-1 scale-105 rounded-xl border border-violet-500/50 glass px-3 py-2 text-sm shadow-[0_12px_34px_rgba(90,140,240,0.4)]">
+          <div className="cursor-grabbing rotate-1 scale-105 rounded-xl surface px-3 py-2 text-sm shadow-md">
             <span className="font-medium text-violet-100">{activeTask.title}</span>
           </div>
         ) : null}
@@ -456,7 +455,7 @@ function DayColumn({
       className={cn(
         "group relative flex-1 cursor-crosshair border-l border-white/10 transition-colors",
         isToday && "bg-violet-500/[0.05]",
-        isOver && "bg-violet-500/[0.09] shadow-[inset_0_0_32px_rgba(90,140,240,0.1)]",
+        isOver && "bg-violet-500/[0.07]",
       )}
       style={{ height: TOTAL_ROWS * ROW_HEIGHT }}
     >
@@ -533,7 +532,7 @@ function DayColumn({
               key={block.id}
               type="button"
               className={cn(
-                "absolute inset-x-1 relative z-[1] overflow-hidden rounded-lg border px-2 py-1 text-left text-[11px] leading-tight shadow-[0_3px_10px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.06)] transition-[transform,box-shadow] duration-200 ease-out-expo hover:scale-[1.02] hover:shadow-[0_6px_20px_rgba(90,140,240,0.28),inset_0_1px_0_rgba(255,255,255,0.06)] active:scale-[0.98]",
+                "absolute inset-x-1 relative z-[1] overflow-hidden rounded-lg border px-2 py-1 text-left text-[11px] leading-tight transition-[transform,border-color] duration-200 ease-out-expo hover:scale-[1.02] hover:brightness-110 active:scale-[0.98]",
                 BLOCK_COLORS[block.color ?? "default"],
               )}
               style={{ top: top + 1, height: height - 2 }}
@@ -555,7 +554,7 @@ function DayColumn({
       <button
         type="button"
         aria-label={`${date} ï¼‹`}
-        className="absolute bottom-1.5 right-1.5 grid h-8 w-8 place-items-center rounded-full border border-white/[0.12] bg-white/[0.06] text-muted opacity-100 shadow-[var(--inset-top)] backdrop-blur-md transition-all duration-200 ease-out-expo hover:border-violet-400/50 hover:text-violet-300 sm:opacity-0 sm:group-hover:opacity-100 active:scale-[0.92] active:duration-75"
+        className="absolute bottom-1.5 right-1.5 grid h-8 w-8 place-items-center rounded-md border border-white/[0.12] bg-surface-2 text-muted opacity-100 transition-all duration-200 ease-out-expo hover:border-violet-400/50 hover:text-violet-300 sm:opacity-0 sm:group-hover:opacity-100 active:scale-[0.92] active:duration-75"
         onClick={() => onCreateBlock(date)}
       >
         <CalendarPlus size={13} />
@@ -589,7 +588,7 @@ function UnscheduledTask({ task }: { task: Task }) {
           : undefined,
       }}
       className={cn(
-        "flex cursor-grab items-center gap-2 rounded-xl glass px-3 py-2.5 text-sm transition-all duration-200 ease-out-expo hover:border-violet-300/40 hover:bg-white/[0.09] min-h-[44px]",
+        "flex cursor-grab items-center gap-2 rounded-xl surface px-3 py-2.5 text-sm transition-all duration-200 ease-out-expo hover:border-violet-300/40 hover:bg-surface-hover min-h-[44px]",
         isDragging && "opacity-40 ring-1 ring-violet-500/40",
       )}
     >
@@ -640,7 +639,7 @@ function BlockModal({ open, block, onClose, onSave, onDelete }: BlockModalProps)
   }
 
   const isNew = block?.id.startsWith("new:") ?? false;
-  const colors: BlockColor[] = ["blue", "green", "orange", "red", "default"];
+  const colors: BlockColor[] = ["blue", "green", "orange", "red", "brand", "teal", "default"];
 
   return (
     <Modal open={open} onClose={onClose} labelledBy="block-modal-title">
@@ -668,7 +667,7 @@ function BlockModal({ open, block, onClose, onSave, onDelete }: BlockModalProps)
             <input
               type="date"
               value={date}
-              className="min-h-[44px] rounded-lg border border-white/[0.12] bg-white/[0.04] px-3 text-sm text-foreground backdrop-blur-md transition-[border-color,box-shadow,background-color] duration-200 ease-out-expo focus:border-violet-400/70 focus:outline-none focus:ring-2 focus:ring-violet-400/20 [color-scheme:dark]"
+              className="min-h-[44px] rounded-lg border border-white/[0.12] bg-surface-1 px-3 text-sm text-foreground transition-[border-color,box-shadow,background-color] duration-200 ease-out-expo hover:border-white/[0.16] focus:border-violet-400/70 focus:bg-surface-2 focus:outline-none focus:ring-2 focus:ring-violet-400/20 [color-scheme:dark]"
               onChange={(e) => setDate(e.target.value)}
             />
             <div className="flex flex-1 items-center gap-1.5">

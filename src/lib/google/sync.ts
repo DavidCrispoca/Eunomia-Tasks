@@ -35,6 +35,8 @@ const COLOR_TO_EVENT_COLOR_ID: Record<BlockColor, string> = {
   orange: "5", // banana
   red: "11", // tomato
   blue: "1", // lavender
+  brand: "9", // blueberry
+  teal: "7", // peacock
 };
 
 const createdEventSchema = z.object({ id: z.string().min(1) });

@@ -1,39 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  /* Midnight navy backplate · Eunomia: orden, disciplina y armonía */
-  --app-bg: #050a16;
-  --app-surface-1: #0b1226;
-  --app-surface-2: #101a38;
-  --app-surface-hover: #17224a;
-  --app-border: rgba(230, 240, 255, 0.12);
-  --app-border-strong: rgba(230, 240, 255, 0.3);
-  --app-foreground: #f4f8ff;
-  --app-muted: #8ea1c1;
-  --app-faint: rgba(255, 255, 255, 0.05);
-  --app-accent: #5a8cf0;
-  --app-accent-hover: #8ab8ff;
-  --app-accent-soft: rgba(90, 140, 240, 0.16);
-  --app-green: #449d8a;
-  --app-orange: #d3a65a;
-  --app-red: #ff5f7a;
-  --app-blue: #8cb4ff;
-  --app-shadow: 0 10px 30px rgba(2, 6, 16, 0.45);
-  --app-shadow-lg: 0 24px 80px rgba(2, 6, 16, 0.55);
-  --app-glow: 0 6px 24px rgba(90, 140, 240, 0.2);
-  --inset-top: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  --inset-top-soft: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  /* Glass volume: frosted panels over navy-ice */
-  --glass-drop: 0 14px 40px -10px rgba(2, 6, 16, 0.6);
-  --glass-inner: inset 0 1px 0 rgba(255, 255, 255, 0.09);
-  --glass-shadow: var(--glass-drop), var(--glass-inner);
-  --glass-blur: blur(20px) saturate(160%);
-  /* Shimmer sweep for brand + page titles (pure CSS, no JS) */
-  --shimmer-dur: 2800ms;
-  --shimmer-base: #a9c4f0;
-  --shimmer-highlight: #ffffff;
-  --shimmer-band: 400%;
-  --shimmer-ease: linear;
+  /* Ink night backplate · Eunomia: orden, disciplina y armonía */
+  --app-bg: #0a0e16;
+  --app-surface-1: #11151f;
+  --app-surface-2: #141a26;
+  --app-surface-raised: #1b212f;
+  --app-surface-hover: #1d2433;
+  --app-border: rgba(226, 232, 248, 0.1);
+  --app-border-strong: rgba(226, 232, 248, 0.18);
+  --app-faint: rgba(255, 255, 255, 0.06);
+  --app-foreground: #eef2fa;
+  --app-muted: #9aa7bd;
+  --app-brand: #3e6ae0;
+  --app-brand-hover: #5179e8;
+  --app-brand-soft: rgba(62, 106, 224, 0.16);
+  --app-green: #3f9e7c;
+  --app-orange: #c98f3a;
+  --app-red: #e2555f;
+  --app-blue: #6b9fe8;
+  --app-shadow-sm: 0 1px 2px rgba(2, 6, 16, 0.4);
+  --app-shadow-md: 0 8px 24px -12px rgba(2, 6, 16, 0.6);
+  --app-shadow-lg: 0 24px 64px -20px rgba(2, 6, 16, 0.72);
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -48,87 +40,96 @@
     system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  /* Brand ramp · Azur hielo (orden y claridad; re-themes el amber) */
-  --color-amber-50: #eef4ff;
-  --color-amber-100: #e0ebff;
-  --color-amber-200: #c7dbff;
-  --color-amber-300: #a4c1ff;
-  --color-amber-400: #82abff;
-  --color-amber-500: #5a8cf0;
-  --color-amber-600: #3c6fd6;
-  --color-amber-700: #2f54a8;
-  --color-amber-800: #27407d;
-  --color-amber-900: #1b2e5c;
+  /* Marca · azul sobrio (acciones, navegación activa, "hoy") */
+  --color-violet-50: #eaf0fd;
+  --color-violet-100: #d6e1fa;
+  --color-violet-200: #adc2f3;
+  --color-violet-300: #82a1ec;
+  --color-violet-400: #5d84e6;
+  --color-violet-500: #3e6ae0;
+  --color-violet-600: #3054c2;
+  --color-violet-700: #29469e;
+  --color-violet-800: #243a80;
+  --color-violet-900: #213163;
 
-  /* Violeta Tailwind unificado con la marca (azur) */
-  --color-violet-50: #eef4ff;
-  --color-violet-100: #e0ebff;
-  --color-violet-200: #c7dbff;
-  --color-violet-300: #a4c1ff;
-  --color-violet-400: #82abff;
-  --color-violet-500: #5a8cf0;
-  --color-violet-600: #3c6fd6;
-  --color-violet-700: #2f54a8;
-  --color-violet-800: #27407d;
-  --color-violet-900: #1b2e5c;
+  /* Azur profundo · profundidad de marca en estados presionados */
+  --color-indigo-50: #e9edf9;
+  --color-indigo-100: #d6ddf3;
+  --color-indigo-200: #b0bde6;
+  --color-indigo-300: #8599d5;
+  --color-indigo-400: #6077c4;
+  --color-indigo-500: #435aab;
+  --color-indigo-600: #36508f;
+  --color-indigo-700: #304575;
+  --color-indigo-800: #2a3a61;
+  --color-indigo-900: #26304f;
 
-  /* Azur profundo para gradientes (profundidad navy) */
-  --color-indigo-50: #eaeffc;
-  --color-indigo-100: #dde7ff;
-  --color-indigo-200: #bfd1fd;
-  --color-indigo-300: #95b5fb;
-  --color-indigo-400: #6c96f2;
-  --color-indigo-500: #4a77e0;
-  --color-indigo-600: #3560c7;
-  --color-indigo-700: #2a4a9c;
-  --color-indigo-800: #203a75;
-  --color-indigo-900: #162b56;
+  /* Ámbar · semántico "media prioridad" (sereno, corporativo) */
+  --color-amber-100: #f7edd2;
+  --color-amber-200: #f0dfaa;
+  --color-amber-300: #e6c979;
+  --color-amber-400: #dcab55;
+  --color-amber-500: #c98f3a;
+  --color-amber-600: #a9742f;
+  --color-amber-700: #865921;
+  --color-amber-800: #6b461c;
+  --color-amber-900: #583a18;
 
-  /* Logro sereno · bronce cálido (disciplina/enfoque, re-themes el orange) */
-  --color-orange-100: #faf1df;
-  --color-orange-200: #f5e3bd;
-  --color-orange-300: #edcf94;
-  --color-orange-400: #e0b36b;
-  --color-orange-500: #d3a65a;
-  --color-orange-600: #ab7f3e;
-  --color-orange-700: #86602f;
-  --color-orange-800: #644722;
-  --color-orange-900: #47341a;
+  /* Naranja · semántico "alta prioridad / en curso" */
+  --color-orange-100: #fbeadd;
+  --color-orange-200: #f6d4b8;
+  --color-orange-300: #eda55a;
+  --color-orange-400: #e68b3c;
+  --color-orange-500: #d9742e;
+  --color-orange-600: #b45a23;
+  --color-orange-700: #90491f;
 
-  /* Denim · azul grisáceo (el former fuchsia, sin rosa) */
-  --color-fuchsia-50: #eef2fb;
-  --color-fuchsia-100: #dfe7f6;
-  --color-fuchsia-200: #c2d0ee;
-  --color-fuchsia-300: #9cb3e3;
-  --color-fuchsia-400: #7190d2;
-  --color-fuchsia-500: #5672b6;
-  --color-fuchsia-600: #445b96;
-  --color-fuchsia-700: #374a79;
-  --color-fuchsia-800: #2b3a5e;
-  --color-fuchsia-900: #1e2a46;
+  /* Esmeralda · semántico "completado" */
+  --color-emerald-100: #ddf2e8;
+  --color-emerald-200: #bce5d5;
+  --color-emerald-300: #8fd1b6;
+  --color-emerald-400: #5cb494;
+  --color-emerald-500: #3f9e7c;
+  --color-emerald-600: #2f8266;
 
-  /* Hielo · azul claro informativo (el former neón cyan) */
-  --color-cyan-100: #e5f1fb;
-  --color-cyan-200: #cde4f8;
-  --color-cyan-300: #a3d0f2;
-  --color-cyan-400: #72b6e8;
-  --color-cyan-500: #4f96d6;
-  --color-cyan-600: #3e78b4;
-  --color-cyan-700: #325f8e;
-  --color-cyan-800: #29496c;
-  --color-cyan-900: #1d3552;
+  /* Azul informativo · "today blocks", enlaces, info (sin neón) */
+  --color-cyan-100: #e2ecf9;
+  --color-cyan-200: #c6d9f0;
+  --color-cyan-300: #9cbfe4;
+  --color-cyan-400: #7299d4;
+  --color-cyan-500: #567cbe;
+  --color-cyan-600: #46659f;
+  --color-cyan-700: #3a527f;
+  --color-cyan-800: #304264;
+  --color-cyan-900: #2a374d;
 
-  /* Armonía · aguamarina serena (completar = calma, el former mint) */
-  --color-emerald-100: #e5f6f2;
-  --color-emerald-200: #cee9e0;
-  --color-emerald-300: #9ad3c6;
-  --color-emerald-400: #63b8a6;
-  --color-emerald-500: #449d8a;
-  --color-emerald-600: #357d6e;
+  /* Oro · destaque complementario del azur (ranking, logros, méritos) */
+  --color-gold-100: #f7ecd1;
+  --color-gold-200: #f1dda3;
+  --color-gold-300: #ecc26b;
+  --color-gold-400: #e0ad47;
+  --color-gold-500: #c8913a;
+  --color-gold-600: #a97f2f;
+  --color-gold-700: #866427;
 
-  --color-brand: #3c6fd6;
-  --color-brand-soft: rgba(90, 140, 240, 0.16);
-  --color-neon: #72b6e8;
+  /* Teal · datos y series frías (data-viz, info alternativa al azur) */
+  --color-teal-100: #d3efe9;
+  --color-teal-200: #a8dcd3;
+  --color-teal-300: #7ac4b8;
+  --color-teal-400: #4fb3a5;
+  --color-teal-500: #2e8a7e;
+  --color-teal-600: #27746a;
+  --color-teal-700: #1f5e56;
+
+  --color-brand: #3e6ae0;
+  --color-brand-hover: #5179e8;
+  --color-brand-soft: rgba(62, 106, 224, 0.16);
+  --color-gold: #e0ad47;
+  --color-gold-hover: #ecc26b;
+  --color-teal: #4fb3a5;
+  --color-teal-hover: #7ac4b8;
+  --color-steel: #8fa3c8;
+  --color-steel-soft: rgba(143, 163, 200, 0.14);
 }
 
 @theme inline {
@@ -137,6 +138,7 @@
   --color-surface: var(--app-surface-2);
   --color-surface-1: var(--app-surface-1);
   --color-surface-2: var(--app-surface-2);
+  --color-surface-raised: var(--app-surface-raised);
   --color-surface-hover: var(--app-surface-hover);
   --color-sidebar: var(--app-surface-1);
   --color-border: var(--app-border);
@@ -144,9 +146,9 @@
   --color-foreground: var(--app-foreground);
   --color-muted: var(--app-muted);
   --color-faint: var(--app-faint);
-  --color-accent: var(--app-accent);
-  --color-accent-hover: var(--app-accent-hover);
-  --color-accent-soft: var(--app-accent-soft);
+  --color-accent: var(--app-brand);
+  --color-accent-hover: var(--app-brand-hover);
+  --color-accent-soft: var(--app-brand-soft);
   --color-success: var(--app-green);
   --color-warning: var(--app-orange);
   --color-danger: var(--app-red);
@@ -160,22 +162,12 @@ body {
 
 body {
   background-color: var(--app-bg);
-  background-image:
-    radial-gradient(
-      1100px 520px at 88% -12%,
-      rgba(54, 96, 196, 0.28),
-      transparent 62%
-    ),
-    radial-gradient(
-      900px 500px at -12% 32%,
-      rgba(31, 56, 110, 0.16),
-      transparent 60%
-    ),
-    radial-gradient(
-      820px 620px at 50% 116%,
-      rgba(90, 140, 240, 0.09),
-      transparent 62%
-    );
+  /* Profundidad de marca contenida: un único halo superior, casi imperceptible */
+  background-image: radial-gradient(
+    900px 420px at 85% -10%,
+    rgba(48, 80, 150, 0.14),
+    transparent 60%
+  );
   background-attachment: fixed;
   color: var(--app-foreground);
   font-family: var(--font-sora), ui-sans-serif, system-ui, -apple-system,
@@ -185,7 +177,7 @@ body {
 }
 
 ::selection {
-  background: var(--app-accent-soft);
+  background: var(--app-brand-soft);
   color: var(--app-foreground);
 }
 
@@ -199,234 +191,48 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(164, 193, 255, 0.22);
+  background: rgba(148, 163, 190, 0.35);
   border-radius: 8px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(90, 140, 240, 0.5);
+  background: rgba(148, 163, 190, 0.55);
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
-/* ---------- Brand gradients ---------- */
-/* Signature text gradient: blanco hielo → azur → navy (professional white) */
-.text-gold-gradient {
-  background: linear-gradient(
-    110deg,
-    #f2f7ff 0%,
-    #7fa6ff 48%,
-    #27407d 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/* ---------- Surfaces (material sólido, sin cristal) ---------- */
+/* Jerarquía por superposición: base < surface < raised. Bordes con intención. */
+.surface {
+  background: var(--app-surface-2);
+  border: 1px solid var(--app-border);
 }
 
-/* Brand surface gradient: frosted navy sheen */
-.surface-gold-gradient {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.09),
-    rgba(10, 18, 40, 0.35) 30%,
-    rgba(20, 32, 71, 0.22)
-  );
-  backdrop-filter: blur(24px) saturate(150%);
+.surface-raised {
+  background: var(--app-surface-raised);
+  border: 1px solid var(--app-border-strong);
+  box-shadow: var(--app-shadow-md);
 }
 
-/* Ambient deep-azure glow mask */
-.glow-mask {
-  background: radial-gradient(
-    circle at top,
-    rgba(53, 96, 199, 0.18) 0%,
-    rgba(53, 96, 199, 0.05) 45%,
-    transparent 70%
-  );
+.chip {
+  background: var(--app-surface-1);
+  border: 1px solid var(--app-border);
 }
 
-/* ---------- Frosted glass material ---------- */
-.glass {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.075),
-    rgba(255, 255, 255, 0.03) 55%,
-    rgba(255, 255, 255, 0.045)
-  );
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shadow);
+/* Hover táctil para paneles interactivos: luz sutil, sin levitar */
+.surface-hover {
+  transition: border-color 0.2s var(--ease-out-expo),
+    background-color 0.2s var(--ease-out-expo),
+    box-shadow 0.2s var(--ease-out-expo);
 }
-
-.glass-deep {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.06),
-    rgba(255, 255, 255, 0.02)
-  );
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(26px) saturate(170%);
-  box-shadow: var(--glass-shadow);
+.surface-hover:hover {
+  border-color: var(--app-border-strong);
+  background-color: var(--app-surface-hover);
 }
-
-.glass-pill {
-  background: rgba(255, 255, 255, 0.045);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(14px) saturate(150%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
-}
-
-/* Haptic lift for interactive frosted panels */
-.glass-hover {
-  transition: transform 0.24s var(--ease-out-expo), box-shadow 0.24s var(--ease-out-expo),
-    border-color 0.24s var(--ease-out-expo), background-color 0.24s var(--ease-out-expo);
-}
-.glass-hover:hover {
-  transform: translateY(-2px);
-  border-color: rgba(164, 193, 255, 0.45);
-  background-color: rgba(255, 255, 255, 0.06);
-  box-shadow: var(--glass-drop), var(--glass-inner),
-    0 14px 34px -12px rgba(90, 140, 240, 0.4);
-}
-.glass-hover:active {
-  transform: translateY(0) scale(0.98);
-}
-
-/* ---------- Ambient aurora ---------- */
-.aurora {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-.aurora-blob {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(70px);
-  opacity: 0.68;
-  background: radial-gradient(circle, var(--blob-c, #5a8cf0) 0%, transparent 68%);
-  animation: aurora-drift 18s ease-in-out infinite alternate;
-}
-.aurora-blob--a {
-  --blob-c: rgba(54, 96, 196, 0.5);
-  width: 480px;
-  height: 480px;
-  top: -140px;
-  left: -80px;
-  animation-duration: 17s;
-}
-.aurora-blob--b {
-  --blob-c: rgba(22, 43, 86, 0.42);
-  width: 420px;
-  height: 420px;
-  top: 12%;
-  right: -140px;
-  animation-delay: -6s;
-  animation-duration: 21s;
-}
-.aurora-blob--c {
-  --blob-c: rgba(90, 140, 240, 0.34);
-  width: 380px;
-  height: 380px;
-  bottom: -120px;
-  left: 32%;
-  animation-delay: -12s;
-  animation-duration: 24s;
-}
-
-@keyframes aurora-drift {
-  0% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(46px, -34px, 0) scale(1.12);
-  }
-  100% {
-    transform: translate3d(-30px, 30px, 0) scale(0.94);
-  }
-}
-
-/* ---------- Micro-interactions ---------- */
-@keyframes pulse-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(90, 140, 240, 0.4);
-  }
-  60% {
-    box-shadow: 0 0 0 9px rgba(90, 140, 240, 0);
-  }
-}
-.animate-pulse-glow {
-  animation: pulse-glow 2.4s var(--ease-out-expo) infinite;
-}
-
-@keyframes float-y {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-.animate-float {
-  animation: float-y 5s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: 180% 0;
-  }
-  100% {
-    background-position: -80% 0;
-  }
-}
-/* ---------- Shimmer text (titles + brand) ---------- */
-/* Two-layer: base text renders in --shimmer-base; ::before duplicates the
-   string via attr(data-text), clips a transparent → highlight → transparent
-   band to the glyphs and sweeps it across with background-position. */
-.t-shimmer {
-  position: relative;
-  display: inline-block;
-  color: var(--shimmer-base);
-}
-
-.t-shimmer::before {
-  content: attr(data-text);
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image: linear-gradient(
-    90deg,
-    transparent 0%,
-    transparent 40%,
-    var(--shimmer-highlight) 50%,
-    transparent 60%,
-    transparent 100%
-  );
-  background-size: var(--shimmer-band) 100%;
-  background-repeat: no-repeat;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  animation: t-shimmer var(--shimmer-dur) var(--shimmer-ease) infinite;
-}
-
-@keyframes t-shimmer {
-  0% {
-    background-position: 100% 0;
-  }
-  100% {
-    background-position: 0% 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .t-shimmer::before {
-    animation: none !important;
-  }
+.surface-hover:active {
+  transform: scale(0.99);
 }
 
 /* ---------- Professional type & interaction ---------- */
@@ -457,13 +263,13 @@ body {
   transform: scaleX(1);
 }
 
-/* Foco de teclado profesional (a11y): anillo azur sobre el navy */
+/* Foco de teclado profesional (a11y): anillo de marca sobre el fondo oscuro */
 :where(button, a, input, select, textarea, [role="button"], [tabindex]):focus-visible {
-  outline: 2px solid rgba(138, 184, 255, 0.85);
+  outline: 2px solid rgba(62, 106, 224, 0.6);
   outline-offset: 2px;
 }
 
-/* Haptic response: confirm the touch of every interactive surface */
+/* Respeto total a prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

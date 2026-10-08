@@ -33,11 +33,6 @@ export default function DashboardLayout({
   return (
     <PomodoroProvider>
       <div className="flex h-full overflow-hidden">
-        <div className="aurora" aria-hidden>
-          <div className="aurora-blob aurora-blob--a" />
-          <div className="aurora-blob aurora-blob--b" />
-          <div className="aurora-blob aurora-blob--c" />
-        </div>
         <div className="hidden shrink-0 lg:flex">
           <Sidebar onOpenPalette={() => setPaletteOpen(true)} />
         </div>
@@ -81,13 +76,13 @@ function PageTransition({ children }: { children: React.ReactNode }) {
         initial={
           reduceMotion
             ? { opacity: 0 }
-            : { opacity: 0, y: 14, scale: 0.998, filter: "blur(4px)" }
+            : { opacity: 0, y: 8 }
         }
-        animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+        animate={{ opacity: 1, y: 0 }}
         exit={
           reduceMotion
             ? { opacity: 0 }
-            : { opacity: 0, y: -8, scale: 0.999, filter: "blur(3px)" }
+            : { opacity: 0, y: -6 }
         }
         transition={
           reduceMotion

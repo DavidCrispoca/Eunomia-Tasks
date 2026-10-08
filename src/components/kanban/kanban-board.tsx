@@ -205,7 +205,7 @@ export function KanbanBoard() {
     cn(
       "shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200 ease-out-expo",
       active
-        ? "border-violet-500/50 bg-violet-500/15 text-violet-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_4px_14px_rgba(90,140,240,0.18)]"
+        ? "border-violet-500/50 bg-violet-500/15 text-violet-200"
         : "border-white/10 bg-white/[0.03] text-muted hover:border-white/25 hover:text-foreground",
     );
 

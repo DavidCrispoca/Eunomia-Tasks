@@ -127,9 +127,9 @@ export function FlightControls({ disabled, onStart }: FlightControlsProps) {
                       disabled={ongoing}
                       onClick={() => setSelected(rec)}
                       className={cn(
-                        "flex w-full items-center gap-3 rounded-xl glass px-3 py-2 text-left transition-all duration-200 ease-out-expo",
+                        "flex w-full items-center gap-3 rounded-xl surface px-3 py-2 text-left transition-all duration-200 ease-out-expo",
                         active
-                          ? "border-violet-500/45 bg-violet-500/15 shadow-[0_4px_18px_rgba(90,140,240,0.22)]"
+                          ? "border-violet-500/45 bg-violet-500/15"
                           : "hover:border-violet-500/25",
                       )}
                     >

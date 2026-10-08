@@ -38,7 +38,14 @@ export interface TimeBlock {
   color?: BlockColor;
 }
 
-export type BlockColor = "default" | "green" | "orange" | "red" | "blue";
+export type BlockColor =
+  | "default"
+  | "green"
+  | "orange"
+  | "red"
+  | "blue"
+  | "brand"
+  | "teal";
 
 export type Language = "es" | "en";
 

@@ -159,7 +159,7 @@ export function PomodoroSession({ task }: { task: Task }) {
     cn(
       "flex-1 rounded-full px-3 py-1.5 text-[12px] font-medium transition-all duration-200 ease-out-expo",
       modeInUse === value
-        ? "bg-violet-500/20 text-violet-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+        ? "bg-violet-500/20 text-violet-200"
         : "text-muted hover:text-foreground",
     );
 
@@ -167,10 +167,8 @@ export function PomodoroSession({ task }: { task: Task }) {
     <section className="flex flex-col gap-5">
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-lg sm:text-xl font-semibold tracking-tight font-display">
-            <span className="t-shimmer" data-text={t.pomodoro.title}>
-              {t.pomodoro.title}
-            </span>
+          <h1 className="text-lg sm:text-xl font-semibold tracking-tight font-display text-foreground">
+            {t.pomodoro.title}
             {modeInUse === "flight" && (
               <span className="ml-2 text-[11px] font-mono text-violet-500/70 tracking-widest uppercase">
                 PomodoroFlight
@@ -188,8 +186,7 @@ export function PomodoroSession({ task }: { task: Task }) {
       </header>
 
       <div className="mx-auto flex w-full max-w-md flex-col gap-6 px-2 sm:px-0">
-        <div className="relative overflow-hidden rounded-3xl glass p-6 shadow-[var(--glass-drop),var(--app-shadow-lg)]">
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-500/80 via-indigo-500/35 to-transparent" />
+        <div className="relative rounded-2xl surface p-6">
 
           <div className="mb-6 flex items-center gap-2.5">
             <span
@@ -243,21 +240,17 @@ export function PomodoroSession({ task }: { task: Task }) {
               />
               <defs>
                 <linearGradient id="pomodoro-ring" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#a4c1ff" />
-                  <stop offset="60%" stopColor="#5a8cf0" />
-                  <stop offset="100%" stopColor="#27407d" />
+                  <stop offset="0%" stopColor="#6f8fe8" />
+                  <stop offset="60%" stopColor="#3e6ae0" />
+                  <stop offset="100%" stopColor="#3054c2" />
                 </linearGradient>
                 <linearGradient id="pomodoro-flight-ring" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#82abff" />
-                  <stop offset="100%" stopColor="#27407d" />
+                  <stop offset="0%" stopColor="#5d84e6" />
+                  <stop offset="100%" stopColor="#3054c2" />
                 </linearGradient>
               </defs>
             </svg>
-            <div
-              className="absolute inset-0 rounded-full shadow-[var(--glass-inner)]"
-              aria-hidden
-            />
-            <div className="absolute inset-[7px] flex flex-col items-center justify-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.05] shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_8px_24px_-8px_rgba(0,0,0,0.6)] backdrop-blur-xl">
+            <div className="absolute inset-[7px] flex flex-col items-center justify-center gap-1.5 rounded-full border border-white/[0.08] bg-surface-1">
               <span
                 className={cn(
                   "font-mono text-5xl sm:text-[44px] font-semibold leading-none tracking-tight text-tabular",
@@ -281,7 +274,7 @@ export function PomodoroSession({ task }: { task: Task }) {
             </div>
           </div>
 
-          <div className="mt-5 flex items-center gap-1 rounded-full border border-white/10 glass-pill p-1">
+          <div className="mt-5 flex items-center gap-1 rounded-full chip p-1">
             {(["simple", "flight"] as const).map((value) => (
               <button
                 key={value}
@@ -316,8 +309,8 @@ export function PomodoroSession({ task }: { task: Task }) {
                         className={cn(
                           "min-h-[44px] min-w-[44px] rounded-full px-3 font-mono text-base font-semibold transition-all duration-200 ease-out-expo active:scale-[0.97] active:duration-75 disabled:cursor-not-allowed disabled:opacity-40",
                           duration === minutes
-                            ? "border border-violet-500/45 bg-violet-500/15 text-violet-200 shadow-[0_4px_18px_rgba(90,140,240,0.25),inset_0_1px_0_rgba(255,255,255,0.08)]"
-                            : "glass-pill border-none bg-transparent text-muted hover:border-violet-500/25 hover:text-foreground",
+                            ? "border border-violet-500/45 bg-violet-500/15 text-violet-200"
+                            : "bg-transparent text-muted hover:border-violet-500/25 hover:bg-white/[0.06] hover:text-foreground",
                         )}
                       >
                         {minutes}
@@ -329,7 +322,7 @@ export function PomodoroSession({ task }: { task: Task }) {
           </div>
 
           <div className="mt-5">
-            <div className="rounded-xl glass-deep px-3.5 py-3">
+            <div className="rounded-xl surface px-3.5 py-3">
               <AudioControls
                 ambience={ambience}
                 volume={volume}

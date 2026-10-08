@@ -47,11 +47,11 @@ export function AccountMenu() {
         aria-expanded={open}
         aria-label={t.account.openMenu}
         className={cn(
-          "flex h-9 max-md:h-11 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] pl-1.5 pr-3 text-[13px] transition-all duration-200 ease-out-expo hover:border-violet-500/35 hover:bg-violet-500/5 active:translate-y-px active:scale-[0.98] active:duration-75",
-          open && "border-violet-500/35 bg-violet-500/10",
+          "flex h-9 max-md:h-11 items-center gap-2 rounded-full border border-white/10 bg-surface-2 pl-1.5 pr-3 text-[13px] transition-all duration-200 ease-out-expo hover:border-violet-500/30 hover:bg-surface-hover active:translate-y-px active:scale-[0.98] active:duration-75",
+          open && "border-violet-500/40 bg-surface-hover",
         )}
       >
-        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-xs font-bold text-white shadow-[0_4px_14px_rgba(63,118,216,0.35),inset_0_1px_0_rgba(255,255,255,0.35)]">
+        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand text-xs font-bold text-white">
           {initial}
         </span>
         <span className="hidden min-w-0 max-w-[120px] truncate font-medium text-foreground lg:block">
@@ -69,7 +69,7 @@ export function AccountMenu() {
       <AnimatePresence>
         {open && (
           <motion.div
-            className="absolute right-0 top-[calc(100%+8px)] z-50 w-64 origin-top-right overflow-hidden rounded-2xl glass-deep shadow-[var(--app-shadow-lg)]"
+            className="surface-raised absolute right-0 top-[calc(100%+8px)] z-50 w-64 origin-top-right overflow-hidden rounded-xl"
             initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.97 }}
@@ -79,10 +79,8 @@ export function AccountMenu() {
                 : { duration: 0.2, ease: [0.16, 1, 0.3, 1] }
             }
           >
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-500/80 via-indigo-500/35 to-transparent" />
-
             <div className="flex items-center gap-2.5 border-b border-white/10 px-3.5 py-3">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-sm font-bold text-white shadow-[0_4px_14px_rgba(63,118,216,0.35)]">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand text-sm font-bold text-white">
                 {initial}
               </span>
               <div className="min-w-0 flex-1">

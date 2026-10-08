@@ -13,6 +13,7 @@ import {
 import { usePomodoro } from "@/providers/pomodoro-provider";
 import { useData } from "@/providers/data-provider";
 import { useLanguage } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 import type { TaskStatus } from "@/types";
 import { Button } from "@/components/ui/button";
 
@@ -73,7 +74,7 @@ export function PomodoroChip() {
         transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
       >
         <div
-          className="relative overflow-hidden rounded-xl border border-white/[0.12] bg-white/[0.06] text-sm shadow-[var(--clay-drop),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl"
+          className="surface-raised relative overflow-hidden rounded-xl text-sm"
           role={isActive ? "button" : "status"}
           tabIndex={isActive ? 0 : undefined}
           onClick={isActive ? open : undefined}
@@ -89,7 +90,7 @@ export function PomodoroChip() {
           }
         >
           <div
-            className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-violet-400/90 via-indigo-400/45 to-transparent"
+            className="absolute inset-x-0 bottom-0 h-0.5 bg-brand"
             style={{ width: `${elapsedPct}%` }}
           />
           <div className="flex flex-col gap-2.5 px-4 py-3">
@@ -99,13 +100,14 @@ export function PomodoroChip() {
                   <span className="absolute inline-flex size-full animate-ping rounded-full bg-violet-400 opacity-60" />
                 )}
                 <span
-                  className={`relative inline-flex size-2 rounded-full ${
+                  className={cn(
+                    "relative inline-flex size-2 rounded-full",
                     isRunning
                       ? "bg-violet-400"
                       : paused
                         ? "bg-violet-300/60"
-                        : "bg-emerald-400"
-                  }`}
+                        : "bg-emerald-400",
+                  )}
                 />
               </span>
               <span className="max-w-40 truncate font-medium">

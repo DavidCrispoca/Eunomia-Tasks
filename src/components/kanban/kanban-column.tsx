@@ -61,7 +61,7 @@ export const KanbanColumn = forwardRef<HTMLDivElement, KanbanColumnProps>(
         <h3 className="text-[13px] font-semibold tracking-tight font-display">
           {t.kanban.columns[status]}
         </h3>
-        <span className="rounded-md border border-white/10 bg-white/[0.04] px-1.5 font-mono text-[11px] text-violet-300/90 text-tabular">
+        <span className="rounded-md border border-white/10 bg-surface-1 px-1.5 font-mono text-[11px] text-violet-300/90 text-tabular">
           {sorted.length}
         </span>
         {status === "todo" && (
@@ -72,9 +72,9 @@ export const KanbanColumn = forwardRef<HTMLDivElement, KanbanColumnProps>(
       <div
         ref={setRefs}
         className={cn(
-          "flex-1 min-h-[200px] overflow-y-auto rounded-2xl glass-deep p-1.5 transition-[border-color,box-shadow,background-color] duration-200 ease-out-expo",
+          "flex-1 min-h-[200px] overflow-y-auto rounded-xl surface p-1.5 transition-[border-color,background-color] duration-200 ease-out-expo",
           isOver &&
-            "border-violet-500/60 bg-violet-500/[0.07] shadow-[inset_3px_3px_10px_rgba(90,140,240,0.08),inset_-3px_-3px_10px_rgba(0,0,0,0.4)]",
+            "border-violet-500/50 bg-violet-500/[0.06]",
         )}
       >
         <SortableContext

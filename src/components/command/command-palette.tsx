@@ -54,13 +54,12 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
 
   return (
 <div
-        className="fixed inset-0 z-50 flex items-start justify-center bg-[#02040c]/65 px-4 pt-[12vh] backdrop-blur-lg"
+        className="fixed inset-0 z-50 flex items-start justify-center bg-[#05070d]/75 px-4 pt-[12vh]"
         onMouseDown={(e) => {
           if (e.target === e.currentTarget) onClose();
         }}
       >
-        <div className="relative w-full max-w-lg overflow-hidden rounded-2xl glass shadow-[var(--glass-drop),var(--app-shadow-lg)]">
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-500/80 via-indigo-500/35 to-transparent" />
+        <div className="surface-raised relative w-full max-w-lg overflow-hidden rounded-xl">
           <Command
             label="Command palette"
             shouldFilter
@@ -74,7 +73,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                 placeholder={t.command.placeholder}
                 className="h-12 w-full bg-transparent text-sm outline-none placeholder:text-muted"
               />
-              <kbd className="rounded-md border border-violet-500/30 bg-black/30 px-1.5 py-0.5 font-mono text-[10px] text-violet-200/80">
+              <kbd className="rounded-md border border-steel/30 bg-black/30 px-1.5 py-0.5 font-mono text-[10px] text-steel">
                 ESC
               </kbd>
             </div>
@@ -116,7 +115,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                 <PaletteItem onSelect={run(() => toggleLanguage())}>
                   <Globe size={14} className="text-violet-300/90" />
                   {t.command.changeLanguage}
-                  <span className="ml-auto rounded-md border border-violet-500/40 bg-gradient-to-br from-violet-500 to-indigo-600 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase text-white shadow-[0_2px_8px_rgba(63,118,216,0.4)]">
+                  <span className="ml-auto rounded-md border border-violet-500/40 bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase text-violet-300">
                     {lang === "es" ? "EN" : "ES"}
                   </span>
                 </PaletteItem>
@@ -142,7 +141,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                       className={cn(
                         "grid h-4 w-4 shrink-0 place-items-center rounded-full border",
                         task.status === "done"
-                          ? "border-transparent bg-gradient-to-br from-emerald-400 to-emerald-500 text-black shadow-[0_0_8px_rgba(99,184,166,0.55)]"
+                          ? "border-transparent bg-emerald-500 text-black"
                           : "border-white/20",
                       )}
                     >
@@ -185,7 +184,7 @@ function PaletteItem({
     <Command.Item
       value={value}
       onSelect={onSelect}
-      className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[13.5px] text-foreground transition-all duration-200 ease-out-expo data-[selected=true]:border-violet-500/30 data-[selected=true]:bg-violet-500/15 active:scale-[0.99] active:duration-75"
+      className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[13.5px] text-foreground transition-all duration-200 ease-out-expo data-[selected=true]:border-violet-500/30 data-[selected=true]:bg-violet-500/10 active:scale-[0.99] active:duration-75"
     >
       {children}
     </Command.Item>
