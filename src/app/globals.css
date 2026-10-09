@@ -269,6 +269,37 @@ body {
   outline-offset: 2px;
 }
 
+/* ---------- Capa mundo (ilustración) ---------- */
+/* Motion de la mascota. Se detiene con prefers-reduced-motion (abajo).
+   Solo transform/opacity. Ver docs/visual-identity.md. */
+.world-float,
+.world-sway,
+.world-sleep {
+  transform-origin: 50% 90%;
+  will-change: transform;
+}
+.world-float {
+  animation: world-float 6s var(--ease-out-expo) infinite;
+}
+.world-sway {
+  animation: world-sway 4s var(--ease-out-expo) infinite;
+}
+.world-sleep {
+  animation: world-sleep 4s ease-in-out infinite;
+}
+@keyframes world-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes world-sway {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+@keyframes world-sleep {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.025); }
+}
+
 /* Respeto total a prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   *,

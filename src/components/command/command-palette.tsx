@@ -6,6 +6,7 @@ import { Command } from "cmdk";
 import {
   CalendarDays,
   Check,
+  Compass,
   FolderKanban,
   Globe,
   House,
@@ -101,6 +102,13 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                 <PaletteItem onSelect={run(() => router.push("/calendar"))}>
                   <CalendarDays size={14} className="text-violet-300/90" />
                   {t.command.goToCalendar}
+                </PaletteItem>
+              </Command.Group>
+
+              <Command.Group heading={t.nav.world}>
+                <PaletteItem onSelect={run(() => router.push("/world"))}>
+                  <Compass size={14} className="text-violet-300/90" />
+                  {t.command.goToWorld}
                 </PaletteItem>
               </Command.Group>
 

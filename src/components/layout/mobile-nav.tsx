@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, FolderKanban, House, Plus } from "lucide-react";
+import { CalendarDays, Compass, FolderKanban, House, Plus } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { useUi } from "@/providers/ui-provider";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ export function MobileNav() {
     { href: "/", label: t.nav.home, icon: House },
     { href: "/kanban", label: t.nav.kanban, icon: FolderKanban },
     { href: "/calendar", label: t.nav.calendar, icon: CalendarDays },
+    { href: "/world", label: t.nav.world, icon: Compass },
   ];
 
   const isActive = (href: string) =>

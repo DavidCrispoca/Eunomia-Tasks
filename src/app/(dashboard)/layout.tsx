@@ -10,6 +10,7 @@ import { CommandPalette } from "@/components/command/command-palette";
 import { TaskModal } from "@/components/task-modal";
 import { PomodoroProvider } from "@/providers/pomodoro-provider";
 import { PomodoroChip } from "@/components/pomodoro/pomodoro-chip";
+import { CelebrationLayer } from "@/components/gamification/celebration-layer";
 import { useUi } from "@/providers/ui-provider";
 
 export default function DashboardLayout({
@@ -49,6 +50,7 @@ export default function DashboardLayout({
         <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
         <TaskModal />
         <PomodoroChip />
+        <CelebrationLayer />
         <UrlHandlers />
       </div>
     </PomodoroProvider>

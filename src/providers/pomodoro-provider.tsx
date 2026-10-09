@@ -12,6 +12,7 @@ import {
 } from "react";
 import { useLanguage } from "@/lib/i18n";
 import { useData } from "@/providers/data-provider";
+import { useGamification } from "@/providers/gamification-provider";
 import {
   playBackgroundAudio,
   stopBackgroundAudio,
@@ -131,6 +132,7 @@ function elapsedMinutesOf(session: StoredPomodoro): number {
 export function PomodoroProvider({ children }: { children: ReactNode }) {
   const { t } = useLanguage();
   const { tasks, updateTask } = useData();
+  const { noteFocusSession } = useGamification();
   const [session, setSession] = useState<StoredPomodoro | null>(() =>
     loadSession(),
   );
@@ -186,8 +188,10 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
       const task = tasksRef.current.find((item) => item.id === current.taskId);
       const updated = (task?.focusMinutes ?? 0) + minutes;
       updateTaskRef.current(current.taskId, { focusMinutes: updated });
+      // El servidor decide la recompensa; aquí solo se envía la clave del evento.
+      void noteFocusSession({ taskId: current.taskId, refId: key, minutes });
     },
-    [],
+    [noteFocusSession],
   );
 
   const notifyFinished = useCallback(

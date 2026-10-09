@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Sora } from "next/font/google";
 import { AppProviders } from "@/providers/app-providers";
 import { getSessionUser } from "@/lib/auth/cookies";
 import { loadCloudData } from "@/lib/data/actions";
+import { loadGamification } from "@/lib/gamification/actions";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,6 +35,8 @@ export const viewport: Viewport = {
 export default async function RootLayout(props: LayoutProps<"/">) {
   const user = await getSessionUser();
   const cloudData = user && !user.demo ? await loadCloudData() : null;
+  const gamification =
+    user && !user.demo ? await loadGamification() : null;
 
   return (
     <html
@@ -41,7 +44,7 @@ export default async function RootLayout(props: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} ${sora.variable} h-full antialiased`}
     >
       <body className="h-full flex flex-col">
-        <AppProviders initialUser={user} initialData={cloudData}>
+        <AppProviders initialUser={user} initialData={cloudData} initialGamification={gamification}>
           {props.children}
         </AppProviders>
       </body>
