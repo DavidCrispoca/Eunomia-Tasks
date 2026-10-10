@@ -39,6 +39,7 @@ interface NewTaskInput {
   dueTime?: string;
   status?: TaskStatus;
   groupId?: string;
+  isMilestone?: boolean;
 }
 
 interface NewTimeBlockInput {
@@ -286,6 +287,7 @@ export function DataProvider({
           dueDate: input.dueDate,
           status: input.status ?? "todo",
           groupId: input.groupId,
+          isMilestone: input.isMilestone,
           completedAt:
             (input.status ?? "todo") === "done"
               ? new Date().toISOString()

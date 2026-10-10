@@ -298,6 +298,7 @@ export type Database = {
           focus_minutes: number
           group_id: string | null
           id: string
+          is_milestone: boolean
           notes: string
           order: number
           priority: string
@@ -313,6 +314,7 @@ export type Database = {
           focus_minutes?: number
           group_id?: string | null
           id?: string
+          is_milestone?: boolean
           notes?: string
           order?: number
           priority?: string
@@ -328,6 +330,7 @@ export type Database = {
           focus_minutes?: number
           group_id?: string | null
           id?: string
+          is_milestone?: boolean
           notes?: string
           order?: number
           priority?: string

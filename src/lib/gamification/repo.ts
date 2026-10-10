@@ -4,6 +4,8 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import {
   EMPTY_SNAPSHOT,
   FOCUS_DAILY_CAP,
+  FOCUS_MAX_MINUTES,
+  FOCUS_MIN_VALID_MINUTES,
   REWARD,
   levelForXp,
   type AchievementView,
@@ -214,6 +216,26 @@ export async function taskOwnedByUser(
   return Boolean(res.data);
 }
 
+/**
+ * ¿La tarea está marcada como hito? Si la columna no existe todavía (migración
+ * `tasks_milestone` pendiente), devuelve `false` para no romper el premio base.
+ */
+export async function taskIsMilestone(
+  userId: string,
+  taskId: string,
+): Promise<boolean> {
+  const client = db();
+  if (!client) return false;
+  const res = await client
+    .from("tasks")
+    .select("is_milestone")
+    .eq("id", taskId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (res.error) return false;
+  return Boolean((res.data as { is_milestone?: boolean } | null)?.is_milestone);
+}
+
 /** Sesiones de enfoque ya premiadas hoy (UTC), para el tope diario. */
 export async function countFocusSessionsToday(userId: string): Promise<number> {
   const client = db();
@@ -231,6 +253,24 @@ export async function countFocusSessionsToday(userId: string): Promise<number> {
 
 export function focusDailyCap(): number {
   return FOCUS_DAILY_CAP;
+}
+
+/**
+ * Premia una sesión de enfoque validada por minutos, sin tarea asociada (p. ej.
+ * una sesión de modo registrada por NFC). Aplica el mínimo, el tope por sesión
+ * y el límite diario. `refId` debe ser único por sesión (p. ej. `nfc:{id}`).
+ */
+export async function awardFocusForUser(
+  userId: string,
+  refId: string,
+  minutes: number,
+): Promise<AwardResult | null> {
+  const client = db();
+  if (!client) return null;
+  const rounded = Math.min(Math.round(minutes), FOCUS_MAX_MINUTES);
+  if (!Number.isFinite(rounded) || rounded < FOCUS_MIN_VALID_MINUTES) return null;
+  if ((await countFocusSessionsToday(userId)) >= FOCUS_DAILY_CAP) return null;
+  return awardForKind(userId, "focus_session", refId, { minutes: rounded });
 }
 
 /**

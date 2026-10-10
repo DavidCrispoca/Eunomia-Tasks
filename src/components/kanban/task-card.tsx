@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { CalendarDays, Check, Clock, FolderOpen, StickyNote } from "lucide-react";
+import { CalendarDays, Check, Clock, FolderOpen, StickyNote, Trophy } from "lucide-react";
 import type { Task } from "@/types";
 import { PRIORITY_TEXT, STATUS_DOT } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -87,6 +87,12 @@ export function TaskCard({ task, onOpen, onToggleDone, overlay }: TaskCardProps)
       )}
 
       <div className="flex flex-wrap items-center gap-1.5 pl-6">
+        {task.isMilestone && (
+          <span className="inline-flex items-center gap-1 font-mono text-[11px] text-gold-300">
+            <Trophy size={11} />
+            {t.task.milestoneBadge}
+          </span>
+        )}
         {group && (
           <span className="inline-flex items-center gap-1 font-mono text-[11px] text-violet-300/70">
             <FolderOpen size={11} />

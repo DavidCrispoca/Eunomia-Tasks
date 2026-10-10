@@ -53,6 +53,7 @@ create table if not exists public.tasks (
   completed_at timestamptz,
   "order" integer not null default 0,
   focus_minutes integer not null default 0,
+  is_milestone boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -79,6 +80,8 @@ create index if not exists task_groups_user_id_idx on public.task_groups (user_i
 alter table public.tasks add column if not exists group_id uuid;
 -- En bases ya existentes, "create table if not exists" no añade columnas:
 alter table public.tasks add column if not exists focus_minutes integer not null default 0;
+-- Hitos de tarea: al completar uno se otorga la recompensa `milestone` (Fase 4).
+alter table public.tasks add column if not exists is_milestone boolean not null default false;
 
 alter table public.tasks
   drop constraint if exists tasks_group_id_fk;

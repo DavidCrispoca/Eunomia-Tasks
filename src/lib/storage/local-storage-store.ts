@@ -1,4 +1,4 @@
-import type { Task, TaskGroup, TimeBlock } from "@/types";
+import type { Language, Task, TaskGroup, TimeBlock } from "@/types";
 import { hhmmToMinutes } from "@/lib/utils";
 import type { DataStore } from "@/lib/storage/store";
 
@@ -56,7 +56,7 @@ export const localStorageStore: DataStore = {
   loadLanguage() {
     try {
       const raw = localStorage.getItem(LANG_KEY);
-      return raw === "en" || raw === "es" ? raw : null;
+      return parseLanguage(raw);
     } catch {
       return null;
     }
@@ -77,13 +77,37 @@ export const localStorageStore: DataStore = {
   },
   saveLanguage(lang) {
     try {
-      localStorage.setItem(LANG_KEY, lang);
+      localStorage.setItem(LANG_KEY, JSON.stringify(lang));
       notify();
     } catch {
       // ignore
     }
   },
 };
+
+/**
+ * Lee el idioma tolerando el formato antiguo (crudo: `en`/`es`) y el actual
+ * (JSON: `"en"`/`"es"`). `useSynced` parsea el valor con `JSON.parse`, así que
+ * el formato crudo anterior se perdía; aquí se migra al leerlo.
+ */
+export function parseLanguage(raw: string | null): Language | null {
+  if (raw === null) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed === "en" || parsed === "es") return parsed;
+  } catch {
+    // formato antiguo sin comillas
+  }
+  if (raw === "en" || raw === "es") {
+    try {
+      localStorage.setItem(LANG_KEY, JSON.stringify(raw));
+    } catch {
+      // ignore
+    }
+    return raw;
+  }
+  return null;
+}
 
 export function defaultTasks(): Task[] {
   return seedTasks();

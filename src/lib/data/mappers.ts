@@ -12,6 +12,7 @@ export interface TaskRow {
   order: number;
   group_id: string | null;
   focus_minutes: number | null;
+  is_milestone: boolean | null;
   created_at: string;
   updated_at: string;
 }
@@ -49,6 +50,7 @@ export function taskFromRow(row: TaskRow): Task {
     order: Number(row.order ?? 0),
     groupId: row.group_id ?? undefined,
     focusMinutes: row.focus_minutes ? Number(row.focus_minutes) : undefined,
+    isMilestone: row.is_milestone ?? undefined,
     createdAt: row.created_at ?? new Date().toISOString(),
   };
 }
@@ -85,6 +87,7 @@ export function taskToRow(userId: string, task: Task): Omit<TaskRow, "created_at
     order: Number(task.order ?? 0),
     group_id: task.groupId ?? null,
     focus_minutes: task.focusMinutes ?? 0,
+    is_milestone: task.isMilestone ?? false,
   };
 }
 

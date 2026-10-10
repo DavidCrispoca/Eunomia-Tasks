@@ -5,6 +5,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 import {
   FOCUS_MAX_MINUTES,
   FOCUS_MIN_VALID_MINUTES,
+  type AchievementView,
   type AwardResult,
   type GamificationSnapshot,
 } from "@/lib/gamification/rules";
@@ -13,6 +14,7 @@ import {
   countFocusSessionsToday,
   focusDailyCap,
   getSnapshot,
+  taskIsMilestone,
   taskOwnedByUser,
 } from "@/lib/gamification/repo";
 
@@ -21,6 +23,25 @@ async function readyUser() {
   const user = await getSessionUser();
   if (!user || user.demo) return null;
   return user;
+}
+
+/** Combina dos premios consecutivos (tarea + hito) en un único resultado. */
+function mergeAwards(base: AwardResult, extra: AwardResult): AwardResult {
+  const unlockedByCode = new Map<string, AchievementView>();
+  for (const achievement of [...base.unlocked, ...extra.unlocked]) {
+    unlockedByCode.set(achievement.code, achievement);
+  }
+  return {
+    awarded: base.awarded || extra.awarded,
+    xp: extra.xp,
+    level: extra.level,
+    coins: extra.coins,
+    xpDelta: base.xpDelta + extra.xpDelta,
+    coinDelta: base.coinDelta + extra.coinDelta,
+    levelUp: base.levelUp || extra.levelUp,
+    unlocked: [...unlockedByCode.values()],
+    event: extra.event ?? base.event,
+  };
 }
 
 /** Carga el estado de gamificación del usuario conectado. */
@@ -42,7 +63,16 @@ export async function awardTaskCompleted(
   if (!user || typeof taskId !== "string" || taskId.length === 0) return null;
   try {
     if (!(await taskOwnedByUser(user.id, taskId))) return null;
-    return await awardForKind(user.id, "task_completed", taskId);
+    const base = await awardForKind(user.id, "task_completed", taskId);
+    // Los hitos se deciden en el servidor: si la tarea lo es, se otorga su
+    // recompensa adicional (idempotente vía `ref_id = {taskId}:milestone`).
+    if (!(await taskIsMilestone(user.id, taskId))) return base;
+    const milestone = await awardForKind(
+      user.id,
+      "milestone",
+      `${taskId}:milestone`,
+    );
+    return mergeAwards(base, milestone);
   } catch {
     return null;
   }

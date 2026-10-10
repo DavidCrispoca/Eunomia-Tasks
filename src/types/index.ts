@@ -26,6 +26,7 @@ export interface Task {
   createdAt: string;
   groupId?: string;
   focusMinutes?: number;
+  isMilestone?: boolean;
 }
 
 export interface TimeBlock {

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CalendarDays, Clock, Flag, FolderOpen, Tags, Timer } from "lucide-react";
+import { CalendarDays, Clock, Flag, FolderOpen, Tags, Timer, Trophy } from "lucide-react";
 import type { TaskPriority, TaskStatus } from "@/types";
 import { useUi } from "@/providers/ui-provider";
 import { useData } from "@/providers/data-provider";
@@ -26,6 +26,7 @@ export function TaskModal() {
   const [dueDate, setDueDate] = useState("");
   const [dueTime, setDueTime] = useState("");
   const [groupId, setGroupId] = useState("");
+  const [isMilestone, setIsMilestone] = useState(false);
 
   const dialogKey = editing?.id ?? (open ? "new" : "closed");
   const [lastDialog, setLastDialog] = useState(dialogKey);
@@ -40,6 +41,7 @@ export function TaskModal() {
       editing ? (blocks.find((b) => b.taskId === editing.id)?.start ?? "") : "",
     );
     setGroupId(editing?.groupId ?? "");
+    setIsMilestone(editing?.isMilestone ?? false);
   }
 
   const canSave = title.trim().length > 0;
@@ -55,6 +57,7 @@ export function TaskModal() {
         dueDate: dueDate || undefined,
         dueTime: dueTime || undefined,
         groupId: groupId || undefined,
+        isMilestone,
         completedAt:
           status === "done"
             ? editing.completedAt ?? new Date().toISOString()
@@ -69,6 +72,7 @@ export function TaskModal() {
         dueDate: dueDate || undefined,
         dueTime: dueTime || undefined,
         groupId: groupId || undefined,
+        isMilestone,
       });
     }
     closeTaskDialog();
@@ -193,6 +197,37 @@ export function TaskModal() {
               <option value="done">{t.kanban.columns.done}</option>
             </Select>
           </div>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <button
+            type="button"
+            role="switch"
+            aria-checked={isMilestone}
+            onClick={() => setIsMilestone((value) => !value)}
+            className={`flex min-h-[44px] w-full items-center justify-between gap-3 rounded-[10px] border px-3 text-sm font-medium transition-colors duration-200 ease-out-expo ${
+              isMilestone
+                ? "border-gold/50 bg-gold/10 text-foreground"
+                : "border-white/[0.08] bg-surface-2 text-muted hover:bg-surface-hover"
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              <Trophy size={14} /> {t.task.milestone}
+            </span>
+            <span
+              aria-hidden
+              className={`relative h-5 w-9 shrink-0 rounded-full transition-colors duration-200 ease-out-expo ${
+                isMilestone ? "bg-gold" : "bg-white/15"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform duration-200 ease-out-expo ${
+                  isMilestone ? "translate-x-[18px]" : "translate-x-0.5"
+                }`}
+              />
+            </span>
+          </button>
+          <p className="px-1 text-xs text-muted/80">{t.task.milestoneHint}</p>
         </div>
 
         {editing && editing.status !== "done" && (

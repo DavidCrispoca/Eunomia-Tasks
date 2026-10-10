@@ -2,16 +2,20 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import type { Language } from "@/types";
 import es from "@/lib/i18n/dictionaries/es";
 import en from "@/lib/i18n/dictionaries/en";
 import type { Dictionary } from "@/lib/i18n/dictionaries/es";
-import { LANG_KEY, localStorageStore } from "@/lib/storage/local-storage-store";
-import { useSynced } from "@/lib/storage/synced";
+import {
+  localStorageStore,
+  subscribeStore,
+} from "@/lib/storage/local-storage-store";
 import { saveUserLanguage } from "@/lib/data/actions";
 
 interface LanguageContextValue {
@@ -25,12 +29,24 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 export function LanguageProvider({
   syncToCloud = false,
+  initialLanguage = "es",
   children,
 }: {
   syncToCloud?: boolean;
+  initialLanguage?: Language;
   children: ReactNode;
 }) {
-  const lang = useSynced<Language>(LANG_KEY, () => "es");
+  // `useSyncExternalStore` con `getServerSnapshot` garantiza que la hidratación
+  // siempre rinde el idioma del servidor (sin mismatches: se evita el flag
+  // global compartido que adelantaba el valor guardado a límites aún por
+  // hidratar). El idioma persistido se aplica justo tras hidratar. Solo hay un
+  // consumidor (este provider), así que no hay carrera entre instancias.
+  const getSnapshot = useCallback(
+    () => localStorageStore.loadLanguage() ?? initialLanguage,
+    [initialLanguage],
+  );
+  const getServerSnapshot = useCallback(() => initialLanguage, [initialLanguage]);
+  const lang = useSyncExternalStore(subscribeStore, getSnapshot, getServerSnapshot);
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -41,13 +57,16 @@ export function LanguageProvider({
     void saveUserLanguage(lang);
   }, [lang, syncToCloud]);
 
-  const setLanguage = (next: Language) => {
-    localStorageStore.saveLanguage(next);
-  };
+  const setLanguage = useCallback(
+    (next: Language) => {
+      localStorageStore.saveLanguage(next);
+    },
+    [],
+  );
 
-  const toggleLanguage = () => {
-    localStorageStore.saveLanguage(lang === "es" ? "en" : "es");
-  };
+  const toggleLanguage = useCallback(() => {
+    setLanguage(lang === "es" ? "en" : "es");
+  }, [lang, setLanguage]);
 
   const value: LanguageContextValue = {
     lang,
