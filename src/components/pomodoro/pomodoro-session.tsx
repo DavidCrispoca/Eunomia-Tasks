@@ -328,6 +328,7 @@ export function PomodoroSession({ task }: { task: Task }) {
                 volume={volume}
                 onChange={onAmbienceChange}
                 onChangeVolume={onVolumeChange}
+                preview={!session || session.status === "finished"}
               />
             </div>
           </div>

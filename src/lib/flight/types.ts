@@ -16,13 +16,15 @@ export interface FlightInfo {
 
 export type AmbienceType =
   | "none"
-  | "cabin"
+  | "storm"
   | "rain"
-  | "white"
-  | "brown"
-  | "lofi"
+  | "forest-night"
+  | "cabin"
   | "coffee"
-  | "fireplace";
+  | "lofi"
+  | "fireplace"
+  | "white"
+  | "brown";
 
 export type FlightMode = "simple" | "flight";
 export type FlightPick = "minutes" | "route";
