@@ -6,6 +6,7 @@ export const TASKS_KEY = "eunomia:tasks";
 export const BLOCKS_KEY = "eunomia:blocks";
 export const GROUPS_KEY = "eunomia:groups";
 export const LANG_KEY = "eunomia:lang";
+export const WEEKLY_GOAL_PREFIX = "eunomia:weeklyGoal:";
 
 type Listener = () => void;
 const listeners = new Set<Listener>();
@@ -119,6 +120,31 @@ export function defaultTimeBlocks(): TimeBlock[] {
 
 export function defaultGroups(): TaskGroup[] {
   return [];
+}
+
+/**
+ * Objetivo de la próxima semana (nota corta por semana ISO). Se guarda en
+ * `localStorage` con clave `eunomia:weeklyGoal:{weekIso}` y notifica a los
+ * suscriptores del store para que la UI se actualice en la misma pestaña.
+ */
+export function readWeeklyGoal(weekIso: string): string {
+  try {
+    return localStorage.getItem(WEEKLY_GOAL_PREFIX + weekIso) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+export function saveWeeklyGoal(weekIso: string, text: string) {
+  const value = text.trim();
+  try {
+    const key = WEEKLY_GOAL_PREFIX + weekIso;
+    if (value === "") localStorage.removeItem(key);
+    else localStorage.setItem(key, value);
+    notify();
+  } catch {
+    // storage full or unavailable — ignore for local MVP
+  }
 }
 
 /**

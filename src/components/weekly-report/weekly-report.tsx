@@ -1,11 +1,25 @@
 "use client";
 
-import { useMemo } from "react";
+import {
+  useCallback,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { endOfWeek, format, isSameDay, parseISO, startOfWeek, subDays } from "date-fns";
 import { es, enUS } from "date-fns/locale";
-import { CheckCircle2, Clock, Flame, ListTodo } from "lucide-react";
+import { CheckCircle2, Clock, Flame, ListTodo, Pencil, Sparkles } from "lucide-react";
 import { useData } from "@/providers/data-provider";
 import { useLanguage } from "@/lib/i18n";
+import { useGamification } from "@/providers/gamification-provider";
+import { awardWeeklyReview } from "@/lib/gamification/actions";
+import { isoWeekKey } from "@/lib/week";
+import {
+  readWeeklyGoal,
+  saveWeeklyGoal,
+  subscribeStore,
+} from "@/lib/storage/local-storage-store";
+import { Button } from "@/components/ui/button";
 import { Mascot } from "@/components/mascot/mascot";
 import { cn } from "@/lib/utils";
 
@@ -32,10 +46,94 @@ function KpiCard({
   );
 }
 
+/** Objetivo de la próxima semana: nota corta persistida por semana ISO. */
+function WeeklyGoalEditor({ weekIso }: { weekIso: string }) {
+  const { t } = useLanguage();
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState("");
+
+  const getSnapshot = useCallback(() => readWeeklyGoal(weekIso), [weekIso]);
+  const getServerSnapshot = useCallback(() => "", []);
+  const goal = useSyncExternalStore(subscribeStore, getSnapshot, getServerSnapshot);
+
+  const start = () => {
+    setDraft(goal);
+    setEditing(true);
+  };
+  const confirm = () => {
+    saveWeeklyGoal(weekIso, draft);
+    setEditing(false);
+  };
+  const cancel = () => setEditing(false);
+
+  return (
+    <div
+      className={cn(
+        "mt-auto rounded-lg border border-dashed border-border p-2.5",
+        editing ? "flex flex-col gap-2" : "flex items-start justify-between gap-2",
+      )}
+    >
+      {editing ? (
+        <>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[11px] font-semibold text-foreground">
+              {t.report.nextGoal}
+            </span>
+            <textarea
+              autoFocus
+              rows={2}
+              maxLength={160}
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
+                  confirm();
+                }
+                if (event.key === "Escape") cancel();
+              }}
+              placeholder={t.report.goalPlaceholder}
+              className="surface w-full resize-none rounded-md px-2.5 py-1.5 text-[13px] text-foreground placeholder:text-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/40"
+            />
+          </label>
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="ghost" size="sm" onClick={cancel}>
+              {t.common.cancel}
+            </Button>
+            <Button variant="subtle" size="sm" onClick={confirm}>
+              {t.common.save}
+            </Button>
+          </div>
+        </>
+      ) : (
+        <>
+          <span className="min-w-0 flex-1 text-[11px] text-muted">
+            {t.report.nextGoal}:{" "}
+            <span className={goal ? "text-foreground" : ""}>
+              {goal || t.report.goalPlaceholder}
+            </span>
+          </span>
+          <button
+            type="button"
+            onClick={start}
+            aria-label={t.common.edit}
+            title={t.common.edit}
+            className="rounded-md p-1 text-muted transition-colors hover:bg-white/5 hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/40 max-md:min-h-[44px] max-md:min-w-[44px]"
+          >
+            <Pencil size={13} />
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
 export function WeeklyReport() {
   const { tasks, groups } = useData();
   const { t, lang } = useLanguage();
+  const { serverBacked, snapshot, applyAward } = useGamification();
   const locale = lang === "es" ? es : enUS;
+  const [reviewBusy, setReviewBusy] = useState(false);
 
   const data = useMemo(() => {
     const now = new Date();
@@ -70,6 +168,7 @@ export function WeeklyReport() {
       .slice(0, 4);
 
     return {
+      weekIso: isoWeekKey(weekStart),
       completedThisWeek,
       pending,
       days,
@@ -79,6 +178,23 @@ export function WeeklyReport() {
       range: `${format(weekStart, "d MMM", { locale })} – ${format(weekEnd, "d MMM", { locale })}`,
     };
   }, [tasks, groups, locale]);
+
+  // La revisión de la semana ya hecha se lee de los eventos reales del servidor
+  // (kind `weekly_review` con refId = semana ISO en curso).
+  const reviewDone = snapshot.events.some(
+    (event) => event.kind === "weekly_review" && event.refId === data.weekIso,
+  );
+
+  const handleReview = async () => {
+    if (reviewBusy || reviewDone || !serverBacked) return;
+    setReviewBusy(true);
+    try {
+      // El servidor calcula la semana; el cliente solo aplica el resultado.
+      applyAward(await awardWeeklyReview());
+    } finally {
+      setReviewBusy(false);
+    }
+  };
 
   const mascotState = data.completedThisWeek > 0 ? "work" : "sleep";
 
@@ -123,6 +239,37 @@ export function WeeklyReport() {
             value={String(data.focusByGroup.length)}
             hint={t.report.classesHint}
           />
+        </div>
+
+        <div className="mt-1 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
+          <div className="flex flex-col gap-0.5">
+            <span className="flex items-center gap-1.5 text-[13px] font-semibold text-foreground">
+              <Sparkles size={14} className="text-gold" />
+              {t.report.review}
+            </span>
+            <span className="text-[11px] text-muted">
+              {reviewDone
+                ? t.report.reviewDoneHint
+                : serverBacked
+                  ? t.report.reviewHint
+                  : t.gamification.localNote}
+            </span>
+          </div>
+          {reviewDone ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-teal/10 px-2.5 py-1 text-[11px] font-medium text-teal">
+              <CheckCircle2 size={12} />
+              {t.report.reviewDone}
+            </span>
+          ) : (
+            <Button
+              variant="primary"
+              size="md"
+              onClick={handleReview}
+              disabled={reviewBusy || !serverBacked}
+            >
+              {t.report.reviewCta}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -169,10 +316,7 @@ export function WeeklyReport() {
               })}
             </ul>
           )}
-          <div className={cn("mt-auto rounded-lg border border-dashed border-border p-2.5",
-            "text-[11px] text-muted")}>
-            {t.report.nextGoal}: <span className="text-foreground">{t.report.nextGoalHint}</span>
-          </div>
+          <WeeklyGoalEditor weekIso={data.weekIso} />
         </div>
       </div>
     </div>

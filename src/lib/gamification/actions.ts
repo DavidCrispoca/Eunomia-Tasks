@@ -2,6 +2,7 @@
 
 import { getSessionUser } from "@/lib/auth/cookies";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { isoWeekKey } from "@/lib/week";
 import {
   FOCUS_MAX_MINUTES,
   FOCUS_MIN_VALID_MINUTES,
@@ -104,14 +105,16 @@ export async function awardFocusSession(input: {
   }
 }
 
-/** Premia la revisión semanal (una por semana ISO). */
-export async function awardWeeklyReview(
-  weekIso: string,
-): Promise<AwardResult | null> {
+/**
+ * Premia la revisión semanal de la semana en curso. Idempotente por semana
+ * ISO (`unique(user_id, kind, ref_id)`); el servidor decide la semana y el
+ * cliente no puede premiar semanas pasadas ni futuras.
+ */
+export async function awardWeeklyReview(): Promise<AwardResult | null> {
   const user = await readyUser();
-  if (!user || typeof weekIso !== "string" || weekIso.length === 0) return null;
+  if (!user) return null;
   try {
-    return await awardForKind(user.id, "weekly_review", weekIso);
+    return await awardForKind(user.id, "weekly_review", isoWeekKey(new Date()));
   } catch {
     return null;
   }
