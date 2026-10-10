@@ -374,7 +374,21 @@ async function evaluateAchievements(
       {},
     );
     if (outcome.awarded) {
-      newlyUnlocked.push(toView(row, new Date().toISOString()));
+      const now = new Date().toISOString();
+      // El RPC concedió el premio pero no registra `user_achievements`; se
+      // persiste aquí para que el logro siga desbloqueado al recargar
+      // (idempotente: solo cuando el RPC concedió y con guarda previa).
+      await client
+        .from("user_achievements")
+        .upsert(
+          {
+            user_id: userId,
+            achievement_code: row.code,
+            unlocked_at: now,
+          },
+          { onConflict: "user_id,achievement_code", ignoreDuplicates: true },
+        );
+      newlyUnlocked.push(toView(row, now));
     }
   }
   return newlyUnlocked;
