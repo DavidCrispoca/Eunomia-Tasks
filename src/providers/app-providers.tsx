@@ -4,6 +4,7 @@ import { useMemo, type ReactNode } from "react";
 import { DataProvider } from "@/providers/data-provider";
 import { UiProvider } from "@/providers/ui-provider";
 import { GamificationProvider } from "@/providers/gamification-provider";
+import { NfcProvider } from "@/providers/nfc-provider";
 import { LanguageProvider } from "@/lib/i18n";
 import { AuthProvider } from "@/lib/auth/provider";
 import type { AppUser } from "@/types";
@@ -33,14 +34,19 @@ export function AppProviders({
   );
 
   return (
-    <LanguageProvider syncToCloud={Boolean(initialData)}>
+    <LanguageProvider
+      syncToCloud={Boolean(initialData)}
+      initialLanguage={initialData?.language ?? undefined}
+    >
       <AuthProvider initialUser={initialUser}>
         <DataProvider initialData={initialData ?? null}>
           <GamificationProvider
             initialData={initialGamification ?? null}
             initialDoneIds={initialDoneIds}
           >
-            <UiProvider>{children}</UiProvider>
+            <NfcProvider>
+              <UiProvider>{children}</UiProvider>
+            </NfcProvider>
           </GamificationProvider>
         </DataProvider>
       </AuthProvider>

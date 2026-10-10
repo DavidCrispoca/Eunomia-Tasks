@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Compass, FolderKanban, House, Plus, Search } from "lucide-react";
+import { Activity, CalendarDays, Compass, FolderKanban, House, Plus, Search } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { useUi } from "@/providers/ui-provider";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,7 @@ export function Sidebar({ onOpenPalette }: { onOpenPalette: () => void }) {
     { href: "/", label: t.nav.home, icon: House },
     { href: "/kanban", label: t.nav.kanban, icon: FolderKanban },
     { href: "/calendar", label: t.nav.calendar, icon: CalendarDays },
+    { href: "/pomodoro", label: t.nfc.navLabel, icon: Activity },
     { href: "/world", label: t.nav.world, icon: Compass },
   ];
 

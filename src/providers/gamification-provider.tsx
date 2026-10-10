@@ -55,6 +55,8 @@ interface GamificationContextValue {
     refId: string;
     minutes: number;
   }) => Promise<void>;
+  /** Aplica un resultado de premio ya resuelto por el servidor (p. ej. NFC). */
+  applyAward: (result: AwardResult | null) => void;
   refresh: () => Promise<void>;
   /** Mundo de campañas (islas del usuario); null hasta cargar o en demo. */
   world: WorldView | null;
@@ -294,6 +296,7 @@ export function GamificationProvider({
       celebrations,
       dismissCelebration,
       noteFocusSession,
+      applyAward: applyResult,
       refresh,
       world: worldLoaded ? world : null,
       worldLoaded,
@@ -306,6 +309,7 @@ export function GamificationProvider({
       celebrations,
       dismissCelebration,
       noteFocusSession,
+      applyResult,
       refresh,
       world,
       worldLoaded,

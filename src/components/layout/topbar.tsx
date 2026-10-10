@@ -7,6 +7,7 @@ import { Logo } from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
 import { AccountMenu } from "@/components/layout/account-menu";
 import { GamificationBar } from "@/components/gamification/gamification-bar";
+import { ModePill } from "@/components/nfc/mode-pill";
 
 export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
   const { lang, toggleLanguage, t } = useLanguage();
@@ -34,6 +35,7 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
 
       <div className="ml-auto flex items-center gap-1 max-md:gap-0.5">
         <GamificationBar variant="compact" className="mr-1 hidden sm:flex" />
+        <ModePill className="mr-1" />
         <Button
           variant="ghost"
           size="icon"
