@@ -9,21 +9,28 @@
 
 | Orden | Migración | Qué hace | Estado |
 | ----- | --------- | -------- | ------ |
-| 1 | `gamification_core` (aplicada vía MCP, Fase 2) | `user_gamification`, `gamification_events`, `achievements`, `user_achievements`, RPC `grant_reward`/`spend_coins`/`level_for_xp`, trigger de perfil y RLS | aplicada |
-| 2 | `campaign_world` (aplicada vía MCP, Fase 3) | `islands`, `campaign_unlocks`, RPC `unlock_island`, seed de islas y RLS | aplicada |
-| 3 | `unlock_island_out_column` + `unlock_island_prefixed_out` (Fase 3) | Fixes del RPC `unlock_island` (columnas OUT con prefijo `s_` por ambigüedad plpgsql) | aplicada |
-| 4 | `20261012201932_tasks_milestone.sql` | `tasks.is_milestone` (hitos → recompensa `milestone`) | aplicada |
-| 5 | `20261012201939_activity_modes_nfc.sql` | Modos + tarjetas NFC + sesiones (Fase 4) | aplicada |
+| 1 | `20260924163034_google_calendar_sync.sql` | Sincronización con Google Calendar (tokens, eventos, RLS) | aplicada |
+| 2 | `20260925030503_add_focus_minutes_to_tasks.sql` | `tasks.focus_minutes` (minutos de enfoque por tarea) | aplicada |
+| 3 | `20261009040151_gamification_core.sql` | `user_gamification`, `gamification_events`, `achievements`, `user_achievements`, RPC `grant_reward`/`spend_coins`/`level_for_xp`, trigger de perfil y RLS | aplicada |
+| 4 | `20261009043801_campaign_world.sql` | `islands`, `campaign_unlocks`, RPC `unlock_island`, seed de islas y RLS | aplicada |
+| 5 | `20261009044541_unlock_island_out_column.sql` + `20261009044557_unlock_island_prefixed_out.sql` | Fixes del RPC `unlock_island` (columnas OUT con prefijo `s_` por ambigüedad plpgsql) | aplicada |
+| 6 | `20261012201932_tasks_milestone.sql` | `tasks.is_milestone` (hitos → recompensa `milestone`) | aplicada |
+| 7 | `20261012201939_activity_modes_nfc.sql` | Modos + tarjetas NFC + sesiones (Fase 4) | aplicada |
 
-> Las migraciones 1–3 se aplicaron con el MCP de Supabase antes de versionarlas como
-> fichero; 4–5 ya están versionadas. Si el proyecto Supabase quedó con 1–3, basta con
-> aplicar 4 y 5.
+> Todas las migraciones del historial remoto tienen su fichero local, con el **mismo
+> prefijo de versión** que `supabase_migrations.schema_migrations` (necesario para que la
+> comprobación "Supabase Preview" no falle).
+
+> Algunas migraciones (1–5) se aplicaron con el MCP de Supabase / SQL Editor antes de
+> versionarlas como fichero; el SQL de esos ficheros se recuperó de
+> `supabase_migrations.schema_migrations` (`statements`) para que el historial remoto y el
+> repo coincidan.
 >
-> **Importante:** al aplicar con el MCP, Supabase registra la versión con la marca de
-> tiempo del momento de aplicación. El nombre del fichero local debe usar **ese mismo
-> prefijo de versión** (`20261012201932`, `20261012201939`) para que la comprobación
-> "Remote migration versions not found in local migrations directory" pase. Si vuelves
-> a aplicar una migración vía MCP, renombra el fichero local con la versión registrada.
+> **Importante:** el nombre del fichero local debe usar **el mismo prefijo de versión** que
+> registra el servidor en `supabase_migrations.schema_migrations`. Si aplicas una migración
+> vía MCP o SQL Editor, renombra el fichero local con la versión registrada (o crea uno
+> nuevo con ese prefijo) para que la comprobación "Supabase Preview" no falle con
+> "Remote migration versions not found in local migrations directory".
 
 ## Cómo aplicar
 
