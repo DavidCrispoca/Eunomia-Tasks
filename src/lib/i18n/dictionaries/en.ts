@@ -381,6 +381,9 @@ const en: Dictionary = {
     scannedStarted: (mode: string) => `${mode} mode activated`,
     scannedEnded: (mode: string, min: number) => `${mode} mode closed · ${min} min`,
     scanError: "The card could not be read or the link is invalid.",
+    scanInvalidToken: "This card isn't registered or has been disabled.",
+    scanNotReady:
+      "Sign in with your account (not a demo session) to use cards.",
     backToModes: "Go to Modes",
     openModes: "Open modes",
     minutes: (n: number) => `${n} min`,

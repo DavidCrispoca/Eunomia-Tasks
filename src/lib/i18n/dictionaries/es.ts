@@ -381,6 +381,9 @@ const es = {
     scannedStarted: (mode: string) => `Modo ${mode} activado`,
     scannedEnded: (mode: string, min: number) => `Modo ${mode} cerrado · ${min} min`,
     scanError: "No se pudo leer la tarjeta o el enlace no es válido.",
+    scanInvalidToken: "Esta tarjeta no está registrada o está desactivada.",
+    scanNotReady:
+      "Inicia sesión con tu cuenta (no una sesión demo) para usar tarjetas.",
     backToModes: "Ir a Modos",
     openModes: "Abrir modos",
     minutes: (n: number) => `${n} min`,

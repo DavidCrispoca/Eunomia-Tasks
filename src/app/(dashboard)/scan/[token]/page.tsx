@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 
 type Outcome =
   | { state: "loading" }
-  | { state: "error" }
+  | { state: "error"; reason: string | null }
   | {
       state: "done";
       action: "started" | "ended";
@@ -41,10 +41,10 @@ export default function ScanPage() {
             minutes: result.action === "ended" ? result.minutes : null,
           });
         } else {
-          setOutcome({ state: "error" });
+          setOutcome({ state: "error", reason: result?.reason ?? null });
         }
       } catch {
-        setOutcome({ state: "error" });
+        setOutcome({ state: "error", reason: null });
       }
     })();
   }, [token, toggle]);
@@ -54,6 +54,15 @@ export default function ScanPage() {
       ? (modes.find((item) => item.code === outcome.modeCode) ?? null)
       : null;
   const modeName = mode ? modeLabel(mode, lang) : "";
+
+  const errorMessage =
+    outcome.state === "error"
+      ? outcome.reason === "invalid-token"
+        ? t.nfc.scanInvalidToken
+        : outcome.reason === "not-ready"
+          ? t.nfc.scanNotReady
+          : t.nfc.scanError
+      : "";
 
   return (
     <section className="mx-auto flex w-full max-w-md flex-col px-4 py-10">
@@ -68,7 +77,7 @@ export default function ScanPage() {
         {outcome.state === "error" && (
           <>
             <XCircle className="text-rose-400" aria-hidden />
-            <p className="text-sm text-foreground">{t.nfc.scanError}</p>
+            <p className="text-sm text-foreground">{errorMessage}</p>
           </>
         )}
 
