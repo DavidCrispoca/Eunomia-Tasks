@@ -12,12 +12,18 @@
 | 1 | `gamification_core` (aplicada vía MCP, Fase 2) | `user_gamification`, `gamification_events`, `achievements`, `user_achievements`, RPC `grant_reward`/`spend_coins`/`level_for_xp`, trigger de perfil y RLS | aplicada |
 | 2 | `campaign_world` (aplicada vía MCP, Fase 3) | `islands`, `campaign_unlocks`, RPC `unlock_island`, seed de islas y RLS | aplicada |
 | 3 | `unlock_island_out_column` + `unlock_island_prefixed_out` (Fase 3) | Fixes del RPC `unlock_island` (columnas OUT con prefijo `s_` por ambigüedad plpgsql) | aplicada |
-| 4 | `20261009120000_tasks_milestone.sql` | `tasks.is_milestone` (hitos → recompensa `milestone`) | aplicada |
-| 5 | `20261009130000_activity_modes_nfc.sql` | Modos + tarjetas NFC + sesiones (Fase 4) | aplicada |
+| 4 | `20261012201932_tasks_milestone.sql` | `tasks.is_milestone` (hitos → recompensa `milestone`) | aplicada |
+| 5 | `20261012201939_activity_modes_nfc.sql` | Modos + tarjetas NFC + sesiones (Fase 4) | aplicada |
 
 > Las migraciones 1–3 se aplicaron con el MCP de Supabase antes de versionarlas como
 > fichero; 4–5 ya están versionadas. Si el proyecto Supabase quedó con 1–3, basta con
 > aplicar 4 y 5.
+>
+> **Importante:** al aplicar con el MCP, Supabase registra la versión con la marca de
+> tiempo del momento de aplicación. El nombre del fichero local debe usar **ese mismo
+> prefijo de versión** (`20261012201932`, `20261012201939`) para que la comprobación
+> "Remote migration versions not found in local migrations directory" pase. Si vuelves
+> a aplicar una migración vía MCP, renombra el fichero local con la versión registrada.
 
 ## Cómo aplicar
 
