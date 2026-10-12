@@ -127,6 +127,27 @@ export async function openSession(
   return toSession(res.data as SessionRow);
 }
 
+/**
+ * Últimas sesiones cerradas del usuario (resumen de tiempo por modo). Solo
+ * sesiones finalizadas: la activa se muestra en el cronómetro del panel.
+ */
+export async function readRecentSessions(
+  userId: string,
+  limit = 8,
+): Promise<NfcSessionView[]> {
+  const client = db();
+  if (!client) return [];
+  const res = await client
+    .from("activity_sessions")
+    .select("id, mode_code, source, started_at, ended_at, minutes")
+    .eq("user_id", userId)
+    .not("ended_at", "is", null)
+    .order("started_at", { ascending: false })
+    .limit(limit);
+  if (res.error || !res.data) return [];
+  return (res.data as SessionRow[]).map(toSession);
+}
+
 /** Cierra una sesión y calcula los minutos efectivos. */
 export async function closeSession(
   userId: string,

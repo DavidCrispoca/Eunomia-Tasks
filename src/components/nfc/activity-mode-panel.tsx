@@ -7,6 +7,7 @@ import { Mascot } from "@/components/mascot/mascot";
 import { Button } from "@/components/ui/button";
 import { ModeSelector } from "./mode-selector";
 import { NfcReaderButton } from "./nfc-reader-button";
+import { RecentSessions } from "./recent-sessions";
 import { formatDuration, useElapsed } from "./use-elapsed";
 import { cn } from "@/lib/utils";
 
@@ -67,6 +68,8 @@ export function ActivityModePanel({ className }: { className?: string }) {
         <p className="text-[12px] text-muted">{t.nfc.scanHint}</p>
         <NfcReaderButton />
       </div>
+
+      <RecentSessions />
     </section>
   );
 }

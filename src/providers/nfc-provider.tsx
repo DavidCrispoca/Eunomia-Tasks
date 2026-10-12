@@ -13,6 +13,7 @@ import { useGamification } from "@/providers/gamification-provider";
 import {
   loadActiveSession,
   loadModes,
+  loadRecentSessions,
   toggleMode,
 } from "@/lib/nfc/actions";
 import {
@@ -27,6 +28,8 @@ interface NfcContextValue {
   modes: ActivityModeView[];
   /** Sesión de actividad abierta (modo activo), o null. */
   active: NfcSessionView | null;
+  /** Últimas sesiones cerradas (tiempo registrado por modo). */
+  sessions: NfcSessionView[];
   /** Hay una operación de activación/desactivación en curso. */
   busy: boolean;
   /** Activa/desactiva un modo por código o por token de tarjeta. */
@@ -44,6 +47,7 @@ export function NfcProvider({ children }: { children: ReactNode }) {
   const { applyAward } = useGamification();
   const [modes, setModes] = useState<ActivityModeView[]>(NFC_MODES);
   const [active, setActive] = useState<NfcSessionView | null>(null);
+  const [sessions, setSessions] = useState<NfcSessionView[]>([]);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -53,6 +57,9 @@ export function NfcProvider({ children }: { children: ReactNode }) {
     });
     void loadActiveSession().then((next) => {
       if (alive) setActive(next);
+    });
+    void loadRecentSessions().then((next) => {
+      if (alive) setSessions(next);
     });
     return () => {
       alive = false;
@@ -70,6 +77,7 @@ export function NfcProvider({ children }: { children: ReactNode }) {
         const result = await toggleMode(input);
         if (result?.ok) {
           setActive(result.action === "ended" ? null : result.session);
+          setSessions(await loadRecentSessions());
           applyAward(result.award);
         }
         return result;
@@ -81,8 +89,8 @@ export function NfcProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo<NfcContextValue>(
-    () => ({ modes, active, busy, toggle, refreshActive }),
-    [modes, active, busy, toggle, refreshActive],
+    () => ({ modes, active, sessions, busy, toggle, refreshActive }),
+    [modes, active, sessions, busy, toggle, refreshActive],
   );
 
   return <NfcContext.Provider value={value}>{children}</NfcContext.Provider>;

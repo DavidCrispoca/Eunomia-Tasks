@@ -9,6 +9,7 @@ import {
   openSession,
   readActiveSession,
   readModes,
+  readRecentSessions,
   resolveTag,
 } from "./repo";
 import {
@@ -43,6 +44,19 @@ export async function loadActiveSession(): Promise<NfcSessionView | null> {
     return await readActiveSession(user.id);
   } catch {
     return null;
+  }
+}
+
+/** Últimas sesiones cerradas (resumen de tiempo registrado por modo). */
+export async function loadRecentSessions(
+  limit = 8,
+): Promise<NfcSessionView[]> {
+  const user = await readyUser();
+  if (!user) return [];
+  try {
+    return await readRecentSessions(user.id, limit);
+  } catch {
+    return [];
   }
 }
 
