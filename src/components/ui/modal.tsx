@@ -52,7 +52,7 @@ export function Modal({ open, onClose, children, className, labelledBy }: ModalP
             role="dialog"
             aria-modal="true"
             className={cn(
-              "surface-raised relative z-10 my-auto w-full max-w-md overflow-hidden rounded-xl",
+              "surface-raised relative z-10 my-auto max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto overscroll-contain rounded-xl",
               className,
             )}
             aria-labelledby={labelledBy}

@@ -48,15 +48,17 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
             {lang === "es" ? "EN" : "ES"}
           </span>
         </Button>
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={() => openCreateTask()}
-          className="ml-1 hidden lg:inline-flex"
-        >
-          <Plus size={14} />
-          <span>{t.kanban.newTask}</span>
-        </Button>
+        <div className="hidden lg:block">
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => openCreateTask()}
+            className="ml-1"
+          >
+            <Plus size={14} />
+            <span>{t.kanban.newTask}</span>
+          </Button>
+        </div>
         <AccountMenu />
       </div>
     </header>

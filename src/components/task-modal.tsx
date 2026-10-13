@@ -216,13 +216,13 @@ export function TaskModal() {
             </span>
             <span
               aria-hidden
-              className={`relative h-5 w-9 shrink-0 rounded-full transition-colors duration-200 ease-out-expo ${
+              className={`relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200 ease-out-expo ${
                 isMilestone ? "bg-gold" : "bg-white/15"
               }`}
             >
               <span
-                className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform duration-200 ease-out-expo ${
-                  isMilestone ? "translate-x-[18px]" : "translate-x-0.5"
+                className={`absolute left-0.5 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-white transition-transform duration-200 ease-out-expo ${
+                  isMilestone ? "translate-x-6" : "translate-x-0"
                 }`}
               />
             </span>

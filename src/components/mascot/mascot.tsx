@@ -23,8 +23,8 @@ const MOTION: Record<MascotState, string> = {
 };
 
 /**
- * Mascota de Eunomia. Renderiza el PNG del arte aprobado
- * (`public/assets/mascot/{species}/{stage}@2x.png`) y cae al SVG provisional
+ * Mascota de Eunomia. Renderiza el WebP del arte aprobado
+ * (`public/assets/mascot/{species}/{stage}.webp`) y cae al SVG provisional
  * (`MascotFallback`) cuando el asset aún no existe, sin romper la UI.
  *
  * `species`/`stage` sobrescriben la selección del usuario (`useMascot`);
@@ -67,8 +67,10 @@ export function Mascot({
       key={src}
       src={src}
       alt={title ?? ""}
+      unoptimized
       width={size}
       height={size}
+      style={{ height: "auto" }}
       aria-hidden={title ? undefined : true}
       onError={() => setBrokenSrc(src)}
       className={cn("shrink-0 object-contain", MOTION[state], className)}
@@ -78,7 +80,7 @@ export function Mascot({
 
 /**
  * Placeholder provisional ("Nomo", ver `docs/visual-identity.md` §6): dibujo SVG
- * con los rasgos canónicos del universo, usado hasta que exista el PNG. Paleta
+ * con los rasgos canónicos del universo, usado hasta que exista el WebP. Paleta
  * del mundo en literales: es arte, no UI.
  */
 function MascotFallback({

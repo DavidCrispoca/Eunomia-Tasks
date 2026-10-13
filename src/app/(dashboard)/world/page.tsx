@@ -15,7 +15,7 @@ export default function WorldPage() {
   const { species, stage, setStage } = useMascot();
 
   return (
-    <section className="flex flex-col gap-6 px-4 sm:px-6 lg:px-8">
+    <section className="flex flex-col gap-6">
       <header className="flex flex-col gap-1">
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">
