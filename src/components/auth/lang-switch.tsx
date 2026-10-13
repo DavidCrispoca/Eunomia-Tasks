@@ -14,7 +14,7 @@ export function LangSwitch() {
         {lang === "es" ? "EN" : "ES"}
       </span>
       <span className="hidden sm:inline">
-        {lang === "es" ? "English" : "EspaÃ±ol"}
+        {lang === "es" ? "English" : "Español"}
       </span>
     </button>
   );

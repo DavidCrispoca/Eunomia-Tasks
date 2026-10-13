@@ -27,6 +27,7 @@ import {
 } from "@/lib/date";
 import { toISODate, todayISO } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useNfc } from "@/providers/nfc-provider";
 
 const PRIORITY_DOT: Record<Task["priority"], string> = {
   low: "bg-violet-300/70",
@@ -56,6 +57,7 @@ interface DeadlineRow {
 
 export function DashboardView() {
   const { tasks, blocks, groups } = useData();
+  const { groupMinutes } = useNfc();
   const { t, lang } = useLanguage();
 
   const data = useMemo(() => {
@@ -113,9 +115,9 @@ export function DashboardView() {
             kind === "overdue"
               ? t.dashboard.overdueBadge
               : kind === "today"
-                ? `Â· ${t.dashboard.todayBadge} Â·`
+                ? `· ${t.dashboard.todayBadge} ·`
                 : kind === "tomorrow"
-                  ? `Â· ${t.dashboard.tomorrowBadge} Â·`
+                  ? `· ${t.dashboard.tomorrowBadge} ·`
                   : "",
         };
       });
@@ -135,7 +137,7 @@ export function DashboardView() {
                 ? sum + (task.focusMinutes ?? 0)
                 : sum,
             0,
-          ),
+          ) + (groupMinutes[group.id] ?? 0),
         }))
         .filter((c) => c.minutes > 0),
       {
@@ -163,7 +165,7 @@ export function DashboardView() {
       hasTasks: tasks.length > 0,
       classFocus,
     };
-  }, [tasks, blocks, t, groups]);
+  }, [tasks, blocks, t, groups, groupMinutes]);
 
   if (!data.hasTasks) {
     return (
@@ -415,7 +417,7 @@ export function DashboardView() {
                       aria-hidden
                     />
                     <span className="shrink-0 font-mono text-[10.5px] text-muted">
-                      {block.start}â€“{block.end}
+                      {block.start}–{block.end}
                     </span>
                     <span className="min-w-0 flex-1 truncate text-foreground/90">
                       {block.title}

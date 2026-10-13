@@ -10,6 +10,7 @@ import { NfcReaderButton } from "./nfc-reader-button";
 import { RecentSessions } from "./recent-sessions";
 import { formatDuration, useElapsed } from "./use-elapsed";
 import { cn } from "@/lib/utils";
+import { SessionSubjectPicker } from "./session-subject-picker";
 
 export function ActivityModePanel({ className }: { className?: string }) {
   const { active, modes, busy, toggle } = useNfc();
@@ -43,6 +44,7 @@ export function ActivityModePanel({ className }: { className?: string }) {
             {formatDuration(elapsed)}
           </p>
           <p className="mt-1 text-[11px] text-muted">{t.nfc.focusRewardHint}</p>
+          <SessionSubjectPicker />
         </div>
         {active && (
           <Button

@@ -82,7 +82,7 @@ export function PomodoroSession({ task }: { task: Task }) {
   useEffect(() => {
     const previous = document.title;
     if (isRunning) {
-      document.title = `${time} Â· ${task.title}`;
+      document.title = `${time} · ${task.title}`;
     }
     return () => {
       document.title = previous;

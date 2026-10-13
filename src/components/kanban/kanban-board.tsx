@@ -70,13 +70,13 @@ export function KanbanBoard() {
   );
 
   // pointerWithin elige el contenedor bajo el cursor: es lo que hace fiable
-  // soltar en una columna vacÃ­a (rectIntersection exige solape real).
+  // soltar en una columna vacía (rectIntersection exige solape real).
   const collisionDetection = useCallback<typeof pointerWithin>(
     (args) => {
       const withinPointer = pointerWithin(args);
       if (withinPointer.length > 0) return withinPointer;
       // Respaldo: si el puntero no cae squarely en un droppable (p.ej. por
-      // scrolls) usamos la intersecciÃ³n de rectÃ¡ngulos mÃ¡s cercana.
+      // scrolls) usamos la intersección de rectángulos más cercana.
       return rectIntersection(args);
     },
     [],
@@ -167,7 +167,7 @@ export function KanbanBoard() {
       .filter((t) => t.status === targetStatus)
       .sort((a, b) => a.order - b.order);
 
-    // Soltada sobre sÃ­ misma sin cambio de columna: nada que hacer.
+    // Soltada sobre sí misma sin cambio de columna: nada que hacer.
     let index = column.findIndex((t) => t.id === over.id);
     if (overIsColumn || index < 0) {
       index = column.length;
@@ -282,7 +282,7 @@ return (
         onDragEnd={handleDragEnd}
         onDragCancel={() => setActiveTask(null)}
       >
-        {/* Barra de pestaÃ±as: solo mÃ³vil. Navega el carrusel de columnas. */}
+        {/* Barra de pestañas: solo móvil. Navega el carrusel de columnas. */}
         <div
           className="flex shrink-0 overflow-x-auto border-b border-white/10 pb-1 md:hidden"
           role="tablist"
@@ -317,9 +317,9 @@ return (
         </div>
 
         {/*
-          Un ÃšNICO conjunto de columnas para desktop y mÃ³vil.
+          Un único conjunto de columnas para desktop y móvil.
           Antes se renderizaban ambos a la vez y ambos registraban droppables
-          con el mismo id en dnd-kit; el montÃ­culo oculto (display:none, rect
+          con el mismo id en dnd-kit; el montículo oculto (display:none, rect
           0x0) ganaba el registro y por eso over siempre era null.
         */}
         <div className="flex min-h-0 flex-1 snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-4 pb-6 md:snap-proximity">

@@ -114,13 +114,13 @@ export function CalendarView() {
   const weekLabel = useMemo(() => {
     const start = formatShortDate(toISODate(weekStart), lang);
     const end = formatShortDate(toISODate(addDays(weekStart, 6)), lang);
-    return `${start} â€“ ${end} Â· ${weekStart.getFullYear()}`;
+    return `${start} – ${end} · ${weekStart.getFullYear()}`;
   }, [weekStart, lang]);
 
   const weekStartISO = toISODate(weekStart);
   const weekEndISO = toISODate(addDays(weekStart, 6));
 
-  // Estado de la conexiÃ³n con Google Calendar (oculto en modo demo).
+  // Estado de la conexión con Google Calendar (oculto en modo demo).
   useEffect(() => {
     if (isDemo) return;
     let cancelled = false;
@@ -407,7 +407,7 @@ interface DayColumnProps {
   onCreateBlock: (date: string) => void;
 }
 
-/** Recorte del evento de Google a la rejilla del dÃ­a (por si cruza dÃ­as). */
+/** Recorte del evento de Google a la rejilla del día (por si cruza días). */
 interface GoogleSpan {
   top: number;
   height: number;
@@ -487,7 +487,7 @@ function DayColumn({
                 {t.calendar.google.badge}
               </span>
               <Clock size={9} />
-              {toHoursMinutes(new Date(event.start))}â€“
+              {toHoursMinutes(new Date(event.start))}–
               {toHoursMinutes(new Date(event.end))}
             </span>
           </>
@@ -545,7 +545,7 @@ function DayColumn({
               <span className="line-clamp-2 font-medium pl-1.5">{block.title}</span>
               <span className="flex items-center gap-1 pl-1.5 font-mono text-[10px] opacity-70">
                 <Clock size={9} />
-                {block.start}â€“{block.end}
+                {block.start}–{block.end}
               </span>
             </button>
           );
@@ -678,7 +678,7 @@ function BlockModal({ open, block, onClose, onSave, onDelete }: BlockModalProps)
                   </option>
                 ))}
               </Select>
-              <span className="text-sm text-muted">â€“</span>
+              <span className="text-sm text-muted">–</span>
               <Select value={end} onChange={(e) => setEnd(e.target.value)} aria-label={t.calendar.to} className="min-h-[44px]">
                 {TIME_OPTIONS.map((o) => (
                   <option key={o} value={o}>
@@ -708,7 +708,7 @@ function BlockModal({ open, block, onClose, onSave, onDelete }: BlockModalProps)
               value={taskId}
               onChange={(e) => setTaskId(e.target.value)}
             >
-              <option value="">â€”</option>
+              <option value="">—</option>
               {tasks.map((task) => (
                 <option key={task.id} value={task.id}>
                   {task.title}

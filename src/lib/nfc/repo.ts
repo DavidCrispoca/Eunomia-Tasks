@@ -28,6 +28,7 @@ interface SessionRow {
   started_at: string;
   ended_at: string | null;
   minutes: number | null;
+  group_id?: string | null;
 }
 
 function toMode(row: ModeRow): ActivityModeView {
@@ -48,6 +49,7 @@ function toSession(row: SessionRow): NfcSessionView {
     startedAt: row.started_at,
     endedAt: row.ended_at,
     minutes: row.minutes === null ? null : Number(row.minutes),
+    groupId: row.group_id ?? null,
   };
 }
 
@@ -90,12 +92,24 @@ export async function readActiveSession(
   if (!client) return null;
   const res = await client
     .from("activity_sessions")
-    .select("id, mode_code, source, started_at, ended_at, minutes")
+    .select("id, mode_code, source, started_at, ended_at, minutes, group_id")
     .eq("user_id", userId)
     .is("ended_at", null)
     .order("started_at", { ascending: false })
     .limit(1)
     .maybeSingle();
+  if (res.error) {
+    const fallback = await client
+      .from("activity_sessions")
+      .select("id, mode_code, source, started_at, ended_at, minutes")
+      .eq("user_id", userId)
+      .is("ended_at", null)
+      .order("started_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (fallback.error || !fallback.data) return null;
+    return toSession(fallback.data as SessionRow);
+  }
   if (res.error || !res.data) return null;
   return toSession(res.data as SessionRow);
 }
@@ -119,8 +133,17 @@ export async function openSession(
       source,
       ref_key: `open:${randomUUID()}`,
     })
-    .select("id, mode_code, source, started_at, ended_at, minutes")
+    .select("id, mode_code, source, started_at, ended_at, minutes, group_id")
     .maybeSingle();
+  if (res.error) {
+    const fallback = await client
+      .from("activity_sessions")
+      .insert({ user_id: userId, mode_code: modeCode, source, ref_key: `open:${randomUUID()}` })
+      .select("id, mode_code, source, started_at, ended_at, minutes")
+      .maybeSingle();
+    if (fallback.error || !fallback.data) return readActiveSession(userId);
+    return toSession(fallback.data as SessionRow);
+  }
   if (res.error || !res.data) {
     return readActiveSession(userId);
   }
@@ -139,13 +162,62 @@ export async function readRecentSessions(
   if (!client) return [];
   const res = await client
     .from("activity_sessions")
-    .select("id, mode_code, source, started_at, ended_at, minutes")
+    .select("id, mode_code, source, started_at, ended_at, minutes, group_id")
     .eq("user_id", userId)
     .not("ended_at", "is", null)
     .order("started_at", { ascending: false })
     .limit(limit);
+  if (res.error) {
+    const fallback = await client
+      .from("activity_sessions")
+      .select("id, mode_code, source, started_at, ended_at, minutes")
+      .eq("user_id", userId)
+      .not("ended_at", "is", null)
+      .order("started_at", { ascending: false })
+      .limit(limit);
+    if (fallback.error || !fallback.data) return [];
+    return (fallback.data as SessionRow[]).map(toSession);
+  }
   if (res.error || !res.data) return [];
   return (res.data as SessionRow[]).map(toSession);
+}
+
+/** Minutos cerrados de enfoque/estudio atribuidos a cada materia. */
+export async function readGroupSessionMinutes(userId: string): Promise<Record<string, number>> {
+  const client = db();
+  if (!client) return {};
+  const res = await client
+    .from("activity_sessions")
+    .select("group_id, minutes")
+    .eq("user_id", userId)
+    .not("ended_at", "is", null)
+    .in("mode_code", ["focus", "study"])
+    .not("group_id", "is", null);
+  if (res.error || !res.data) return {};
+  return res.data.reduce<Record<string, number>>((totals, row) => {
+    if (row.group_id) totals[row.group_id] = (totals[row.group_id] ?? 0) + Number(row.minutes ?? 0);
+    return totals;
+  }, {});
+}
+
+export async function assignSessionGroup(
+  userId: string,
+  sessionId: string,
+  groupId: string | null,
+): Promise<boolean> {
+  const client = db();
+  if (!client) return false;
+  if (groupId) {
+    const group = await client.from("task_groups").select("id").eq("id", groupId).eq("user_id", userId).maybeSingle();
+    if (group.error || !group.data) return false;
+  }
+  const result = await client
+    .from("activity_sessions")
+    .update({ group_id: groupId })
+    .eq("id", sessionId)
+    .eq("user_id", userId)
+    .is("ended_at", null);
+  return !result.error;
 }
 
 /** Cierra una sesión y calcula los minutos efectivos. */
@@ -155,27 +227,46 @@ export async function closeSession(
 ): Promise<{ session: NfcSessionView; minutes: number } | null> {
   const client = db();
   if (!client) return null;
-  const read = await client
+  let read = await client
     .from("activity_sessions")
-    .select("id, mode_code, source, started_at, ended_at, minutes")
+    .select("id, mode_code, source, started_at, ended_at, minutes, group_id")
     .eq("id", sessionId)
     .eq("user_id", userId)
     .is("ended_at", null)
     .maybeSingle();
+  if (read.error) {
+    read = await client
+      .from("activity_sessions")
+      .select("id, mode_code, source, started_at, ended_at, minutes")
+      .eq("id", sessionId)
+      .eq("user_id", userId)
+      .is("ended_at", null)
+      .maybeSingle();
+  }
   if (read.error || !read.data) return null;
 
   const startedAt = new Date((read.data as SessionRow).started_at).getTime();
   const minutes = Math.max(0, Math.floor((Date.now() - startedAt) / 60000));
   const endedAt = new Date().toISOString();
 
-  const res = await client
+  let res = await client
     .from("activity_sessions")
     .update({ ended_at: endedAt, minutes })
     .eq("id", sessionId)
     .eq("user_id", userId)
     .is("ended_at", null)
-    .select("id, mode_code, source, started_at, ended_at, minutes")
+    .select("id, mode_code, source, started_at, ended_at, minutes, group_id")
     .maybeSingle();
+  if (res.error) {
+    res = await client
+      .from("activity_sessions")
+      .update({ ended_at: endedAt, minutes })
+      .eq("id", sessionId)
+      .eq("user_id", userId)
+      .is("ended_at", null)
+      .select("id, mode_code, source, started_at, ended_at, minutes")
+      .maybeSingle();
+  }
   if (res.error || !res.data) return null;
   return { session: toSession(res.data as SessionRow), minutes };
 }

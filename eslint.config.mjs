@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     // Playwright: perfiles de navegador y utilidades de E2E
     ".playwright-profiles/**",
     "scripts/**",
+    // Proyectos de referencia de terceros (no forman parte de la app)
+    "references/**",
   ]),
 ]);
 

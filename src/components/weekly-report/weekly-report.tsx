@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Mascot } from "@/components/mascot/mascot";
 import { cn } from "@/lib/utils";
+import { useNfc } from "@/providers/nfc-provider";
 
 function KpiCard({
   icon,
@@ -130,6 +131,7 @@ function WeeklyGoalEditor({ weekIso }: { weekIso: string }) {
 
 export function WeeklyReport() {
   const { tasks, groups } = useData();
+  const { groupMinutes } = useNfc();
   const { t, lang } = useLanguage();
   const { serverBacked, snapshot, applyAward } = useGamification();
   const locale = lang === "es" ? es : enUS;
@@ -155,13 +157,15 @@ export function WeeklyReport() {
     });
     const maxCount = Math.max(1, ...days.map((d) => d.count));
 
-    const focusTotal = tasks.reduce((sum, task) => sum + (task.focusMinutes ?? 0), 0);
+    const focusTotal = tasks.reduce((sum, task) => sum + (task.focusMinutes ?? 0), 0)
+      + Object.values(groupMinutes).reduce((sum, minutes) => sum + minutes, 0);
     const focusByGroup = groups
       .map((group) => ({
         name: group.name,
         minutes: tasks
           .filter((task) => task.groupId === group.id)
-          .reduce((sum, task) => sum + (task.focusMinutes ?? 0), 0),
+          .reduce((sum, task) => sum + (task.focusMinutes ?? 0), 0)
+          + (groupMinutes[group.id] ?? 0),
       }))
       .filter((entry) => entry.minutes > 0)
       .sort((a, b) => b.minutes - a.minutes)
@@ -177,7 +181,7 @@ export function WeeklyReport() {
       focusByGroup,
       range: `${format(weekStart, "d MMM", { locale })} – ${format(weekEnd, "d MMM", { locale })}`,
     };
-  }, [tasks, groups, locale]);
+  }, [tasks, groups, locale, groupMinutes]);
 
   // La revisión de la semana ya hecha se lee de los eventos reales del servidor
   // (kind `weekly_review` con refId = semana ISO en curso).

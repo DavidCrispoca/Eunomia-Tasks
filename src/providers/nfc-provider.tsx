@@ -10,10 +10,13 @@ import {
   type ReactNode,
 } from "react";
 import { useGamification } from "@/providers/gamification-provider";
+import { useData } from "@/providers/data-provider";
 import {
   loadActiveSession,
   loadModes,
   loadRecentSessions,
+  loadGroupSessionMinutes,
+  assignActiveSessionGroup,
   toggleMode,
 } from "@/lib/nfc/actions";
 import {
@@ -30,6 +33,9 @@ interface NfcContextValue {
   active: NfcSessionView | null;
   /** Últimas sesiones cerradas (tiempo registrado por modo). */
   sessions: NfcSessionView[];
+  groupMinutes: Record<string, number>;
+  groups: ReturnType<typeof useData>["groups"];
+  assignGroup: (groupId: string | null) => Promise<boolean>;
   /** Hay una operación de activación/desactivación en curso. */
   busy: boolean;
   /** Activa/desactiva un modo por código o por token de tarjeta. */
@@ -45,9 +51,11 @@ const NfcContext = createContext<NfcContextValue | null>(null);
 
 export function NfcProvider({ children }: { children: ReactNode }) {
   const { applyAward } = useGamification();
+  const { groups } = useData();
   const [modes, setModes] = useState<ActivityModeView[]>(NFC_MODES);
   const [active, setActive] = useState<NfcSessionView | null>(null);
   const [sessions, setSessions] = useState<NfcSessionView[]>([]);
+  const [groupMinutes, setGroupMinutes] = useState<Record<string, number>>({});
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -61,6 +69,9 @@ export function NfcProvider({ children }: { children: ReactNode }) {
     void loadRecentSessions().then((next) => {
       if (alive) setSessions(next);
     });
+    void loadGroupSessionMinutes().then((next) => {
+      if (alive) setGroupMinutes(next);
+    });
     return () => {
       alive = false;
     };
@@ -68,6 +79,15 @@ export function NfcProvider({ children }: { children: ReactNode }) {
 
   const refreshActive = useCallback(async () => {
     setActive(await loadActiveSession());
+  }, []);
+
+  const assignGroup = useCallback(async (groupId: string | null) => {
+    const ok = await assignActiveSessionGroup(groupId);
+    if (ok) {
+      setActive(await loadActiveSession());
+      setGroupMinutes(await loadGroupSessionMinutes());
+    }
+    return ok;
   }, []);
 
   const toggle = useCallback<NfcContextValue["toggle"]>(
@@ -78,6 +98,7 @@ export function NfcProvider({ children }: { children: ReactNode }) {
         if (result?.ok) {
           setActive(result.action === "ended" ? null : result.session);
           setSessions(await loadRecentSessions());
+          setGroupMinutes(await loadGroupSessionMinutes());
           applyAward(result.award);
         }
         return result;
@@ -89,8 +110,8 @@ export function NfcProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo<NfcContextValue>(
-    () => ({ modes, active, sessions, busy, toggle, refreshActive }),
-    [modes, active, sessions, busy, toggle, refreshActive],
+    () => ({ modes, active, sessions, groupMinutes, groups, assignGroup, busy, toggle, refreshActive }),
+    [modes, active, sessions, groupMinutes, groups, assignGroup, busy, toggle, refreshActive],
   );
 
   return <NfcContext.Provider value={value}>{children}</NfcContext.Provider>;

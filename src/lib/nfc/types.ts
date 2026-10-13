@@ -19,6 +19,7 @@ export interface NfcSessionView {
   startedAt: string;
   endedAt: string | null;
   minutes: number | null;
+  groupId: string | null;
 }
 
 export type ToggleErrorKind =

@@ -237,14 +237,7 @@ const en: Dictionary = {
     subtitle: "Campaign map and your explorer mascot.",
     prototype: "Campaigns",
     prototypeNote: "Spend Euno Coins to unlock islands. Each area opens a new route.",
-    statesTitle: "Nomo · states",
     mapTitle: "Campaign map",
-    mascot: {
-      chill: "Chill",
-      work: "Work mode",
-      sleep: "Sleeping",
-      learn: "Learning mode",
-    },
     biomeCoast: "Serene Coast",
     coins: "Euno Coins",
     islandCoast: "Serene Coast",
@@ -257,13 +250,27 @@ const en: Dictionary = {
     insufficientBalance: (missing: number) => `You need ${missing} more Euno Coins`,
     pathHint: "The path opens when the island is unlocked",
   },
+  mascot: {
+    label: "Mascot",
+    openMenu: "Choose mascot",
+    stageLabel: "Stage",
+    species: {
+      pegaso: "Pegasus",
+      lechuza: "Owl",
+      fenix: "Phoenix",
+    },
+    stages: {
+      bebe: "Baby",
+      adulto: "Adult",
+    },
+  },
   report: {
     title: "Weekly report",
     subtitle: "Your real activity for the week at a glance.",
     week: "Week",
     narrative:
       "A summary from your real tasks and sessions. The numbers come from your data; the illustration is decorative only.",
-    mascotAlt: "Nomo, the Eunomia mascot",
+    mascotAlt: "Your Eunomia mascot",
     completed: "Completed",
     completedHint: "this week",
     pending: "Pending",
@@ -387,6 +394,9 @@ const en: Dictionary = {
     backToModes: "Go to Modes",
     openModes: "Open modes",
     minutes: (n: number) => `${n} min`,
+    subjectLabel: "Subject for this session",
+    noSubject: "No subject",
+    subjectHint: "Focus and Study time will be added to the selected subject.",
   },
 };
 

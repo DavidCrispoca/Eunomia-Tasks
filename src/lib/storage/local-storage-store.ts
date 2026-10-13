@@ -1,4 +1,5 @@
 import type { Language, Task, TaskGroup, TimeBlock } from "@/types";
+import type { MascotSelection } from "@/lib/mascot/types";
 import { hhmmToMinutes } from "@/lib/utils";
 import type { DataStore } from "@/lib/storage/store";
 
@@ -6,6 +7,7 @@ export const TASKS_KEY = "eunomia:tasks";
 export const BLOCKS_KEY = "eunomia:blocks";
 export const GROUPS_KEY = "eunomia:groups";
 export const LANG_KEY = "eunomia:lang";
+export const MASCOT_KEY = "eunomia:mascot";
 export const WEEKLY_GOAL_PREFIX = "eunomia:weeklyGoal:";
 
 type Listener = () => void;
@@ -85,6 +87,22 @@ export const localStorageStore: DataStore = {
     }
   },
 };
+
+/**
+ * Mascota seleccionada por el usuario. Se guarda como JSON y se expone como
+ * string crudo para que `useSyncExternalStore` tenga un snapshot estable.
+ */
+export function readMascotRaw(): string {
+  try {
+    return localStorage.getItem(MASCOT_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+export function saveMascot(selection: MascotSelection) {
+  writeJson(MASCOT_KEY, selection);
+}
 
 /**
  * Lee el idioma tolerando el formato antiguo (crudo: `en`/`es`) y el actual

@@ -6,10 +6,12 @@ import { awardFocusForUser } from "@/lib/gamification/repo";
 import type { AwardResult } from "@/lib/gamification/rules";
 import {
   closeSession,
+  assignSessionGroup as persistSessionGroup,
   openSession,
   readActiveSession,
   readModes,
   readRecentSessions,
+  readGroupSessionMinutes,
   resolveTag,
 } from "./repo";
 import {
@@ -58,6 +60,22 @@ export async function loadRecentSessions(
   } catch {
     return [];
   }
+}
+
+export async function loadGroupSessionMinutes(): Promise<Record<string, number>> {
+  const user = await readyUser();
+  if (!user) return {};
+  try { return await readGroupSessionMinutes(user.id); } catch { return {}; }
+}
+
+export async function assignActiveSessionGroup(groupId: string | null): Promise<boolean> {
+  const user = await readyUser();
+  if (!user || (groupId !== null && (typeof groupId !== "string" || groupId.length > 100))) return false;
+  try {
+    const active = await readActiveSession(user.id);
+    if (!active || !["focus", "study"].includes(active.modeCode)) return false;
+    return await persistSessionGroup(user.id, active.id, groupId);
+  } catch { return false; }
 }
 
 /**

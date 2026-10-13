@@ -16,6 +16,7 @@
 | 5 | `20261009044541_unlock_island_out_column.sql` + `20261009044557_unlock_island_prefixed_out.sql` | Fixes del RPC `unlock_island` (columnas OUT con prefijo `s_` por ambigüedad plpgsql) | aplicada |
 | 6 | `20261012201932_tasks_milestone.sql` | `tasks.is_milestone` (hitos → recompensa `milestone`) | aplicada |
 | 7 | `20261012201939_activity_modes_nfc.sql` | Modos + tarjetas NFC + sesiones (Fase 4) | aplicada |
+| 8 | `20261012210000_activity_session_subject.sql` | Asignación opcional de sesiones Focus/Study a una materia (`task_groups`) | pendiente de aplicar |
 
 > Todas las migraciones del historial remoto tienen su fichero local, con el **mismo
 > prefijo de versión** que `supabase_migrations.schema_migrations` (necesario para que la

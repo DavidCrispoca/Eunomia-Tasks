@@ -238,14 +238,7 @@ const es = {
     prototype: "Campañas",
     prototypeNote:
       "Desbloquea islas con Euno Coins. Cada zona abre una nueva ruta.",
-    statesTitle: "Nomo · estados",
     mapTitle: "Mapa de campaña",
-    mascot: {
-      chill: "Chill",
-      work: "Modo trabajo",
-      sleep: "Durmiendo",
-      learn: "Modo estudio",
-    },
     biomeCoast: "Costa Serena",
     coins: "Euno Coins",
     islandCoast: "Costa Serena",
@@ -258,13 +251,27 @@ const es = {
     insufficientBalance: (missing: number) => `Te faltan ${missing} Euno Coins`,
     pathHint: "La ruta se abre al desbloquear la isla",
   },
+  mascot: {
+    label: "Mascota",
+    openMenu: "Elegir mascota",
+    stageLabel: "Etapa",
+    species: {
+      pegaso: "Pegaso",
+      lechuza: "Lechuza",
+      fenix: "Fénix",
+    },
+    stages: {
+      bebe: "Bebé",
+      adulto: "Adulto",
+    },
+  },
   report: {
     title: "Informe de la semana",
     subtitle: "Tu actividad real de la semana, en un vistazo.",
     week: "Semana",
     narrative:
       "Un resumen a partir de tus tareas y sesiones reales. Las cifras proceden de tus datos; la ilustración es solo decorativa.",
-    mascotAlt: "Nomo, la mascota de Eunomia",
+    mascotAlt: "Tu mascota de Eunomia",
     completed: "Completadas",
     completedHint: "esta semana",
     pending: "Pendientes",
@@ -387,6 +394,9 @@ const es = {
     backToModes: "Ir a Modos",
     openModes: "Abrir modos",
     minutes: (n: number) => `${n} min`,
+    subjectLabel: "Materia para esta sesión",
+    noSubject: "Sin materia",
+    subjectHint: "El tiempo de Enfoque y Estudio se sumará a la materia elegida.",
   },
 };
 

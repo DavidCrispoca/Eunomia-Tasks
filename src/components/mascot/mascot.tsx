@@ -1,22 +1,19 @@
+"use client";
+
+import Image from "next/image";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useMascot } from "@/lib/mascot/provider";
+import {
+  hasMascotArt,
+  mascotAssetPath,
+  type MascotSpecies,
+  type MascotStage,
+} from "@/lib/mascot/types";
 
 export type MascotState = "chill" | "work" | "sleep" | "learn";
 
 export const MASCOT_STATES: MascotState[] = ["chill", "work", "sleep", "learn"];
-
-/**
- * Placeholder provisional de "Nomo" (ver `docs/visual-identity.md` §6).
- * Dibujo SVG con los rasgos canónicos; se reemplazará por el asset aprobado
- * sin cambiar la API del componente. Paleta del mundo en literales: es arte,
- * no UI (los tokens de mundo no viven en `globals.css` hasta su aprobación).
- */
-const INK = "#2b2620";
-const SCARF = "#3e6ae0";
-const FUR = "#e6d2a4";
-const FUR_DEEP = "#d8bf8a";
-const SATCHEL = "#c07a55";
-const GOLD = "#e0ad47";
-const PAGE = "#f2ead6";
 
 const MOTION: Record<MascotState, string> = {
   chill: "world-float",
@@ -25,17 +22,84 @@ const MOTION: Record<MascotState, string> = {
   learn: "world-sway",
 };
 
+/**
+ * Mascota de Eunomia. Renderiza el PNG del arte aprobado
+ * (`public/assets/mascot/{species}/{stage}@2x.png`) y cae al SVG provisional
+ * (`MascotFallback`) cuando el asset aún no existe, sin romper la UI.
+ *
+ * `species`/`stage` sobrescriben la selección del usuario (`useMascot`);
+ * `state` solo afecta al SVG de respaldo (poses provisionales).
+ */
 export function Mascot({
   state = "chill",
   size = 160,
   className,
   title,
+  species,
+  stage,
 }: {
   state?: MascotState;
   size?: number;
   className?: string;
   title?: string;
+  species?: MascotSpecies;
+  stage?: MascotStage;
 }) {
+  const selection = useMascot();
+  const activeSpecies = species ?? selection.species;
+  const activeStage = stage ?? selection.stage;
+  const src = mascotAssetPath(activeSpecies, activeStage);
+  const [brokenSrc, setBrokenSrc] = useState<string | null>(null);
+
+  if (!hasMascotArt(activeSpecies) || brokenSrc === src) {
+    return (
+      <MascotFallback
+        state={state}
+        size={size}
+        className={className}
+        title={title}
+      />
+    );
+  }
+
+  return (
+    <Image
+      key={src}
+      src={src}
+      alt={title ?? ""}
+      width={size}
+      height={size}
+      aria-hidden={title ? undefined : true}
+      onError={() => setBrokenSrc(src)}
+      className={cn("shrink-0 object-contain", MOTION[state], className)}
+    />
+  );
+}
+
+/**
+ * Placeholder provisional ("Nomo", ver `docs/visual-identity.md` §6): dibujo SVG
+ * con los rasgos canónicos del universo, usado hasta que exista el PNG. Paleta
+ * del mundo en literales: es arte, no UI.
+ */
+function MascotFallback({
+  state,
+  size,
+  className,
+  title,
+}: {
+  state: MascotState;
+  size: number;
+  className?: string;
+  title?: string;
+}) {
+  const INK = "#2b2620";
+  const SCARF = "#3e6ae0";
+  const FUR = "#e6d2a4";
+  const FUR_DEEP = "#d8bf8a";
+  const SATCHEL = "#c07a55";
+  const GOLD = "#e0ad47";
+  const PAGE = "#f2ead6";
+
   const sleeping = state === "sleep";
   const working = state === "work";
   const learning = state === "learn";

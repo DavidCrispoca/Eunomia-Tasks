@@ -8,6 +8,7 @@ import { useLanguage } from "@/lib/i18n";
 import { useNfc } from "@/providers/nfc-provider";
 import { modeLabel } from "@/lib/nfc/types";
 import { Button } from "@/components/ui/button";
+import { SessionSubjectPicker } from "@/components/nfc/session-subject-picker";
 
 type Outcome =
   | { state: "loading" }
@@ -89,6 +90,7 @@ export default function ScanPage() {
                 ? t.nfc.scannedEnded(modeName, outcome.minutes ?? 0)
                 : t.nfc.scannedStarted(modeName)}
             </p>
+            {outcome.action === "started" && <SessionSubjectPicker />}
           </>
         )}
 

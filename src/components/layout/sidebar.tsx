@@ -78,7 +78,7 @@ export function Sidebar({ onOpenPalette }: { onOpenPalette: () => void }) {
               {lang === "es" ? "EN" : "ES"}
             </span>
           }
-          label={lang === "es" ? "English" : "EspaÃ±ol"}
+          label={lang === "es" ? "English" : "Español"}
           onClick={toggleLanguage}
         />
         <Button

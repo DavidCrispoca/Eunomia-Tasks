@@ -6,6 +6,7 @@ import { UiProvider } from "@/providers/ui-provider";
 import { GamificationProvider } from "@/providers/gamification-provider";
 import { NfcProvider } from "@/providers/nfc-provider";
 import { LanguageProvider } from "@/lib/i18n";
+import { MascotProvider } from "@/lib/mascot/provider";
 import { AuthProvider } from "@/lib/auth/provider";
 import type { AppUser } from "@/types";
 import type { CloudData } from "@/lib/data/mappers";
@@ -38,18 +39,20 @@ export function AppProviders({
       syncToCloud={Boolean(initialData)}
       initialLanguage={initialData?.language ?? undefined}
     >
-      <AuthProvider initialUser={initialUser}>
-        <DataProvider initialData={initialData ?? null}>
-          <GamificationProvider
-            initialData={initialGamification ?? null}
-            initialDoneIds={initialDoneIds}
-          >
-            <NfcProvider>
-              <UiProvider>{children}</UiProvider>
-            </NfcProvider>
-          </GamificationProvider>
-        </DataProvider>
-      </AuthProvider>
+      <MascotProvider>
+        <AuthProvider initialUser={initialUser}>
+          <DataProvider initialData={initialData ?? null}>
+            <GamificationProvider
+              initialData={initialGamification ?? null}
+              initialDoneIds={initialDoneIds}
+            >
+              <NfcProvider>
+                <UiProvider>{children}</UiProvider>
+              </NfcProvider>
+            </GamificationProvider>
+          </DataProvider>
+        </AuthProvider>
+      </MascotProvider>
     </LanguageProvider>
   );
 }

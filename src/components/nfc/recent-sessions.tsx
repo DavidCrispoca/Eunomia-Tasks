@@ -21,7 +21,7 @@ function formatWhen(iso: string, lang: Language): string {
 
 /** Últimas sesiones cerradas: evidencia del tiempo registrado por modo. */
 export function RecentSessions({ className }: { className?: string }) {
-  const { sessions, modes } = useNfc();
+  const { sessions, modes, groups } = useNfc();
   const { t, lang } = useLanguage();
 
   return (
@@ -46,6 +46,11 @@ export function RecentSessions({ className }: { className?: string }) {
                 </span>
                 <span className="min-w-0 flex-1 truncate text-[13px] text-foreground">
                   {mode ? modeLabel(mode, lang) : session.modeCode}
+                  {session.groupId && groups.find((group) => group.id === session.groupId) && (
+                    <span className="ml-1 text-[11px] text-muted">
+                      · {groups.find((group) => group.id === session.groupId)?.name}
+                    </span>
+                  )}
                 </span>
                 <span className="text-tabular text-[12px] text-muted">
                   {formatWhen(session.startedAt, lang)}

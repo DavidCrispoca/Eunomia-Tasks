@@ -168,7 +168,7 @@ export function FlightControls({ disabled, onStart }: FlightControlsProps) {
               <option value="">{t.pomodoro.selectAirport}</option>
               {AIRPORTS.map((a) => (
                 <option key={a.iata} value={a.iata}>
-                  {a.iata} Â· {a.city} ({a.country})
+                  {a.iata} · {a.city} ({a.country})
                 </option>
               ))}
             </Select>
@@ -186,7 +186,7 @@ export function FlightControls({ disabled, onStart }: FlightControlsProps) {
               <option value="">{t.pomodoro.selectAirport}</option>
               {AIRPORTS.map((a) => (
                 <option key={a.iata} value={a.iata}>
-                  {a.iata} Â· {a.city} ({a.country})
+                  {a.iata} · {a.city} ({a.country})
                 </option>
               ))}
             </Select>
@@ -198,7 +198,7 @@ export function FlightControls({ disabled, onStart }: FlightControlsProps) {
               {t.pomodoro.flightDuration}
             </span>
             <span className="font-mono text-[13px] font-semibold text-violet-200">
-              {flight ? formatFlightDuration(flight.durationMin) : "â€”â€”"}
+              {flight ? formatFlightDuration(flight.durationMin) : "——"}
             </span>
           </div>
         </div>

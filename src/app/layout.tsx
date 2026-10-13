@@ -23,6 +23,7 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://eunomia-tasks.vercel.app"),
   title: "Eunomia Tasks",
   description:
     "Gestión de tareas, productividad personal y planificación del tiempo.",

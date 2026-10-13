@@ -11,6 +11,7 @@ import { TaskModal } from "@/components/task-modal";
 import { PomodoroProvider } from "@/providers/pomodoro-provider";
 import { PomodoroChip } from "@/components/pomodoro/pomodoro-chip";
 import { CelebrationLayer } from "@/components/gamification/celebration-layer";
+import { RemotionCelebrationOverlay } from "@/components/remotion/celebration-overlay";
 import { useUi } from "@/providers/ui-provider";
 
 export default function DashboardLayout({
@@ -51,6 +52,7 @@ export default function DashboardLayout({
         <TaskModal />
         <PomodoroChip />
         <CelebrationLayer />
+        <RemotionCelebrationOverlay />
         <UrlHandlers />
       </div>
     </PomodoroProvider>
