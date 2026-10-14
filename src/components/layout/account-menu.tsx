@@ -2,15 +2,17 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ChevronDown, LogOut } from "lucide-react";
+import { Bell, ChevronDown, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth/provider";
 import { useLanguage } from "@/lib/i18n";
 import { logout } from "@/lib/auth/actions";
 import { cn } from "@/lib/utils";
+import { useBrowserNotifications } from "@/providers/browser-notifications-provider";
 
 export function AccountMenu() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { permission, enable, notify } = useBrowserNotifications();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
@@ -37,6 +39,34 @@ export function AccountMenu() {
 
   const displayName = user.name ?? user.email ?? "";
   const initial = (displayName.charAt(0) || "?").toUpperCase();
+
+  async function manageNotifications() {
+    if (permission === "granted") {
+      await notify(t.account.notificationTestTitle, {
+        body: t.account.notificationTestBody,
+        tag: "eunomia-notification-test",
+      });
+      return;
+    }
+    if (permission === "default") await enable();
+  }
+
+  const notificationLabel =
+    permission === "granted"
+      ? t.account.notificationsEnabled
+      : permission === "denied"
+        ? t.account.notificationsBlocked
+        : permission === "unsupported"
+          ? t.account.notificationsUnsupported
+          : t.account.notificationsEnable;
+  const notificationCaption =
+    permission === "granted"
+      ? t.account.notificationsTestHint
+      : permission === "denied"
+        ? t.account.notificationsBlockedHint
+        : permission === "unsupported"
+          ? t.account.notificationsUnsupportedHint
+          : t.account.notificationsEnableHint;
 
   return (
     <div className="relative" ref={containerRef}>
@@ -97,6 +127,12 @@ export function AccountMenu() {
             </div>
 
             <div className="p-1.5">
+              <AccountMenuItem
+                icon={<Bell size={14} />}
+                label={notificationLabel}
+                caption={notificationCaption}
+                onClick={() => void manageNotifications()}
+              />
               <form action={logout} className="border-t border-white/10 pt-1.5">
                 <AccountMenuItem
                   type="submit"

@@ -76,13 +76,15 @@ export function Modal({ open, onClose, children, className, labelledBy }: ModalP
 export function ModalHeader({
   title,
   onClose,
+  titleId,
 }: {
   title: string;
   onClose: () => void;
+  titleId?: string;
 }) {
   return (
     <div className="flex items-center justify-between border-b border-white/10 px-5 py-3.5">
-      <h2 className="text-[15px] font-semibold tracking-tight">{title}</h2>
+      <h2 id={titleId} className="text-[15px] font-semibold tracking-tight">{title}</h2>
       <Button
         variant="ghost"
         size="icon"

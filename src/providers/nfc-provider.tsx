@@ -18,6 +18,7 @@ import {
   loadGroupSessionMinutes,
   assignActiveSessionGroup,
   toggleMode,
+  verifyOverlongSession,
 } from "@/lib/nfc/actions";
 import {
   NFC_MODES,
@@ -26,6 +27,10 @@ import {
   type NfcSessionView,
   type ToggleResult,
 } from "@/lib/nfc/types";
+import { OverlongSessionReview } from "@/components/nfc/overlong-session-review";
+import { useBrowserNotifications } from "@/providers/browser-notifications-provider";
+import { useLanguage } from "@/lib/i18n";
+import { modeLabel } from "@/lib/nfc/types";
 
 interface NfcContextValue {
   modes: ActivityModeView[];
@@ -45,12 +50,15 @@ interface NfcContextValue {
     source?: NfcSessionSource;
   }) => Promise<ToggleResult | null>;
   refreshActive: () => Promise<void>;
+  verifySession: (sessionId: string, minutes: number) => Promise<boolean>;
 }
 
 const NfcContext = createContext<NfcContextValue | null>(null);
 
 export function NfcProvider({ children }: { children: ReactNode }) {
   const { applyAward } = useGamification();
+  const { lang, t } = useLanguage();
+  const { notify, closeNotification } = useBrowserNotifications();
   const { groups } = useData();
   const [modes, setModes] = useState<ActivityModeView[]>(NFC_MODES);
   const [active, setActive] = useState<NfcSessionView | null>(null);
@@ -81,6 +89,25 @@ export function NfcProvider({ children }: { children: ReactNode }) {
     setActive(await loadActiveSession());
   }, []);
 
+  const verifySession = useCallback(async (sessionId: string, minutes: number) => {
+    setBusy(true);
+    try {
+      const result = await verifyOverlongSession(sessionId, minutes);
+      if (!result.ok) {
+        setActive(await loadActiveSession());
+        return false;
+      }
+      setActive(null);
+      setSessions(await loadRecentSessions());
+      setGroupMinutes(await loadGroupSessionMinutes());
+      applyAward(result.award);
+      await closeNotification("eunomia-activity-mode");
+      return true;
+    } finally {
+      setBusy(false);
+    }
+  }, [applyAward, closeNotification]);
+
   const assignGroup = useCallback(async (groupId: string | null) => {
     const ok = await assignActiveSessionGroup(groupId);
     if (ok) {
@@ -99,22 +126,36 @@ export function NfcProvider({ children }: { children: ReactNode }) {
           setActive(result.action === "ended" ? null : result.session);
           setSessions(await loadRecentSessions());
           setGroupMinutes(await loadGroupSessionMinutes());
-          applyAward(result.award);
+          if (result.action !== "verification-required") applyAward(result.award);
+          if (result.action === "started") {
+            void notify(t.nfc.activityNotificationTitle, {
+              body: t.nfc.activityNotificationBody(modeLabel(result.mode, lang)),
+              tag: "eunomia-activity-mode",
+              url: "/pomodoro",
+            });
+          } else if (result.action === "ended") {
+            await closeNotification("eunomia-activity-mode");
+          }
         }
         return result;
       } finally {
         setBusy(false);
       }
     },
-    [applyAward],
+    [applyAward, closeNotification, lang, notify, t],
   );
 
   const value = useMemo<NfcContextValue>(
-    () => ({ modes, active, sessions, groupMinutes, groups, assignGroup, busy, toggle, refreshActive }),
-    [modes, active, sessions, groupMinutes, groups, assignGroup, busy, toggle, refreshActive],
+    () => ({ modes, active, sessions, groupMinutes, groups, assignGroup, busy, toggle, refreshActive, verifySession }),
+    [modes, active, sessions, groupMinutes, groups, assignGroup, busy, toggle, refreshActive, verifySession],
   );
 
-  return <NfcContext.Provider value={value}>{children}</NfcContext.Provider>;
+  return (
+    <NfcContext.Provider value={value}>
+      {children}
+      <OverlongSessionReview />
+    </NfcContext.Provider>
+  );
 }
 
 export function useNfc() {

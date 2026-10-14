@@ -5,6 +5,7 @@ import { DataProvider } from "@/providers/data-provider";
 import { UiProvider } from "@/providers/ui-provider";
 import { GamificationProvider } from "@/providers/gamification-provider";
 import { NfcProvider } from "@/providers/nfc-provider";
+import { BrowserNotificationsProvider } from "@/providers/browser-notifications-provider";
 import { LanguageProvider } from "@/lib/i18n";
 import { MascotProvider } from "@/lib/mascot/provider";
 import { AuthProvider } from "@/lib/auth/provider";
@@ -46,9 +47,11 @@ export function AppProviders({
               initialData={initialGamification ?? null}
               initialDoneIds={initialDoneIds}
             >
-              <NfcProvider>
-                <UiProvider>{children}</UiProvider>
-              </NfcProvider>
+              <BrowserNotificationsProvider>
+                <NfcProvider>
+                  <UiProvider>{children}</UiProvider>
+                </NfcProvider>
+              </BrowserNotificationsProvider>
             </GamificationProvider>
           </DataProvider>
         </AuthProvider>

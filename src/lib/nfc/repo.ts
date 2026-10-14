@@ -7,6 +7,7 @@ import {
   type ActivityModeView,
   type NfcSessionSource,
   type NfcSessionView,
+  activityLimitMinutes,
 } from "./types";
 
 function db(): SupabaseClient | null {
@@ -224,6 +225,7 @@ export async function assignSessionGroup(
 export async function closeSession(
   userId: string,
   sessionId: string,
+  approvedMinutes?: number,
 ): Promise<{ session: NfcSessionView; minutes: number } | null> {
   const client = db();
   if (!client) return null;
@@ -246,8 +248,18 @@ export async function closeSession(
   if (read.error || !read.data) return null;
 
   const startedAt = new Date((read.data as SessionRow).started_at).getTime();
-  const minutes = Math.max(0, Math.floor((Date.now() - startedAt) / 60000));
-  const endedAt = new Date().toISOString();
+  const elapsedMilliseconds = Math.max(0, Date.now() - startedAt);
+  const session = read.data as SessionRow;
+  const maxMinutes = activityLimitMinutes(session.mode_code);
+  const isOverLimit = elapsedMilliseconds > maxMinutes * 60_000;
+  if (isOverLimit !== (approvedMinutes !== undefined)) return null;
+  if (approvedMinutes !== undefined && (
+    !Number.isInteger(approvedMinutes) || approvedMinutes < 1 || approvedMinutes > maxMinutes
+  )) return null;
+  const minutes = approvedMinutes ?? Math.floor(elapsedMilliseconds / 60_000);
+  const endedAt = approvedMinutes === undefined
+    ? new Date().toISOString()
+    : new Date(startedAt + minutes * 60_000).toISOString();
 
   let res = await client
     .from("activity_sessions")

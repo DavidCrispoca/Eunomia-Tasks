@@ -15,7 +15,7 @@ type Outcome =
   | { state: "error"; reason: string | null }
   | {
       state: "done";
-      action: "started" | "ended";
+      action: "started" | "ended" | "verification-required";
       modeCode: string;
       minutes: number | null;
     };
@@ -88,7 +88,9 @@ export default function ScanPage() {
             <p className="text-sm font-medium text-foreground">
               {outcome.action === "ended"
                 ? t.nfc.scannedEnded(modeName, outcome.minutes ?? 0)
-                : t.nfc.scannedStarted(modeName)}
+                : outcome.action === "verification-required"
+                  ? t.nfc.reviewRequired
+                  : t.nfc.scannedStarted(modeName)}
             </p>
             {outcome.action === "started" && <SessionSubjectPicker />}
           </>

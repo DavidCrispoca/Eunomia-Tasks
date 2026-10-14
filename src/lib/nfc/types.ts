@@ -22,6 +22,15 @@ export interface NfcSessionView {
   groupId: string | null;
 }
 
+export const DEFAULT_ACTIVITY_LIMIT_MINUTES = 8 * 60;
+export const SLEEP_ACTIVITY_LIMIT_MINUTES = 12 * 60;
+
+export function activityLimitMinutes(modeCode: string): number {
+  return modeCode === "sleep"
+    ? SLEEP_ACTIVITY_LIMIT_MINUTES
+    : DEFAULT_ACTIVITY_LIMIT_MINUTES;
+}
+
 export type ToggleErrorKind =
   | "not-ready"
   | "unknown"
@@ -44,6 +53,13 @@ export type ToggleResult =
       session: NfcSessionView;
       minutes: number;
       award: AwardResult | null;
+    }
+  | {
+      ok: true;
+      action: "verification-required";
+      mode: ActivityModeView;
+      session: NfcSessionView;
+      maxMinutes: number;
     }
   | { ok: false; reason: ToggleErrorKind };
 

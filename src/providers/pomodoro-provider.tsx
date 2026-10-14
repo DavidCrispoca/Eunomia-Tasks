@@ -13,6 +13,7 @@ import {
 import { useLanguage } from "@/lib/i18n";
 import { useData } from "@/providers/data-provider";
 import { useGamification } from "@/providers/gamification-provider";
+import { useBrowserNotifications } from "@/providers/browser-notifications-provider";
 import {
   playBackgroundAudio,
   stopBackgroundAudio,
@@ -133,6 +134,7 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   const { t } = useLanguage();
   const { tasks, updateTask } = useData();
   const { noteFocusSession } = useGamification();
+  const { notify, closeNotification } = useBrowserNotifications();
   const [session, setSession] = useState<StoredPomodoro | null>(() =>
     loadSession(),
   );
@@ -194,20 +196,14 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     [noteFocusSession],
   );
 
-  const notifyFinished = useCallback(
-    (finished: StoredPomodoro) => {
-      if (typeof window === "undefined" || !("Notification" in window)) return;
-      if (Notification.permission !== "granted") return;
-      try {
-        new Notification(t.pomodoro.timeUp, {
-          body: `${finished.title} — ${t.pomodoro.finishNotifyBody}`,
-        });
-      } catch {
-        // Notification failed; the in-app chip still shows the finished state.
-      }
-    },
-    [t],
-  );
+  const notifyFinished = useCallback((finished: StoredPomodoro) => {
+    void notify(t.pomodoro.timeUp, {
+      body: `${finished.title} — ${t.pomodoro.finishNotifyBody}`,
+      tag: "eunomia-pomodoro",
+      url: `/pomodoro/${finished.taskId}`,
+      renotify: true,
+    });
+  }, [notify, t]);
 
   useEffect(() => {
     if (!running) return;
@@ -256,15 +252,13 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
       setSession(created);
       setNow(Date.now());
       playChimeSound("start");
-      if (
-        typeof window !== "undefined" &&
-        "Notification" in window &&
-        Notification.permission === "default"
-      ) {
-        void Notification.requestPermission().catch(() => undefined);
-      }
+    void notify(t.account.pomodoroStartedTitle, {
+        body: t.account.pomodoroStartedBody(task.title, durationMin),
+        tag: "eunomia-pomodoro",
+        url: `/pomodoro/${task.id}`,
+      });
     },
-    [],
+    [notify, t],
   );
 
   const pause = useCallback(() => {
@@ -280,7 +274,12 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     saveSession(paused);
     setSession(paused);
     playChimeSound("pause");
-  }, []);
+    void notify(t.account.pomodoroPausedTitle, {
+      body: t.account.pomodoroPausedBody(current.title),
+      tag: "eunomia-pomodoro",
+      url: `/pomodoro/${current.taskId}`,
+    });
+  }, [notify, t]);
 
   const resume = useCallback(() => {
     const current = sessionRef.current;
@@ -295,7 +294,12 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     setSession(resumed);
     setNow(Date.now());
     playChimeSound("start");
-  }, []);
+    void notify(t.account.pomodoroResumedTitle, {
+      body: t.account.pomodoroResumedBody(current.title),
+      tag: "eunomia-pomodoro",
+      url: `/pomodoro/${current.taskId}`,
+    });
+  }, [notify, t]);
 
   const dismiss = useCallback(() => {
     const current = sessionRef.current;
@@ -306,7 +310,8 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     saveSession(null);
     setSession(null);
     stopBackgroundAudio();
-  }, [logFocus]);
+    void closeNotification("eunomia-pomodoro");
+  }, [logFocus, closeNotification]);
 
   const changeAmbience = useCallback((ambience: AmbienceType) => {
     const current = sessionRef.current;
